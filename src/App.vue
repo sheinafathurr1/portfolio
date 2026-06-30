@@ -35,6 +35,21 @@ onUnmounted(() => {
   window.removeEventListener('mousemove', updateMousePosition)
   window.removeEventListener('scroll', handleScroll)
 })
+
+const particles = [
+  { w: 'w-1 h-1',     color: 'bg-blue-400/30',   left: '7%',  top: '12%', dur: 4.2, delay: 0 },
+  { w: 'w-1.5 h-1.5', color: 'bg-violet-400/25',  left: '18%', top: '58%', dur: 6.1, delay: 1.3 },
+  { w: 'w-1 h-1',     color: 'bg-cyan-400/30',    left: '33%', top: '22%', dur: 5.0, delay: 0.7 },
+  { w: 'w-2 h-2',     color: 'bg-blue-300/20',    left: '48%', top: '72%', dur: 7.2, delay: 2.1 },
+  { w: 'w-1 h-1',     color: 'bg-violet-300/25',  left: '62%', top: '38%', dur: 4.7, delay: 1.6 },
+  { w: 'w-1.5 h-1.5', color: 'bg-cyan-300/25',    left: '76%', top: '18%', dur: 5.6, delay: 0.4 },
+  { w: 'w-1 h-1',     color: 'bg-blue-400/25',    left: '87%', top: '62%', dur: 6.3, delay: 2.6 },
+  { w: 'w-2 h-2',     color: 'bg-violet-400/20',  left: '41%', top: '86%', dur: 4.1, delay: 1.0 },
+  { w: 'w-1 h-1',     color: 'bg-cyan-400/25',    left: '13%', top: '78%', dur: 5.3, delay: 3.1 },
+  { w: 'w-1.5 h-1.5', color: 'bg-blue-300/25',    left: '91%', top: '33%', dur: 6.8, delay: 1.9 },
+  { w: 'w-1 h-1',     color: 'bg-violet-400/20',  left: '55%', top: '10%', dur: 5.8, delay: 0.9 },
+  { w: 'w-1.5 h-1.5', color: 'bg-cyan-300/20',    left: '25%', top: '44%', dur: 4.9, delay: 2.4 },
+]
 </script>
 
 <template>
@@ -73,6 +88,21 @@ onUnmounted(() => {
         opacity: 0.35;
       "
     ></div>
+
+    <!-- Floating particles -->
+    <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+      <div
+        v-for="(p, i) in particles"
+        :key="i"
+        :class="['absolute rounded-full', p.w, p.color]"
+        :style="{
+          left: p.left,
+          top: p.top,
+          animation: `float ${p.dur}s ease-in-out infinite`,
+          animationDelay: `${p.delay}s`,
+        }"
+      ></div>
+    </div>
 
     <!-- Corner glows -->
     <div class="fixed top-0 right-0 w-[700px] h-[700px] pointer-events-none z-0 opacity-40 dark:opacity-25">
