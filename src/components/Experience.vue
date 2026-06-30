@@ -1,24 +1,27 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-
-const experiences = ref<any>([])
-const isLoading = ref(true)
-
-const fetchExperiences = async () => {
-  try {
-    const response = await fetch('http://localhost:8000/api/experiences')
-    const result = await response.json()
-    experiences.value = result.data
-  } catch (error) {
-    console.error('Gagal mengambil data pengalaman:', error)
-  } finally {
-    isLoading.value = false
-  }
-}
-
-onMounted(() => {
-  fetchExperiences()
-})
+const experiences = [
+  {
+    id: 1,
+    title: 'Tenaga Lepas Harian (TLH)',
+    company: 'CoE CAATIS',
+    period: 'Jan 2026 – Sekarang',
+    description: 'Mengelola infrastruktur operasional secara menyeluruh, termasuk pengawasan performa server dan manajemen backup data berkala. Bertanggung jawab dalam mengoordinasikan penugasan teknis harian untuk tim.',
+  },
+  {
+    id: 2,
+    title: 'Peneliti AI & Mahasiswa S2IF',
+    company: 'Telkom University',
+    period: '2025 – Sekarang',
+    description: 'Menjalankan riset akademik jenjang magister Informatika dengan fokus pada arsitektur Dynamic API, Machine Learning, dan keamanan siber. Aktif memetakan arsitektur sistem menggunakan metodologi Design Science Research (DSR).',
+  },
+  {
+    id: 3,
+    title: 'Lead Developer',
+    company: 'HEI APP',
+    period: 'Maret 2026 – Sekarang',
+    description: 'Membangun dan mendokumentasikan sistem aplikasi HEI APP untuk mendigitalkan alur proses evaluasi karakter mahasiswa serta mengintegrasikan nilai-nilai universitas secara terpusat.',
+  },
+]
 </script>
 
 <template>
@@ -34,17 +37,7 @@ onMounted(() => {
         <div class="w-16 h-1 bg-gradient-to-r from-blue-500 to-cyan-500 mx-auto rounded-full"></div>
       </div>
 
-      <div v-if="isLoading" class="text-center py-20 relative z-10">
-        <div class="inline-flex items-center gap-3 text-blue-500 font-mono">
-          <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          Memuat data pengalaman...
-        </div>
-      </div>
-
-      <div v-else class="relative z-10">
+      <div class="relative z-10">
         <!-- Vertical line -->
         <div class="absolute left-[19px] md:left-[23px] top-2 bottom-2 w-px bg-gradient-to-b from-blue-500 via-gray-200 dark:via-gray-700 to-transparent"></div>
 

@@ -1,30 +1,40 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 
-const projects = ref<any>([])
-const isLoading = ref(true)
+const projects = [
+  {
+    id: 1,
+    title: 'Arsitektur Dynamic API & TOPSIS',
+    category: 'riset',
+    shortDesc: 'Pengembangan Metode Pemeringkatan Publikasi Ilmiah Multi-Kriteria pada Arsitektur Dynamic API Menggunakan Pendekatan SQL-Driven Berbasis TOPSIS.',
+    fullDesc: 'Penelitian metodologi Design Science Research (DSR) yang berfokus pada sintesis artefak dan riset terbaru. Mengembangkan pemeringkatan publikasi ilmiah multi-kriteria menggunakan pendekatan SQL-Driven berbasis TOPSIS. Pendekatan ini dirancang untuk memproses data evaluasi secara lebih dinamis dan terstruktur pada database.',
+    tags: ['Design Science', 'SQL-Driven', 'TOPSIS'],
+  },
+  {
+    id: 2,
+    title: 'Automasi Ekstraksi Data Jurnal',
+    category: 'development',
+    shortDesc: 'Membangun arsitektur workflow n8n yang diintegrasikan dengan Google Gemini API dan trigger Telegram.',
+    fullDesc: 'Membangun arsitektur workflow n8n yang diintegrasikan dengan Google Gemini API dan trigger Telegram untuk mengekstrak, meringkas, dan memproses data jurnal secara otomatis. Pipeline ini secara signifikan mengurangi beban kerja manual dengan membiarkan AI menangani ekstraksi poin-poin krusial dari dokumen.',
+    tags: ['n8n', 'Gemini API', 'Telegram Bot'],
+  },
+  {
+    id: 3,
+    title: 'Prototype Streaming & IoT',
+    category: 'development',
+    shortDesc: 'Pengembangan prototipe aplikasi mobile untuk streaming video latensi rendah berbasis WebRTC.',
+    fullDesc: 'Membangun prototipe aplikasi mobile menggunakan Flutter yang diintegrasikan dengan perangkat keras IoT (drone). Sistem ini memanfaatkan WebRTC dan Firebase untuk menghasilkan streaming video real-time dengan latensi yang sangat rendah untuk kebutuhan pengawasan visual.',
+    tags: ['Flutter', 'WebRTC', 'Firebase', 'IoT'],
+  },
+]
 
 const activeCategory = ref('semua')
 const isModalOpen = ref(false)
 const selectedProject = ref<any>(null)
 
-const fetchProjects = async () => {
-  try {
-    const response = await fetch('http://localhost:8000/api/projects')
-    const result = await response.json()
-    projects.value = result.data
-  } catch (error) {
-    console.error('Gagal mengambil data proyek:', error)
-  } finally {
-    isLoading.value = false
-  }
-}
-
-fetchProjects()
-
 const filteredProjects = computed(() => {
-  if (activeCategory.value === 'semua') return projects.value
-  return projects.value.filter((p: any) => p.category === activeCategory.value)
+  if (activeCategory.value === 'semua') return projects
+  return projects.filter((p) => p.category === activeCategory.value)
 })
 
 const openModal = (project: any) => {
@@ -78,19 +88,8 @@ const categories = [
         </button>
       </div>
 
-      <!-- Loading state -->
-      <div v-if="isLoading" class="text-center py-20">
-        <div class="inline-flex items-center gap-3 text-blue-500 font-mono">
-          <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          Memuat data proyek...
-        </div>
-      </div>
-
       <!-- Project grid -->
-      <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div
           v-for="(project, index) in filteredProjects"
           :key="project.id"
