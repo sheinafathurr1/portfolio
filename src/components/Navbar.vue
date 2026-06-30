@@ -1,12 +1,38 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 
 const isDark = ref(true)
 const isMenuOpen = ref(false)
 const activeSection = ref('about')
 const isScrolled = ref(false)
 
-const sections = ['about', 'experience', 'skills', 'projects', 'contact']
+const navItems = [
+  { id: 'about',      label: 'Tentang' },
+  { id: 'experience', label: 'Pengalaman' },
+  { id: 'skills',     label: 'Keahlian' },
+  { id: 'projects',   label: 'Proyek' },
+]
+
+const sections = navItems.map(i => i.id).concat('contact')
+
+// Sliding pill
+const navRef = ref<HTMLElement>()
+const pillLeft = ref(0)
+const pillWidth = ref(0)
+const pillReady = ref(false)
+
+const syncPill = () => {
+  if (!navRef.value) return
+  const el = navRef.value.querySelector(`[data-nav="${activeSection.value}"]`) as HTMLElement | null
+  if (!el) return
+  const containerRect = navRef.value.getBoundingClientRect()
+  const elRect = el.getBoundingClientRect()
+  pillLeft.value = elRect.left - containerRect.left
+  pillWidth.value = elRect.width
+  pillReady.value = true
+}
+
+watch(activeSection, () => nextTick(syncPill))
 
 const toggleTheme = () => {
   isDark.value = !isDark.value
@@ -19,17 +45,11 @@ const toggleTheme = () => {
   }
 }
 
-const toggleMenu = () => {
-  isMenuOpen.value = !isMenuOpen.value
-}
-
-const closeMenu = () => {
-  isMenuOpen.value = false
-}
+const toggleMenu = () => { isMenuOpen.value = !isMenuOpen.value }
+const closeMenu = () => { isMenuOpen.value = false }
 
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 20
-
   for (const id of [...sections].reverse()) {
     const el = document.getElementById(id)
     if (el && window.scrollY >= el.offsetTop - 120) {
@@ -48,11 +68,10 @@ onMounted(() => {
     localStorage.setItem('theme', 'dark')
   }
   window.addEventListener('scroll', handleScroll, { passive: true })
+  nextTick(syncPill)
 })
 
-onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll)
-})
+onUnmounted(() => window.removeEventListener('scroll', handleScroll))
 </script>
 
 <template>
@@ -65,45 +84,45 @@ onUnmounted(() => {
     ]"
   >
     <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+
       <!-- Logo -->
       <a
         href="#"
         @click="closeMenu"
-        class="text-xl font-black text-gray-900 dark:text-white tracking-widest transition-colors z-50 relative flex items-center gap-1"
+        class="text-xl font-black tracking-widest transition-colors z-50 relative flex items-center gap-1 text-gray-900 dark:text-white group"
       >
-        <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-cyan-500">SW</span><span>ITCH</span><span class="text-blue-500">.</span>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-cyan-500 group-hover:from-blue-400 group-hover:to-cyan-400 transition-all">SW</span><span>ITCH</span><span class="text-blue-500 group-hover:text-cyan-400 transition-colors">.</span>
       </a>
 
-      <!-- Menu Desktop -->
-      <div class="hidden md:flex gap-1 text-gray-600 dark:text-gray-300 font-medium items-center">
+      <!-- Desktop nav -->
+      <div ref="navRef" class="hidden md:flex gap-1 text-gray-600 dark:text-gray-300 font-medium items-center relative py-1">
+        <!-- Sliding pill background -->
+        <div
+          v-if="pillReady"
+          class="absolute top-0 bottom-0 bg-blue-50 dark:bg-blue-500/10 rounded-lg pointer-events-none transition-[left,width] duration-300 ease-out"
+          :style="{ left: `${pillLeft}px`, width: `${pillWidth}px` }"
+        ></div>
+
         <a
-          v-for="item in [
-            { id: 'about', label: 'Tentang' },
-            { id: 'experience', label: 'Pengalaman' },
-            { id: 'skills', label: 'Keahlian' },
-            { id: 'projects', label: 'Proyek' },
-          ]"
+          v-for="item in navItems"
           :key="item.id"
           :href="`#${item.id}`"
+          :data-nav="item.id"
           :class="[
-            'relative px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200',
+            'relative px-3 py-1.5 rounded-lg text-sm font-medium transition-colors duration-200 z-10 select-none',
             activeSection === item.id
-              ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10'
-              : 'hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800/60'
+              ? 'text-blue-600 dark:text-blue-400'
+              : 'hover:text-gray-900 dark:hover:text-white'
           ]"
         >
           {{ item.label }}
-          <span
-            v-if="activeSection === item.id"
-            class="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-blue-500 rounded-full"
-          ></span>
         </a>
 
-        <!-- Download CV -->
+        <!-- CV download -->
         <a
           href="/cv-switch.pdf"
           target="_blank"
-          class="flex items-center gap-1.5 text-sm font-semibold text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/30 bg-blue-50 dark:bg-blue-500/10 px-4 py-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-colors ml-2"
+          class="relative z-10 flex items-center gap-1.5 text-sm font-semibold text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/30 bg-blue-50 dark:bg-blue-500/10 px-4 py-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-colors ml-1"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
@@ -118,6 +137,7 @@ onUnmounted(() => {
         <button
           @click="toggleTheme"
           class="p-2 rounded-lg bg-white/60 dark:bg-gray-800/60 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700 backdrop-blur-sm"
+          :title="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
         >
           <svg v-if="!isDark" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
             <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
@@ -127,11 +147,11 @@ onUnmounted(() => {
           </svg>
         </button>
 
-        <!-- Hubungi CTA -->
+        <!-- Contact CTA -->
         <a
           href="#contact"
           @click="closeMenu"
-          class="hidden sm:flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-lg font-semibold transition-all duration-300 text-sm shadow-md shadow-blue-500/20"
+          class="hidden sm:flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-lg font-semibold transition-all duration-300 text-sm shadow-md shadow-blue-500/20 hover:-translate-y-0.5"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
@@ -139,10 +159,11 @@ onUnmounted(() => {
           Kontak
         </a>
 
-        <!-- Hamburger Mobile -->
+        <!-- Hamburger mobile -->
         <button
           @click="toggleMenu"
-          class="md:hidden p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
+          class="md:hidden p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 transition-colors"
+          aria-label="Toggle menu"
         >
           <svg v-if="!isMenuOpen" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
@@ -154,32 +175,27 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- Dropdown Mobile -->
+    <!-- Mobile dropdown -->
     <transition
       enter-active-class="transition duration-200 ease-out"
-      enter-from-class="transform -translate-y-4 opacity-0"
-      enter-to-class="transform translate-y-0 opacity-100"
+      enter-from-class="opacity-0 -translate-y-2"
+      enter-to-class="opacity-100 translate-y-0"
       leave-active-class="transition duration-150 ease-in"
-      leave-from-class="transform translate-y-0 opacity-100"
-      leave-to-class="transform -translate-y-4 opacity-0"
+      leave-from-class="opacity-100 translate-y-0"
+      leave-to-class="opacity-0 -translate-y-2"
     >
       <div
         v-if="isMenuOpen"
-        class="md:hidden absolute top-full left-0 w-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 shadow-xl"
+        class="md:hidden absolute top-full left-0 w-full bg-white/96 dark:bg-gray-900/96 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 shadow-xl"
       >
-        <div class="flex flex-col px-4 py-6 space-y-2 text-center">
+        <div class="flex flex-col px-4 py-6 space-y-1.5 text-center">
           <a
-            v-for="item in [
-              { id: 'about', label: 'Tentang' },
-              { id: 'experience', label: 'Pengalaman' },
-              { id: 'skills', label: 'Keahlian' },
-              { id: 'projects', label: 'Proyek' },
-            ]"
+            v-for="item in navItems"
             :key="item.id"
             :href="`#${item.id}`"
             @click="closeMenu"
             :class="[
-              'px-4 py-2.5 rounded-lg font-medium text-sm transition-colors',
+              'px-4 py-2.5 rounded-xl font-medium text-sm transition-colors',
               activeSection === item.id
                 ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10'
                 : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
@@ -204,7 +220,7 @@ onUnmounted(() => {
           <a
             href="#contact"
             @click="closeMenu"
-            class="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-4 py-2.5 rounded-lg font-semibold mt-1"
+            class="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-4 py-2.5 rounded-xl font-semibold mt-1"
           >
             Hubungi Saya
           </a>

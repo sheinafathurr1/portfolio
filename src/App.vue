@@ -7,15 +7,41 @@ import Skills from './components/Skills.vue'
 import Projects from './components/Projects.vue'
 import Contact from './components/Contact.vue'
 import Stats from './components/Stats.vue'
+import Achievements from './components/Achievements.vue'
 
+// Scroll & spotlight
 const mouseX = ref(0)
 const mouseY = ref(0)
 const scrollProgress = ref(0)
 const showBackToTop = ref(false)
 
+// Custom cursor
+const dotX = ref(0)
+const dotY = ref(0)
+const ringX = ref(0)
+const ringY = ref(0)
+const cursorVisible = ref(false)
+const cursorExpanded = ref(false)
+let rafId = 0
+
 const updateMousePosition = (e: MouseEvent) => {
   mouseX.value = e.clientX
   mouseY.value = e.clientY
+  dotX.value = e.clientX
+  dotY.value = e.clientY
+  if (!cursorVisible.value) {
+    ringX.value = e.clientX
+    ringY.value = e.clientY
+    cursorVisible.value = true
+  }
+  const t = e.target as HTMLElement
+  cursorExpanded.value = !!(t.closest('a, button, [role="button"], [tabindex]'))
+}
+
+const animateRing = () => {
+  ringX.value += (dotX.value - ringX.value) * 0.14
+  ringY.value += (dotY.value - ringY.value) * 0.14
+  rafId = requestAnimationFrame(animateRing)
 }
 
 const handleScroll = () => {
@@ -29,11 +55,17 @@ const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 onMounted(() => {
   window.addEventListener('mousemove', updateMousePosition)
   window.addEventListener('scroll', handleScroll, { passive: true })
+  if (window.innerWidth >= 1024) {
+    document.documentElement.classList.add('custom-cursor')
+    rafId = requestAnimationFrame(animateRing)
+  }
 })
 
 onUnmounted(() => {
   window.removeEventListener('mousemove', updateMousePosition)
   window.removeEventListener('scroll', handleScroll)
+  document.documentElement.classList.remove('custom-cursor')
+  cancelAnimationFrame(rafId)
 })
 
 const particles = [
@@ -73,20 +105,12 @@ const particles = [
     <!-- Dot grid light -->
     <div
       class="fixed inset-0 z-0 pointer-events-none dark:hidden"
-      style="
-        background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
-        background-size: 30px 30px;
-        opacity: 0.35;
-      "
+      style="background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px); background-size: 30px 30px; opacity: 0.35;"
     ></div>
     <!-- Dot grid dark -->
     <div
       class="fixed inset-0 z-0 pointer-events-none hidden dark:block"
-      style="
-        background-image: radial-gradient(circle, #1e3a5f 1px, transparent 1px);
-        background-size: 30px 30px;
-        opacity: 0.35;
-      "
+      style="background-image: radial-gradient(circle, #1e3a5f 1px, transparent 1px); background-size: 30px 30px; opacity: 0.35;"
     ></div>
 
     <!-- Floating particles -->
@@ -95,12 +119,7 @@ const particles = [
         v-for="(p, i) in particles"
         :key="i"
         :class="['absolute rounded-full', p.w, p.color]"
-        :style="{
-          left: p.left,
-          top: p.top,
-          animation: `float ${p.dur}s ease-in-out infinite`,
-          animationDelay: `${p.delay}s`,
-        }"
+        :style="{ left: p.left, top: p.top, animation: `float ${p.dur}s ease-in-out infinite`, animationDelay: `${p.delay}s` }"
       ></div>
     </div>
 
@@ -123,6 +142,7 @@ const particles = [
         <Experience />
         <Skills />
         <Projects />
+        <Achievements />
       </main>
       <Contact />
     </div>
@@ -135,16 +155,38 @@ const particles = [
         aria-label="Kembali ke atas"
         class="fixed bottom-8 right-8 z-50 w-11 h-11 bg-gradient-to-br from-blue-600 to-cyan-500 text-white rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/50 hover:scale-110 transition-all duration-300 flex items-center justify-center group"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5 group-hover:-translate-y-0.5 transition-transform duration-200"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:-translate-y-0.5 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7" />
         </svg>
       </button>
     </Transition>
+
+    <!-- Custom cursor (desktop only) -->
+    <div class="pointer-events-none fixed inset-0 z-[9999] hidden lg:block" aria-hidden="true">
+      <!-- Lagging ring -->
+      <div
+        class="absolute rounded-full border-2 border-blue-500/50 transition-[width,height,border-color,background-color] duration-200"
+        :class="cursorExpanded ? 'w-12 h-12 border-blue-400 bg-blue-500/8' : 'w-7 h-7'"
+        :style="{
+          left: `${ringX}px`,
+          top: `${ringY}px`,
+          transform: 'translate(-50%, -50%)',
+          opacity: cursorVisible ? 1 : 0,
+          transition: 'width 0.2s ease, height 0.2s ease, border-color 0.2s ease, background-color 0.2s ease, opacity 0.4s ease',
+        }"
+      ></div>
+      <!-- Center dot -->
+      <div
+        class="absolute rounded-full bg-blue-500 transition-[width,height] duration-150"
+        :class="cursorExpanded ? 'w-1.5 h-1.5 bg-blue-400' : 'w-1.5 h-1.5'"
+        :style="{
+          left: `${dotX}px`,
+          top: `${dotY}px`,
+          transform: 'translate(-50%, -50%)',
+          opacity: cursorVisible ? 1 : 0,
+          transition: 'width 0.15s ease, height 0.15s ease, opacity 0.3s ease',
+        }"
+      ></div>
+    </div>
   </div>
 </template>
