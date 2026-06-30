@@ -8,6 +8,9 @@ import Projects from './components/Projects.vue'
 import Contact from './components/Contact.vue'
 import Stats from './components/Stats.vue'
 import Achievements from './components/Achievements.vue'
+import Preloader from './components/Preloader.vue'
+import CommandPalette from './components/CommandPalette.vue'
+import SectionNav from './components/SectionNav.vue'
 
 // Scroll & spotlight
 const mouseX = ref(0)
@@ -88,6 +91,9 @@ const particles = [
   <div
     class="bg-gray-50 dark:bg-[#050813] min-h-screen text-gray-900 dark:text-gray-100 selection:bg-blue-500/30 overflow-x-hidden transition-colors duration-300 relative"
   >
+    <!-- Preloader -->
+    <Preloader />
+
     <!-- Scroll progress bar -->
     <div
       class="fixed top-0 left-0 z-[100] h-[2px] bg-gradient-to-r from-blue-500 via-cyan-400 to-violet-500 transition-[width] duration-150 ease-out"
@@ -147,6 +153,9 @@ const particles = [
       <Contact />
     </div>
 
+    <!-- Section navigation dots (xl only) -->
+    <SectionNav />
+
     <!-- Back to top button -->
     <Transition name="back-top">
       <button
@@ -160,6 +169,9 @@ const particles = [
         </svg>
       </button>
     </Transition>
+
+    <!-- Command Palette -->
+    <CommandPalette />
 
     <!-- Custom cursor (desktop only) -->
     <div class="pointer-events-none fixed inset-0 z-[9999] hidden lg:block" aria-hidden="true">

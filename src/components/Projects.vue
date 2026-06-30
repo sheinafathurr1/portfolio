@@ -7,7 +7,7 @@ const projects = [
     title: 'Arsitektur Dynamic API & TOPSIS',
     category: 'riset',
     gradient: 'from-violet-600 via-purple-500 to-indigo-600',
-    glowColor: 'hover:shadow-violet-500/15',
+    glowColor: 'hover:shadow-violet-500/20',
     borderHover: 'hover:border-violet-500/60',
     icon: '🔬',
     year: '2025',
@@ -20,7 +20,7 @@ const projects = [
     title: 'Automasi Ekstraksi Data Jurnal',
     category: 'development',
     gradient: 'from-blue-600 via-cyan-500 to-sky-500',
-    glowColor: 'hover:shadow-blue-500/15',
+    glowColor: 'hover:shadow-blue-500/20',
     borderHover: 'hover:border-blue-500/60',
     icon: '🤖',
     year: '2025',
@@ -33,7 +33,7 @@ const projects = [
     title: 'Prototype Streaming & IoT',
     category: 'development',
     gradient: 'from-emerald-600 via-teal-500 to-cyan-600',
-    glowColor: 'hover:shadow-emerald-500/15',
+    glowColor: 'hover:shadow-emerald-500/20',
     borderHover: 'hover:border-emerald-500/60',
     icon: '📡',
     year: '2026',
@@ -76,6 +76,32 @@ const categories = [
   { id: 'riset', label: 'Riset Akademik', count: projects.filter(p => p.category === 'riset').length },
   { id: 'development', label: 'Sistem Aplikasi', count: projects.filter(p => p.category === 'development').length },
 ]
+
+// 3D tilt per card
+const tilts = ref<Record<number, { x: number; y: number }>>(
+  Object.fromEntries(projects.map(p => [p.id, { x: 0, y: 0 }]))
+)
+
+const handleCardMouseMove = (e: MouseEvent, id: number) => {
+  const card = e.currentTarget as HTMLElement
+  const rect = card.getBoundingClientRect()
+  const dx = (e.clientX - (rect.left + rect.width / 2)) / (rect.width / 2)
+  const dy = (e.clientY - (rect.top + rect.height / 2)) / (rect.height / 2)
+  tilts.value[id] = { x: -dy * 7, y: dx * 7 }
+}
+
+const handleCardMouseLeave = (id: number) => {
+  tilts.value[id] = { x: 0, y: 0 }
+}
+
+const cardStyle = (id: number) => {
+  const t = tilts.value[id] ?? { x: 0, y: 0 }
+  const isResting = t.x === 0 && t.y === 0
+  return {
+    transform: `perspective(900px) rotateX(${t.x}deg) rotateY(${t.y}deg)`,
+    transition: isResting ? 'transform 0.55s ease, box-shadow 0.3s ease' : 'transform 0.1s ease',
+  }
+}
 </script>
 
 <template>
@@ -121,7 +147,7 @@ const categories = [
         </button>
       </div>
 
-      <!-- Project grid with TransitionGroup for filter animation -->
+      <!-- Project grid -->
       <TransitionGroup
         name="project-list"
         tag="div"
@@ -131,33 +157,31 @@ const categories = [
           v-for="(project, index) in filteredProjects"
           :key="project.id"
           @click="openModal(project)"
+          @mousemove="handleCardMouseMove($event, project.id)"
+          @mouseleave="handleCardMouseLeave(project.id)"
           :data-aos-delay="index * 80"
           data-aos="fade-up"
+          :style="cardStyle(project.id)"
           :class="[
-            'group relative bg-white/80 dark:bg-gray-900/60 backdrop-blur-md rounded-2xl border border-gray-200/50 dark:border-gray-700/50 transition-all duration-300 hover:-translate-y-2 shadow-md hover:shadow-xl shadow-black/5 dark:shadow-black/20 cursor-pointer flex flex-col overflow-hidden',
+            'group relative bg-white/80 dark:bg-gray-900/60 backdrop-blur-md rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-md hover:shadow-xl shadow-black/5 dark:shadow-black/20 cursor-pointer flex flex-col overflow-hidden will-change-transform',
             project.borderHover,
             project.glowColor,
           ]"
         >
           <!-- Gradient header -->
           <div :class="['h-32 relative overflow-hidden flex-shrink-0 bg-gradient-to-br', project.gradient]">
-            <!-- Dot pattern -->
             <div
               class="absolute inset-0 opacity-20"
               style="background-image: radial-gradient(circle, white 1px, transparent 1px); background-size: 18px 18px;"
             ></div>
-            <!-- Decorative blobs -->
             <div class="absolute -top-6 -right-6 w-24 h-24 bg-white/20 rounded-full blur-xl"></div>
             <div class="absolute bottom-0 -left-4 w-20 h-20 bg-black/15 rounded-full blur-xl"></div>
-            <!-- Big icon -->
             <div class="absolute inset-0 flex items-center justify-center text-6xl opacity-25 select-none group-hover:opacity-35 group-hover:scale-110 transition-all duration-500">
               {{ project.icon }}
             </div>
-            <!-- Year badge -->
             <div class="absolute top-3 left-3 bg-black/25 backdrop-blur-sm text-white text-[10px] font-bold font-mono px-2 py-1 rounded-lg">
               {{ project.year }}
             </div>
-            <!-- Number -->
             <div class="absolute top-3 right-3 text-white/40 text-xs font-mono font-bold group-hover:text-white/60 transition-colors">
               #{{ String(project.id).padStart(2, '0') }}
             </div>
@@ -165,7 +189,6 @@ const categories = [
 
           <!-- Content -->
           <div class="p-6 flex flex-col flex-grow">
-            <!-- Category badge -->
             <div
               :class="[
                 'inline-flex items-center gap-1.5 text-xs font-bold font-mono uppercase px-2.5 py-1 rounded-md mb-3 w-fit',
@@ -184,7 +207,6 @@ const categories = [
               {{ project.shortDesc }}
             </p>
 
-            <!-- Tags -->
             <div class="flex flex-wrap gap-1.5 mb-4">
               <span
                 v-for="tag in project.tags"
@@ -195,7 +217,6 @@ const categories = [
               </span>
             </div>
 
-            <!-- Read more -->
             <div class="flex items-center gap-1.5 text-xs font-semibold text-gray-400 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors mt-auto">
               <span>Lihat Detail</span>
               <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -217,7 +238,6 @@ const categories = [
             v-if="selectedProject"
             class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700/80 rounded-t-2xl sm:rounded-2xl max-w-2xl w-full relative z-10 shadow-2xl overflow-hidden"
           >
-            <!-- Modal gradient header -->
             <div :class="['h-40 relative overflow-hidden bg-gradient-to-br', selectedProject.gradient]">
               <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle, white 1px, transparent 1px); background-size: 20px 20px;"></div>
               <div class="absolute -top-10 -right-10 w-40 h-40 bg-white/20 rounded-full blur-2xl"></div>
@@ -225,7 +245,6 @@ const categories = [
               <div class="absolute inset-0 flex items-center justify-center text-8xl opacity-20 select-none">
                 {{ selectedProject.icon }}
               </div>
-              <!-- Close -->
               <button
                 @click="closeModal"
                 class="absolute top-4 right-4 text-white/70 hover:text-white bg-black/25 hover:bg-black/45 backdrop-blur-sm rounded-xl w-9 h-9 flex items-center justify-center transition-all"
@@ -234,11 +253,9 @@ const categories = [
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
               </button>
-              <!-- ESC hint -->
               <div class="absolute bottom-3 right-4 text-white/40 text-[10px] font-mono">ESC to close</div>
             </div>
 
-            <!-- Body -->
             <div class="p-7 md:p-8">
               <div
                 :class="[

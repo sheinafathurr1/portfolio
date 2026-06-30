@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const formData = ref({
   name: '',
@@ -7,7 +7,13 @@ const formData = ref({
   message: '',
 })
 
+const maxChars = 500
+const charCount = computed(() => formData.value.message.length)
+const charRemaining = computed(() => maxChars - charCount.value)
+
 const isSubmitting = ref(false)
+const emailCopied = ref(false)
+let emailCopyTimer: ReturnType<typeof setTimeout>
 
 const toastVisible = ref(false)
 const toastMessage = ref('')
@@ -19,9 +25,7 @@ const showToast = (msg: string, type: 'success' | 'error') => {
   toastMessage.value = msg
   toastType.value = type
   toastVisible.value = true
-  toastTimer = setTimeout(() => {
-    toastVisible.value = false
-  }, 4000)
+  toastTimer = setTimeout(() => { toastVisible.value = false }, 4000)
 }
 
 const accessKey = '1a9ce086-062c-4623-aa28-623947941fc4'
@@ -46,6 +50,14 @@ const submitForm = async () => {
   } finally {
     isSubmitting.value = false
   }
+}
+
+const copyEmailToClipboard = () => {
+  navigator.clipboard.writeText('sheinafathur@gmail.com').then(() => {
+    clearTimeout(emailCopyTimer)
+    emailCopied.value = true
+    emailCopyTimer = setTimeout(() => { emailCopied.value = false }, 2500)
+  }).catch(() => {})
 }
 
 const socialLinks = [
@@ -92,7 +104,7 @@ const socialLinks = [
       </div>
 
       <!-- Social quick links -->
-      <div data-aos="fade-up" data-aos-delay="100" class="flex justify-center gap-4 mb-12">
+      <div data-aos="fade-up" data-aos-delay="100" class="flex justify-center gap-4 mb-6 flex-wrap">
         <a
           v-for="social in socialLinks"
           :key="social.label"
@@ -104,6 +116,27 @@ const socialLinks = [
           <span v-html="social.icon"></span>
           {{ social.label }}
         </a>
+      </div>
+
+      <!-- Copy email chip -->
+      <div data-aos="fade-up" data-aos-delay="150" class="flex justify-center mb-10">
+        <button
+          @click="copyEmailToClipboard"
+          :class="[
+            'flex items-center gap-2 px-4 py-2 rounded-full text-xs font-mono font-semibold transition-all duration-300 hover:-translate-y-0.5',
+            emailCopied
+              ? 'bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-500/20 shadow-sm shadow-green-500/10'
+              : 'bg-gray-100 dark:bg-gray-800/80 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400',
+          ]"
+        >
+          <svg v-if="!emailCopied" xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+          </svg>
+          <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          {{ emailCopied ? 'Email tersalin!' : 'sheinafathur@gmail.com' }}
+        </button>
       </div>
 
       <!-- Contact Form -->
@@ -136,14 +169,32 @@ const socialLinks = [
           </div>
 
           <div class="mb-6">
-            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Pesan</label>
+            <div class="flex items-center justify-between mb-2">
+              <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Pesan</label>
+            </div>
             <textarea
               v-model="formData.message"
-              rows="4"
+              rows="5"
               required
+              :maxlength="maxChars"
               class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 dark:focus:border-blue-500 outline-none transition-all resize-none text-sm placeholder:text-gray-400"
               placeholder="Halo, saya tertarik untuk berdiskusi mengenai..."
             ></textarea>
+            <!-- Char counter -->
+            <div class="flex justify-end mt-1.5">
+              <span
+                :class="[
+                  'text-xs font-mono transition-colors',
+                  charRemaining <= 0
+                    ? 'text-red-500'
+                    : charRemaining <= 50
+                      ? 'text-amber-500'
+                      : 'text-gray-400 dark:text-gray-600',
+                ]"
+              >
+                {{ charCount }}/{{ maxChars }}
+              </span>
+            </div>
           </div>
 
           <button
@@ -166,7 +217,7 @@ const socialLinks = [
       <!-- Footer bottom -->
       <div class="mt-12 pt-8 border-t border-gray-200/50 dark:border-gray-800/50 text-center">
         <p class="text-gray-400 dark:text-gray-600 text-sm font-mono">
-          &copy; {{ new Date().getFullYear() }} <span class="text-gray-600 dark:text-gray-400 font-semibold">Switch</span>. Dibangun dengan Vue 3 & Tailwind CSS.
+          &copy; {{ new Date().getFullYear() }} <span class="text-gray-600 dark:text-gray-400 font-semibold">Switch</span>. Dibangun dengan Vue 3 &amp; Tailwind CSS.
         </p>
       </div>
     </div>

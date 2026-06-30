@@ -47,6 +47,7 @@ const toggleTheme = () => {
 
 const toggleMenu = () => { isMenuOpen.value = !isMenuOpen.value }
 const closeMenu = () => { isMenuOpen.value = false }
+const openCommandPalette = () => window.dispatchEvent(new Event('open-command-palette'))
 
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 20
@@ -145,6 +146,15 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
           <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4.22 4.22a1 1 0 011.415 0l.884.884a1 1 0 01-1.414 1.415l-.884-.884a1 1 0 010-1.415zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zm-4.22 4.22a1 1 0 010 1.415l-.884.884a1 1 0 01-1.414-1.415l.884-.884a1 1 0 011.415 0zM10 16a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zm-4.22-4.22a1 1 0 01-1.415 0l-.884-.884a1 1 0 011.414-1.415l.884.884a1 1 0 010 1.415zM2 10a1 1 0 011-1h1a1 1 0 110 2H3a1 1 0 01-1-1zm4.22-4.22a1 1 0 010-1.415l.884-.884a1 1 0 011.414 1.415l-.884.884a1 1 0 01-1.415 0zM10 6a4 4 0 100 8 4 4 0 000-8z" clip-rule="evenodd"/>
           </svg>
+        </button>
+
+        <!-- ⌘K Command palette trigger -->
+        <button
+          @click="openCommandPalette"
+          class="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-mono font-semibold text-gray-500 dark:text-gray-500 border border-gray-200 dark:border-gray-700/60 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600 transition-colors"
+          title="Command Palette (Ctrl+K)"
+        >
+          ⌘K
         </button>
 
         <!-- Contact CTA -->
