@@ -110,13 +110,13 @@ const cardStyle = (id: number) => {
 
       <!-- Header -->
       <div data-aos="fade-up" class="text-center mb-12">
-        <span class="inline-block text-xs font-bold font-mono uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-3 bg-blue-50 dark:bg-blue-500/10 px-4 py-1.5 rounded-full border border-blue-200 dark:border-blue-500/20">
+        <span class="section-badge mb-3">
           Portfolio
         </span>
         <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white mb-4 transition-colors">
           Proyek & Riset
         </h2>
-        <div class="w-16 h-1 bg-gradient-to-r from-blue-500 to-cyan-500 mx-auto rounded-full mb-4"></div>
+        <div class="section-divider mb-4"></div>
         <p class="text-gray-500 dark:text-gray-400 text-sm max-w-xl mx-auto">
           Koleksi proyek riset akademik dan pengembangan sistem yang telah dikerjakan.
         </p>
@@ -163,7 +163,7 @@ const cardStyle = (id: number) => {
           data-aos="fade-up"
           :style="cardStyle(project.id)"
           :class="[
-            'group relative bg-white/80 dark:bg-gray-900/60 backdrop-blur-md rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-md hover:shadow-xl shadow-black/5 dark:shadow-black/20 cursor-pointer flex flex-col overflow-hidden will-change-transform',
+            'group relative glass-card rounded-2xl shadow-md hover:shadow-xl shadow-black/5 dark:shadow-black/20 cursor-pointer flex flex-col overflow-hidden will-change-transform',
             project.borderHover,
             project.glowColor,
           ]"

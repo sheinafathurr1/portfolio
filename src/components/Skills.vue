@@ -90,13 +90,13 @@ onUnmounted(() => observer?.disconnect())
 
       <!-- Header -->
       <div data-aos="fade-up" class="text-center mb-12">
-        <span class="inline-block text-xs font-bold font-mono uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-3 bg-blue-50 dark:bg-blue-500/10 px-4 py-1.5 rounded-full border border-blue-200 dark:border-blue-500/20">
+        <span class="section-badge mb-3">
           Tech Stack
         </span>
         <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white mb-4 transition-colors">
           Keahlian & Teknologi
         </h2>
-        <div class="w-16 h-1 bg-gradient-to-r from-blue-500 to-cyan-500 mx-auto rounded-full mb-6"></div>
+        <div class="section-divider mb-6"></div>
 
         <!-- View toggle -->
         <div class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-xl p-1">
@@ -131,7 +131,7 @@ onUnmounted(() => observer?.disconnect())
             :data-aos-delay="ci * 150"
             data-aos="fade-up"
             :class="[
-              'group bg-white/80 dark:bg-gray-900/60 backdrop-blur-md p-6 rounded-2xl border border-gray-200/50 dark:border-gray-700/50 transition-all duration-300 hover:-translate-y-1 shadow-lg shadow-black/5 dark:shadow-black/20',
+              'group glass-card p-6 rounded-2xl transition-all duration-300 hover:-translate-y-1 shadow-lg shadow-black/5 dark:shadow-black/20',
               cat.accentBorder,
             ]"
           >
@@ -170,7 +170,7 @@ onUnmounted(() => observer?.disconnect())
             :data-aos-delay="ci * 100"
             data-aos="fade-up"
             :class="[
-              'group bg-white/80 dark:bg-gray-900/60 backdrop-blur-md p-6 rounded-2xl border border-gray-200/50 dark:border-gray-700/50 transition-all duration-300 hover:-translate-y-1 shadow-lg shadow-black/5 dark:shadow-black/20',
+              'group glass-card p-6 rounded-2xl transition-all duration-300 hover:-translate-y-1 shadow-lg shadow-black/5 dark:shadow-black/20',
               cat.accentBorder,
             ]"
           >

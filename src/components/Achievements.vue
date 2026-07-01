@@ -73,13 +73,13 @@ onUnmounted(() => observer?.disconnect())
 
       <!-- Header -->
       <div data-aos="fade-up" class="text-center mb-16">
-        <span class="inline-block text-xs font-bold font-mono uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-3 bg-blue-50 dark:bg-blue-500/10 px-4 py-1.5 rounded-full border border-blue-200 dark:border-blue-500/20">
+        <span class="section-badge mb-3">
           Highlight
         </span>
         <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white mb-4">
           Pencapaian & Fokus Saat Ini
         </h2>
-        <div class="w-16 h-1 bg-gradient-to-r from-blue-500 to-cyan-500 mx-auto rounded-full"></div>
+        <div class="section-divider"></div>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
@@ -91,7 +91,7 @@ onUnmounted(() => observer?.disconnect())
             :key="i"
             data-aos="fade-right"
             :data-aos-delay="i * 100"
-            class="group flex gap-4 bg-white/80 dark:bg-gray-900/60 backdrop-blur-md p-5 rounded-2xl border border-gray-200/50 dark:border-gray-700/50 hover:-translate-y-0.5 transition-all duration-300 shadow-sm hover:shadow-md shadow-black/5 dark:shadow-black/20 overflow-hidden relative"
+            class="group flex gap-4 glass-card p-5 rounded-2xl hover:-translate-y-0.5 transition-all duration-300 shadow-sm hover:shadow-md shadow-black/5 dark:shadow-black/20 overflow-hidden relative"
           >
             <div :class="['absolute inset-0 opacity-0 group-hover:opacity-[0.04] bg-gradient-to-br transition-opacity duration-500 pointer-events-none', m.color]"></div>
 
@@ -113,7 +113,7 @@ onUnmounted(() => observer?.disconnect())
 
         <!-- Current focus (right, 2 cols) -->
         <div class="lg:col-span-2" data-aos="fade-left" data-aos-delay="200">
-          <div class="bg-white/80 dark:bg-gray-900/60 backdrop-blur-md p-6 rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-lg shadow-black/5 dark:shadow-black/20 h-full">
+          <div class="glass-card p-6 rounded-2xl shadow-lg shadow-black/5 dark:shadow-black/20 h-full">
 
             <div class="flex items-center gap-2 mb-6">
               <div class="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></div>

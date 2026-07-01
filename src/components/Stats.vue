@@ -102,7 +102,7 @@ onUnmounted(() => observer?.disconnect())
           :key="index"
           :data-aos-delay="index * 80"
           data-aos="zoom-in"
-          class="group relative bg-white/80 dark:bg-gray-900/60 backdrop-blur-md p-5 md:p-6 rounded-2xl border border-gray-200/50 dark:border-gray-700/50 hover:border-blue-500/30 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-md shadow-black/5 dark:shadow-black/20 overflow-hidden"
+          class="group relative glass-card hover:border-blue-500/30 p-5 md:p-6 rounded-2xl transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-md shadow-black/5 dark:shadow-black/20 overflow-hidden"
         >
           <!-- Subtle bg glow on hover -->
           <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">

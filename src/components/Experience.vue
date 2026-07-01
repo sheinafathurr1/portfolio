@@ -57,13 +57,13 @@ onUnmounted(() => observer?.disconnect())
   <section id="experience" class="py-24 px-4 transition-colors duration-300 relative">
     <div class="max-w-4xl mx-auto">
       <div data-aos="fade-up" class="text-center mb-16">
-        <span class="inline-block text-xs font-bold font-mono uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-3 bg-blue-50 dark:bg-blue-500/10 px-4 py-1.5 rounded-full border border-blue-200 dark:border-blue-500/20">
+        <span class="section-badge mb-3">
           Perjalanan Karir
         </span>
         <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white mb-4 transition-colors">
           Rekam Jejak & Pengalaman
         </h2>
-        <div class="w-16 h-1 bg-gradient-to-r from-blue-500 to-cyan-500 mx-auto rounded-full"></div>
+        <div class="section-divider"></div>
       </div>
 
       <div ref="timelineContainer" class="relative z-10">
@@ -97,7 +97,7 @@ onUnmounted(() => observer?.disconnect())
             <!-- Content card -->
             <div
               :class="[
-                'flex-1 mb-2 bg-white/80 dark:bg-gray-900/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 transition-all duration-300 hover:-translate-y-1 shadow-md hover:shadow-lg shadow-black/5 dark:shadow-black/20 p-6 md:p-7 rounded-2xl group overflow-hidden relative',
+                'flex-1 mb-2 glass-card transition-all duration-300 hover:-translate-y-1 shadow-md hover:shadow-lg shadow-black/5 dark:shadow-black/20 p-6 md:p-7 rounded-2xl group overflow-hidden relative',
                 accentConfig[exp.accent].border,
                 accentConfig[exp.accent].shadow,
               ]"

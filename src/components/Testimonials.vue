@@ -56,13 +56,13 @@ onUnmounted(stopAutoplay)
 
       <!-- Header -->
       <div data-aos="fade-up" class="text-center mb-14">
-        <span class="inline-block text-xs font-bold font-mono uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-3 bg-blue-50 dark:bg-blue-500/10 px-4 py-1.5 rounded-full border border-blue-200 dark:border-blue-500/20">
+        <span class="section-badge mb-3">
           Testimoni
         </span>
         <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white mb-4">
           Kata Mereka
         </h2>
-        <div class="w-16 h-1 bg-gradient-to-r from-blue-500 to-cyan-500 mx-auto rounded-full"></div>
+        <div class="section-divider"></div>
       </div>
 
       <!-- Carousel -->
@@ -72,7 +72,7 @@ onUnmounted(stopAutoplay)
         @mouseenter="stopAutoplay"
         @mouseleave="startAutoplay"
       >
-        <div class="bg-white/80 dark:bg-gray-900/60 backdrop-blur-md p-8 md:p-10 rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-lg shadow-black/5 dark:shadow-black/20 relative overflow-hidden min-h-[260px] flex flex-col justify-center">
+        <div class="glass-card p-8 md:p-10 rounded-2xl shadow-lg shadow-black/5 dark:shadow-black/20 relative overflow-hidden min-h-[260px] flex flex-col justify-center">
 
           <!-- Big quote mark -->
           <svg class="absolute top-6 left-6 h-10 w-10 text-blue-500/10 dark:text-blue-400/10" fill="currentColor" viewBox="0 0 32 32">

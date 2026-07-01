@@ -1,16 +1,57 @@
 @import 'tailwindcss';
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ════════════════════════════════════════════
+   Design tokens
+   ════════════════════════════════════════════ */
+:root {
+  color-scheme: light;
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-bg-soft: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(226, 232, 240, 0.7);
+  --glass-shadow: rgba(15, 23, 42, 0.06);
+  --brand-from: #3b82f6;
+  --brand-via: #06b6d4;
+  --brand-to: #8b5cf6;
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dark {
+  color-scheme: dark;
+  --glass-bg: rgba(15, 20, 34, 0.62);
+  --glass-bg-soft: rgba(15, 20, 34, 0.45);
+  --glass-border: rgba(71, 85, 105, 0.35);
+  --glass-shadow: rgba(0, 0, 0, 0.35);
+}
+
+/* ════════════════════════════════════════════
+   Base
+   ════════════════════════════════════════════ */
 html {
   scroll-behavior: smooth;
 }
 
 body {
   font-family: 'Plus Jakarta Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 .font-mono {
   font-family: 'Fira Code', monospace;
+}
+
+::selection {
+  background: rgba(59, 130, 246, 0.3);
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand-from);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 /* ──── Custom cursor (hide native cursor on desktop) ──── */
@@ -20,43 +61,98 @@ body {
 }
 
 /* ──── Scrollbar ──── */
-::-webkit-scrollbar { width: 5px; }
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--brand-from) transparent;
+}
+::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #3b82f6, #06b6d4);
+  background: linear-gradient(180deg, var(--brand-from), var(--brand-via));
   border-radius: 10px;
 }
-::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
+::-webkit-scrollbar-thumb:hover { background: var(--brand-from); }
 
-/* ──── Preloader ──── */
-.preloader-leave-active {
-  transition: opacity 0.55s ease, transform 0.55s ease;
+/* ════════════════════════════════════════════
+   Reusable surfaces & utilities
+   ════════════════════════════════════════════ */
+
+/* Frosted glass card surface used across all section cards */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
 }
-.preloader-leave-to {
-  opacity: 0;
-  transform: scale(1.04);
+
+.glass-panel {
+  background: var(--glass-bg-soft);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
 }
 
-/* ──── Command palette backdrop ──── */
-.cmd-backdrop-enter-active, .cmd-backdrop-leave-active { transition: opacity 0.2s ease; }
-.cmd-backdrop-enter-from, .cmd-backdrop-leave-to { opacity: 0; }
+/* Small uppercase pill label used above section headings */
+.section-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: 'Fira Code', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #2563eb;
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  padding: 0.375rem 1rem;
+  border-radius: 9999px;
+}
+.dark .section-badge {
+  color: #60a5fa;
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.2);
+}
 
-/* ──── Command palette panel ──── */
-.cmd-panel-enter-active { transition: all 0.25s cubic-bezier(0.34, 1.3, 0.64, 1); }
-.cmd-panel-leave-active { transition: all 0.15s ease-in; }
-.cmd-panel-enter-from, .cmd-panel-leave-to { opacity: 0; transform: translateY(-12px) scale(0.96); }
+/* Small gradient underline used below section titles */
+.section-divider {
+  width: 4rem;
+  height: 0.25rem;
+  margin-inline: auto;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, var(--brand-from), var(--brand-via));
+  box-shadow: 0 0 14px rgba(59, 130, 246, 0.35);
+}
+
+/* Shine sweep hover effect (used on buttons / feature surfaces) */
+.shine-sweep {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.shine-sweep::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.16) 50%, transparent 65%);
+  transform: translateX(-130%);
+  transition: transform 0.75s var(--ease-out);
+  pointer-events: none;
+}
+.shine-sweep:hover::after {
+  transform: translateX(130%);
+}
 
 /* ──── Modal fade ──── */
 .fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
 
 /* ──── Back-to-top ──── */
-.back-top-enter-active { transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.back-top-enter-active { transition: all 0.35s var(--ease-spring); }
 .back-top-leave-active { transition: all 0.2s ease-in; }
 .back-top-enter-from, .back-top-leave-to { opacity: 0; transform: translateY(14px) scale(0.75); }
 
 /* ──── Toast ──── */
-.toast-enter-active { transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.toast-enter-active { transition: all 0.4s var(--ease-spring); }
 .toast-leave-active { transition: all 0.25s ease-in; }
 .toast-enter-from, .toast-leave-to { opacity: 0; transform: translateY(14px) scale(0.9); }
 
@@ -81,10 +177,28 @@ body {
 .testi-leave-to { opacity: 0; transform: translateX(-24px); }
 
 /* ──── Konami easter egg banner ──── */
-.egg-enter-active { transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.egg-enter-active { transition: all 0.4s var(--ease-spring); }
 .egg-leave-active { transition: all 0.3s ease-in; }
 .egg-enter-from, .egg-leave-to { opacity: 0; transform: translate(-50%, -16px) scale(0.9); }
 .egg-enter-to, .egg-leave-from { transform: translate(-50%, 0) scale(1); }
+
+/* ──── Preloader ──── */
+.preloader-leave-active {
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+.preloader-leave-to {
+  opacity: 0;
+  transform: scale(1.04);
+}
+
+/* ──── Command palette backdrop ──── */
+.cmd-backdrop-enter-active, .cmd-backdrop-leave-active { transition: opacity 0.2s ease; }
+.cmd-backdrop-enter-from, .cmd-backdrop-leave-to { opacity: 0; }
+
+/* ──── Command palette panel ──── */
+.cmd-panel-enter-active { transition: all 0.25s var(--ease-spring); }
+.cmd-panel-leave-active { transition: all 0.15s ease-in; }
+.cmd-panel-enter-from, .cmd-panel-leave-to { opacity: 0; transform: translateY(-12px) scale(0.96); }
 
 /* ──── Keyframes ──── */
 @keyframes float {
@@ -118,6 +232,10 @@ body {
   0%, 100% { background-position: 0% 50%; }
   50%       { background-position: 100% 50%; }
 }
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.35); }
+  50%       { box-shadow: 0 0 0 8px rgba(59, 130, 246, 0); }
+}
 
 /* ──── Utility ──── */
 .animate-float         { animation: float 5s ease-in-out infinite; }
@@ -127,11 +245,13 @@ body {
 .animate-orbit         { animation: orbit 5s linear infinite; }
 .animate-sparkle       { animation: sparkle 3s ease-in-out infinite; }
 .animate-gradient-bg   { background-size: 200% 200%; animation: gradientShift 6s ease infinite; }
+.animate-glow-pulse    { animation: glowPulse 2.4s ease-in-out infinite; }
 
 /* ──── Reduced motion ──── */
 @media (prefers-reduced-motion: reduce) {
   .animate-float, .animate-orbit, .animate-sparkle,
-  .animate-shimmer-text, .animate-gradient-bg { animation: none; }
+  .animate-shimmer-text, .animate-gradient-bg, .animate-glow-pulse { animation: none; }
   .term-line-in  { animation: none; opacity: 1; }
   .cursor-blink  { animation: none; }
+  .shine-sweep::after { transition: none; display: none; }
 }
