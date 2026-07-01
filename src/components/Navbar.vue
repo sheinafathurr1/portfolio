@@ -60,6 +60,18 @@ const handleScroll = () => {
   }
 }
 
+// Live WIB clock
+const currentTime = ref('')
+let clockTimer: ReturnType<typeof setInterval>
+
+const updateClock = () => {
+  const wib = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }))
+  const hh = String(wib.getHours()).padStart(2, '0')
+  const mm = String(wib.getMinutes()).padStart(2, '0')
+  const ss = String(wib.getSeconds()).padStart(2, '0')
+  currentTime.value = `${hh}:${mm}:${ss}`
+}
+
 onMounted(() => {
   if (localStorage.theme === 'light') {
     isDark.value = false
@@ -70,9 +82,14 @@ onMounted(() => {
   }
   window.addEventListener('scroll', handleScroll, { passive: true })
   nextTick(syncPill)
+  updateClock()
+  clockTimer = setInterval(updateClock, 1000)
 })
 
-onUnmounted(() => window.removeEventListener('scroll', handleScroll))
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll)
+  clearInterval(clockTimer)
+})
 </script>
 
 <template>
@@ -134,6 +151,12 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
 
       <!-- Right buttons -->
       <div class="flex items-center gap-2 z-50 relative">
+        <!-- Live WIB clock -->
+        <div class="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/60 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 backdrop-blur-sm text-xs font-mono font-semibold text-gray-500 dark:text-gray-400">
+          <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+          {{ currentTime }} WIB
+        </div>
+
         <!-- Theme toggle -->
         <button
           @click="toggleTheme"

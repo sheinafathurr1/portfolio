@@ -23,6 +23,7 @@ const allCommands: Command[] = [
   { id: 'nav-exp',      group: 'Navigasi', icon: '💼', label: 'Pengalaman',     action: () => { scrollToSection('experience'); close() } },
   { id: 'nav-skills',   group: 'Navigasi', icon: '⚡', label: 'Keahlian',      action: () => { scrollToSection('skills'); close() } },
   { id: 'nav-projects', group: 'Navigasi', icon: '🚀', label: 'Proyek & Riset', action: () => { scrollToSection('projects'); close() } },
+  { id: 'nav-testi',    group: 'Navigasi', icon: '💬', label: 'Testimoni',      action: () => { scrollToSection('testimonials'); close() } },
   { id: 'nav-contact',  group: 'Navigasi', icon: '✉️', label: 'Kontak',         action: () => { scrollToSection('contact'); close() } },
   { id: 'act-cv',       group: 'Aksi',    icon: '📄', label: 'Download CV',    action: () => { window.open('/cv-switch.pdf', '_blank'); close() } },
   { id: 'act-email',    group: 'Aksi',    icon: '📋', label: 'Salin Email',    action: () => { navigator.clipboard.writeText('sheinafathur@gmail.com').catch(() => {}); close() } },

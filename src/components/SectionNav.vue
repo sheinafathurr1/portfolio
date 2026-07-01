@@ -2,11 +2,12 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 
 const sections = [
-  { id: 'about',      label: 'Tentang' },
-  { id: 'experience', label: 'Pengalaman' },
-  { id: 'skills',     label: 'Keahlian' },
-  { id: 'projects',   label: 'Proyek' },
-  { id: 'contact',    label: 'Kontak' },
+  { id: 'about',        label: 'Tentang' },
+  { id: 'experience',   label: 'Pengalaman' },
+  { id: 'skills',       label: 'Keahlian' },
+  { id: 'projects',     label: 'Proyek' },
+  { id: 'testimonials', label: 'Testimoni' },
+  { id: 'contact',      label: 'Kontak' },
 ]
 
 const activeSection = ref('about')

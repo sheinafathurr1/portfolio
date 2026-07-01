@@ -11,6 +11,8 @@ import Achievements from './components/Achievements.vue'
 import Preloader from './components/Preloader.vue'
 import CommandPalette from './components/CommandPalette.vue'
 import SectionNav from './components/SectionNav.vue'
+import Testimonials from './components/Testimonials.vue'
+import { burstConfetti } from './utils/confetti'
 
 // Scroll & spotlight
 const mouseX = ref(0)
@@ -55,9 +57,37 @@ const handleScroll = () => {
 
 const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 
+// Konami code easter egg
+const konamiSequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA']
+const konamiBuffer: string[] = []
+const showEasterEgg = ref(false)
+let easterEggTimer: ReturnType<typeof setTimeout>
+
+const triggerEasterEgg = () => {
+  showEasterEgg.value = true
+  clearTimeout(easterEggTimer)
+  easterEggTimer = setTimeout(() => { showEasterEgg.value = false }, 3500)
+  const points = [
+    { x: window.innerWidth * 0.2, y: window.innerHeight * 0.3 },
+    { x: window.innerWidth * 0.5, y: window.innerHeight * 0.2 },
+    { x: window.innerWidth * 0.8, y: window.innerHeight * 0.3 },
+  ]
+  points.forEach((p, i) => setTimeout(() => burstConfetti(p.x, p.y, 50), i * 200))
+}
+
+const handleKonami = (e: KeyboardEvent) => {
+  konamiBuffer.push(e.code)
+  if (konamiBuffer.length > konamiSequence.length) konamiBuffer.shift()
+  if (konamiBuffer.length === konamiSequence.length && konamiBuffer.every((k, i) => k === konamiSequence[i])) {
+    konamiBuffer.length = 0
+    triggerEasterEgg()
+  }
+}
+
 onMounted(() => {
   window.addEventListener('mousemove', updateMousePosition)
   window.addEventListener('scroll', handleScroll, { passive: true })
+  window.addEventListener('keydown', handleKonami)
   if (window.innerWidth >= 1024) {
     document.documentElement.classList.add('custom-cursor')
     rafId = requestAnimationFrame(animateRing)
@@ -67,6 +97,7 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('mousemove', updateMousePosition)
   window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('keydown', handleKonami)
   document.documentElement.classList.remove('custom-cursor')
   cancelAnimationFrame(rafId)
 })
@@ -149,6 +180,7 @@ const particles = [
         <Skills />
         <Projects />
         <Achievements />
+        <Testimonials />
       </main>
       <Contact />
     </div>
@@ -172,6 +204,15 @@ const particles = [
 
     <!-- Command Palette -->
     <CommandPalette />
+
+    <!-- Konami code easter egg banner -->
+    <Transition name="egg">
+      <div v-if="showEasterEgg" class="fixed top-20 left-1/2 -translate-x-1/2 z-[9500] pointer-events-none px-4 w-full flex justify-center">
+        <div class="flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 text-white font-bold text-sm shadow-2xl shadow-blue-500/40 text-center">
+          🎉 Easter egg ditemukan! Kamu tahu Konami Code!
+        </div>
+      </div>
+    </Transition>
 
     <!-- Custom cursor (desktop only) -->
     <div class="pointer-events-none fixed inset-0 z-[9999] hidden lg:block" aria-hidden="true">

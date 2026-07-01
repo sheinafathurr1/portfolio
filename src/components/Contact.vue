@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { burstConfetti } from '../utils/confetti'
 
 const formData = ref({
   name: '',
@@ -14,6 +15,7 @@ const charRemaining = computed(() => maxChars - charCount.value)
 const isSubmitting = ref(false)
 const emailCopied = ref(false)
 let emailCopyTimer: ReturnType<typeof setTimeout>
+const submitBtnRef = ref<HTMLButtonElement | null>(null)
 
 const toastVisible = ref(false)
 const toastMessage = ref('')
@@ -42,6 +44,10 @@ const submitForm = async () => {
     if (result.success) {
       formData.value = { name: '', email: '', message: '' }
       showToast('Pesan berhasil terkirim! Saya akan segera membalasnya.', 'success')
+      if (submitBtnRef.value) {
+        const rect = submitBtnRef.value.getBoundingClientRect()
+        burstConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2)
+      }
     } else {
       showToast('Gagal mengirim pesan. Silakan coba lagi.', 'error')
     }
@@ -198,6 +204,7 @@ const socialLinks = [
           </div>
 
           <button
+            ref="submitBtnRef"
             type="submit"
             :disabled="isSubmitting"
             class="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 px-8 py-3.5 rounded-xl font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center gap-2"
