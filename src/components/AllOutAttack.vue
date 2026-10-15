@@ -2,6 +2,7 @@
 import { onMounted, onUnmounted, ref } from 'vue'
 import RansomText from './RansomText.vue'
 import { closeOverlay } from '../composables/overlay'
+import { clearRequest } from '../composables/requests'
 import { sfx } from '../composables/sfx'
 import { burstConfetti } from '../utils/confetti'
 
@@ -25,7 +26,10 @@ onMounted(() => {
     setTimeout(closeOverlay, 5600),
   )
 })
-onUnmounted(() => timers.forEach(clearTimeout))
+onUnmounted(() => {
+  timers.forEach(clearTimeout)
+  clearRequest('showtime')
+})
 </script>
 
 <template>

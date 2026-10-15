@@ -12,19 +12,27 @@ dengan CSS/SVG + Google Fonts, tanpa gambar, logo, atau audio dari game aslinya.
 | **SKILL** | Skill per kategori (tab ←/→) + daftar confidant/misi yang memakai skill itu |
 | **CONFIDANT** | Pengalaman; rank naik 1 tiap 2 bulan kerja sama (maks. 10) |
 | **MISSIONS** | Proyek & riset gaya *Mementos request* |
-| **THIEVES DEN** | Galeri pencapaian + rencana yang sedang berjalan |
+| **THIEVES DEN** | Galeri pencapaian, rencana yang sedang berjalan, dan papan *Mementos Requests* |
+| **BATTLE** | Mini-game: lawan Shadow bertema masalah developer dengan skill asli Switch |
 | **CALLING CARD** | Formulir kontak (Web3Forms) dengan pratinjau kartu panggilan langsung |
 
 Fitur interaktif:
 
 - **Phan-Chat** (tombol 📱 Chat atau tombol `C`): ponsel dalam game, pengunjung memilih pertanyaan (klik atau `1`–`4`)
   dan Switch membalas dengan jawaban yang disusun dari `src/data/portfolio.ts`, lengkap dengan tombol pintas ke layar terkait.
-- **Bond with Switch**: kunjungan pertama ke tiap bagian memunculkan notifikasi *RANK UP!*; ketujuh bagian = *MAX RANK*
+- **Bond with Switch**: kunjungan pertama ke tiap bagian memunculkan notifikasi *RANK UP!*; kedelapan bagian = *MAX RANK*
   (dengan konfeti). Progres tersimpan di `localStorage` dan terlihat di menu (bintang di HUD, label *NEW* di menu).
+- **Shadow Battle**: tiga Shadow (Spaghetti Code, Manual Busywork, Clunky Interface, dst.) masing-masing lemah
+  terhadap satu elemen skill (PHYS = backend, PSY = AI, ELEC = frontend). Kena *weakness* → **DOWN** + **1 MORE**;
+  salah pilih → Shadow bangun dan menyerang. Jatuhkan semuanya → **HOLD UP!** → All-Out Attack. Rekor giliran tercepat tersimpan.
+- **Mementos Requests**: 7 tantangan untuk pengunjung (jelajahi semua bagian, ngobrol di Phan-Chat, menang battle,
+  menang dalam satu giliran, kode rahasia, kirim calling card, dll.) dengan notifikasi *REQUEST CLEARED!*.
+  Daftarnya ada di Thieves Den; progres juga tampil di layar judul dan Help.
 - **All-Out Attack**: easter egg lewat kode Konami (`↑ ↑ ↓ ↓ ← → ← → B A`), mengetik `showtime`, atau pilihan di Phan-Chat.
-- **Navigasi cepat**: `1`–`7` langsung ke bagian, `Q`/`E` bagian sebelumnya/berikutnya, tombol ◀ ▶ di bawah tiap
+- **Navigasi cepat**: `1`–`8` langsung ke bagian, `Q`/`E` bagian sebelumnya/berikutnya, tombol ◀ ▶ di bawah tiap
   bagian, dan geser kiri/kanan di ponsel.
-- **Help** (tombol `?`): daftar kontrol, saklar SFX, dan reset bond.
+- **Help** (tombol `?`): daftar kontrol, progres, saklar SFX & getar (haptics di ponsel), dan reset progres.
+- Detail kecil: judul tab berubah jadi *"Take your time."* saat pengunjung pindah tab.
 
 Kontrol: `↑↓` / `W S` pilih, `Enter` buka, `Esc` kembali/tutup, `←→` ganti tab skill. Setiap layar punya URL sendiri
 (`/#/status`, `/#/skill`, …) sehingga tombol *back* browser dan tautan langsung berfungsi. Efek suara (disintesis,
@@ -35,10 +43,10 @@ Struktur penting:
 | Path | Isi |
 | --- | --- |
 | `src/data/portfolio.ts` | **Semua konten** (profil, pengalaman, proyek, skill, pencapaian, sosial). |
-| `src/data/phantom.ts` | Lapisan tema P5R: menu (+ kalimat bond), Social Stats, Persona, Arcana confidant, naskah Phan-Chat. Ubah sesuka hati. |
-| `src/screens/*.vue` | Satu file per layar (Title, MainMenu, Status, Persona, Skill, Confidant, Missions, Den, CallingCard). |
-| `src/components/*.vue` | Komponen bersama: `RansomText`, `P5Background`, `ScreenShell`, `HintBar`, `MaskEmblem`, serta overlay `PhoneChat`, `HelpOverlay`, `AllOutAttack`, `RankUpToast`. |
-| `src/composables/*.ts` | State kecil: navigasi, overlay, bond, chat, SFX. |
+| `src/data/phantom.ts` | Lapisan tema P5R: menu (+ kalimat bond), Social Stats, Persona, Arcana confidant, elemen skill, daftar Shadow, naskah Phan-Chat. Ubah sesuka hati. |
+| `src/screens/*.vue` | Satu file per layar (Title, MainMenu, Status, Persona, Skill, Confidant, Missions, Den, Battle, CallingCard). |
+| `src/components/*.vue` | Komponen bersama: `RansomText`, `P5Background`, `ScreenShell`, `HintBar`, `MaskEmblem`, serta overlay `PhoneChat`, `HelpOverlay`, `AllOutAttack`, `RankUpToast`, `RequestToast`. |
+| `src/composables/*.ts` | State kecil: navigasi, overlay, bond, requests, antrean toast, chat, SFX. |
 | `src/App.vue` | Pergantian layar, URL hash, transisi tebasan, shortcut global, dan notifikasi rank up. |
 
 ## Recommended IDE Setup

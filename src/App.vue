@@ -8,14 +8,18 @@ import SkillScreen from './screens/SkillScreen.vue'
 import ConfidantScreen from './screens/ConfidantScreen.vue'
 import MissionsScreen from './screens/MissionsScreen.vue'
 import DenScreen from './screens/DenScreen.vue'
+import BattleScreen from './screens/BattleScreen.vue'
 import CallingCardScreen from './screens/CallingCardScreen.vue'
 import PhoneChat from './components/PhoneChat.vue'
 import HelpOverlay from './components/HelpOverlay.vue'
 import AllOutAttack from './components/AllOutAttack.vue'
 import RankUpToast from './components/RankUpToast.vue'
+import RequestToast from './components/RequestToast.vue'
 import { NAV, inputBlocked, isTypingTarget, type ScreenId, type SectionId } from './composables/nav'
 import { closeOverlay, openOverlay, overlay } from './composables/overlay'
 import { BOND_MAX, bondRank, markVisited } from './composables/bond'
+import { clearRequest } from './composables/requests'
+import { dropToast, pushToast, toasts } from './composables/toasts'
 import { sfx } from './composables/sfx'
 import { menuItems } from './data/phantom'
 import { burstConfetti } from './utils/confetti'
@@ -27,6 +31,7 @@ const SECTIONS: Record<SectionId, Component> = {
   confidant: ConfidantScreen,
   missions: MissionsScreen,
   den: DenScreen,
+  battle: BattleScreen,
   card: CallingCardScreen,
 }
 const isSection = (id: ScreenId): id is SectionId => id in SECTIONS
@@ -46,28 +51,39 @@ const screen = computed<Component>(() => {
   return SECTIONS[current.value]
 })
 
-// ── Bond with Switch: the first visit to each section ranks the bond up ──
-const toast = ref<{ rank: number; line: string } | null>(null)
+// ── Toasts (bond rank ups, cleared requests): one at a time, paused while an All-Out Attack plays ──
+const visibleToast = computed(() => (overlay.value === 'attack' ? null : (toasts.value[0] ?? null)))
+const rankToast = computed(() => (visibleToast.value?.kind === 'rank' ? visibleToast.value : null))
+const requestToast = computed(() => (visibleToast.value?.kind === 'request' ? visibleToast.value : null))
 let toastTimer: ReturnType<typeof setTimeout>
+let announced = 0 // last toast that played its sound, so it doesn't replay after an attack hides it
 
 const dismissToast = () => {
   clearTimeout(toastTimer)
-  toast.value = null
+  dropToast()
 }
 
+watch(visibleToast, (toast) => {
+  clearTimeout(toastTimer)
+  if (!toast) return
+  const isMax = toast.kind === 'rank' && toast.rank >= BOND_MAX
+  if (toast.id !== announced) {
+    announced = toast.id
+    sfx.rankUp()
+    if (isMax) setTimeout(() => burstConfetti(window.innerWidth - Math.min(window.innerWidth / 2, 190), 140, 60), 250)
+  }
+  toastTimer = setTimeout(dismissToast, isMax ? 6500 : toast.kind === 'rank' ? 3600 : 3400)
+})
+
+// ── Bond with Switch: the first visit to each section ranks the bond up ──
 const trackBond = (id: ScreenId) => {
   if (!isSection(id) || !markVisited(id)) return
   const line = menuItems.find((m) => m.id === id)?.bond ?? ''
-  clearTimeout(toastTimer)
+  const rank = bondRank.value
   // Wait for the transition slashes to clear before the toast slides in
-  toastTimer = setTimeout(() => {
-    const rank = bondRank.value
-    toast.value = { rank, line }
-    sfx.rankUp()
-    if (rank >= BOND_MAX) {
-      setTimeout(() => burstConfetti(window.innerWidth - Math.min(window.innerWidth / 2, 190), 140, 60), 250)
-    }
-    toastTimer = setTimeout(dismissToast, rank >= BOND_MAX ? 6500 : 3600)
+  setTimeout(() => {
+    pushToast({ kind: 'rank', rank, line })
+    if (rank >= BOND_MAX) clearRequest('explorer')
   }, 450)
 }
 
@@ -180,8 +196,8 @@ const onKey = (e: KeyboardEvent) => {
   const key = e.key.toLowerCase()
   if (secretEntered(key)) {
     e.preventDefault()
-    dismissToast()
     openOverlay('attack')
+    clearRequest('cheat')
     return
   }
   if (current.value === 'title' || e.repeat) return
@@ -220,23 +236,28 @@ watch(overlay, (now, before) => {
 
 const syncFromUrl = () => show(fromHash())
 
-watch(
-  current,
-  (id) => {
-    const item = menuItems.find((m) => m.id === id)
-    document.title = item ? `${item.label} · Switch` : id === 'menu' ? 'Menu · Switch' : 'Switch | Technical Lead & AI Researcher'
-  },
-  { immediate: true },
-)
+const setTitle = (id: ScreenId) => {
+  const item = menuItems.find((m) => m.id === id)
+  document.title = item ? `${item.label} · Switch` : id === 'menu' ? 'Menu · Switch' : 'Switch | Technical Lead & AI Researcher'
+}
+watch(current, setTitle, { immediate: true })
+
+// The game's loading-screen line greets anyone who wanders off to another tab
+const onVisibility = () => {
+  if (document.hidden) document.title = 'Take your time. · Switch'
+  else setTitle(current.value)
+}
 
 onMounted(() => {
   window.addEventListener('popstate', syncFromUrl)
   window.addEventListener('keydown', onKey)
+  document.addEventListener('visibilitychange', onVisibility)
   trackBond(current.value) // deep link straight into a section
 })
 onUnmounted(() => {
   window.removeEventListener('popstate', syncFromUrl)
   window.removeEventListener('keydown', onKey)
+  document.removeEventListener('visibilitychange', onVisibility)
   clearTimeout(fallbackTimer)
   clearTimeout(toastTimer)
 })
@@ -245,16 +266,25 @@ onUnmounted(() => {
 <template>
   <component :is="screen" :key="current" />
 
-  <Transition name="toast">
+  <Transition name="toast" mode="out-in">
     <RankUpToast
-      v-if="toast"
-      :key="toast.rank"
-      :rank="toast.rank"
+      v-if="rankToast"
+      :key="rankToast.id"
+      :rank="rankToast.rank"
       :max="BOND_MAX"
-      :line="toast.line"
+      :line="rankToast.line"
       :cta="current !== 'card'"
       @dismiss="dismissToast"
       @card="toastToCard"
+    />
+    <RequestToast
+      v-else-if="requestToast"
+      :key="requestToast.id"
+      :title="requestToast.title"
+      :desc="requestToast.desc"
+      :done="requestToast.done"
+      :total="requestToast.total"
+      @dismiss="dismissToast"
     />
   </Transition>
 

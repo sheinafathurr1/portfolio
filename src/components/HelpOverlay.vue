@@ -2,15 +2,18 @@
 import { onMounted, ref } from 'vue'
 import { BOND_MAX, bondRank, resetBond } from '../composables/bond'
 import { closeOverlay } from '../composables/overlay'
+import { REQUESTS, clearedCount, resetRequests } from '../composables/requests'
 import { sfx, sfxEnabled, toggleSfx } from '../composables/sfx'
+import { menuItems } from '../data/phantom'
 
 const controls: [string, string][] = [
   ['↑ ↓  /  W S', 'Move the cursor'],
-  ['Enter', 'Open / confirm'],
+  ['Enter', 'Open / confirm / attack'],
   ['Esc', 'Back / close'],
   ['Q  /  E', 'Previous / next section'],
-  ['1 – 7', 'Jump straight to a section'],
-  ['← →  /  A D', 'Switch tabs (Skill screen)'],
+  [`1 – ${menuItems.length}`, 'Jump straight to a section'],
+  ['← →  /  A D', 'Skill tabs · Battle target'],
+  ['R', 'Fight again (Battle)'],
   ['C', 'Open Phan-Chat'],
   ['?', 'This screen'],
 ]
@@ -19,6 +22,7 @@ const closeBtn = ref<HTMLButtonElement | null>(null)
 const resetDone = ref(false)
 const reset = () => {
   resetBond()
+  resetRequests()
   resetDone.value = true
   sfx.back()
 }
@@ -42,12 +46,18 @@ onMounted(() => closeBtn.value?.focus())
       </ul>
       <p class="help__touch">On a phone: tap to choose, swipe left or right to change section.</p>
 
+      <h3>Your progress</h3>
+      <dl class="help__progress">
+        <dt>Bond with Switch</dt>
+        <dd>{{ bondRank >= BOND_MAX ? 'MAX' : `Rank ${bondRank}` }} <small>/ {{ BOND_MAX }}</small></dd>
+        <dt>Mementos Requests</dt>
+        <dd>{{ clearedCount }} <small>/ {{ REQUESTS.length }} cleared · list in the Thieves Den</small></dd>
+      </dl>
+
       <h3>Settings</h3>
       <div class="help__settings">
-        <button class="p5-btn p5-btn--red" :aria-pressed="sfxEnabled" @click="toggleSfx">SFX: {{ sfxEnabled ? 'ON' : 'OFF' }}</button>
-        <button class="p5-btn p5-btn--light" @click="reset">
-          {{ resetDone ? 'Bond reset ✔' : `Reset bond (${bondRank}/${BOND_MAX})` }}
-        </button>
+        <button class="p5-btn p5-btn--red" :aria-pressed="sfxEnabled" @click="toggleSfx">SFX &amp; haptics: {{ sfxEnabled ? 'ON' : 'OFF' }}</button>
+        <button class="p5-btn p5-btn--light" @click="reset">{{ resetDone ? 'Progress reset ✔' : 'Reset progress' }}</button>
       </div>
 
       <p class="help__secret">★ Rumor has it a certain old-school cheat code unleashes an <b>All-Out Attack</b>…</p>
@@ -135,6 +145,24 @@ onMounted(() => closeBtn.value?.focus())
   margin: 0.9rem 0 0;
   font-family: var(--font-type);
   font-size: 0.85rem;
+  color: #555;
+}
+.help__progress {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.35rem 1rem;
+  margin: 0;
+}
+.help__progress dt {
+  font-weight: 600;
+}
+.help__progress dd {
+  margin: 0;
+  font-family: var(--font-display);
+  color: var(--red);
+}
+.help__progress small {
+  font-family: var(--font-body);
   color: #555;
 }
 .help__settings {

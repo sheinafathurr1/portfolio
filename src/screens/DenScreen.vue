@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ScreenShell from '../components/ScreenShell.vue'
+import { REQUESTS, cleared, clearedCount } from '../composables/requests'
 import { currentFocus, milestones } from '../data/portfolio'
 
 const tilts = [-3, 2, -1.5, 3]
@@ -35,6 +36,25 @@ const tilts = [-3, 2, -1.5, 3]
           <span class="todo__label">{{ f.icon }} {{ f.label }}</span>
           <div class="p5-bar"><span :style="{ width: `${f.pct}%` }"></span></div>
           <span class="todo__pct">{{ f.pct }}%</span>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Side quests for the visitor -->
+    <section class="board p5-enter" style="--i: 7" aria-labelledby="board-title">
+      <header class="board__head">
+        <h2 id="board-title" class="p5-label">Mementos Requests</h2>
+        <span class="board__count">{{ clearedCount }}/{{ REQUESTS.length }} cleared</span>
+      </header>
+      <p class="board__intro">Requests for you, the visitor. Clear them all to prove you’re a true Phantom Thief.</p>
+      <ul class="board__list">
+        <li v-for="r in REQUESTS" :key="r.id" class="req" :class="{ 'is-cleared': cleared.includes(r.id) }">
+          <span class="req__star" aria-hidden="true">{{ cleared.includes(r.id) ? '★' : '☆' }}</span>
+          <span class="req__text">
+            <span class="req__title">{{ r.title }}</span>
+            <span class="req__desc">{{ r.desc }}</span>
+          </span>
+          <span class="req__state">{{ cleared.includes(r.id) ? 'Cleared' : 'Open' }}</span>
         </li>
       </ul>
     </section>
@@ -163,6 +183,93 @@ const tilts = [-3, 2, -1.5, 3]
   .todo__list li { grid-template-columns: 1.4rem 1fr 2.8rem; }
   .todo__list li .p5-bar { grid-column: 2 / -1; grid-row: 2; }
 }
+/* ── Mementos Requests ── */
+.board {
+  max-width: 760px;
+  margin-top: 2rem;
+  padding: 1.4rem 1.6rem 1.6rem;
+  color: var(--ink);
+  background: var(--paper);
+  clip-path: polygon(1% 0, 100% 3%, 99% 100%, 0 97%);
+}
+.board__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+.board__head h2 {
+  margin: 0;
+  font-size: 1.6rem;
+  color: var(--red);
+}
+.board__count {
+  font-family: var(--font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.board__intro {
+  margin: 0.4rem 0 1rem;
+  font-family: var(--font-type);
+  font-size: 0.92rem;
+  color: #555;
+}
+.board__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+@media (min-width: 700px) {
+  .board__list { grid-template-columns: 1fr 1fr; }
+}
+.req {
+  display: grid;
+  grid-template-columns: 1.4rem 1fr auto;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.55rem 0.8rem;
+  border: 2px dashed rgba(0, 0, 0, 0.25);
+}
+.req__star {
+  font-size: 1.2rem;
+  color: #999;
+}
+.req__text {
+  display: grid;
+}
+.req__title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.req__desc {
+  font-size: 0.85rem;
+  color: #555;
+}
+.req__state {
+  padding: 0.05em 0.5em;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #888;
+  border: 2px solid currentColor;
+  transform: rotate(-6deg);
+}
+.req.is-cleared {
+  border-style: solid;
+  border-color: var(--ink);
+  background: rgba(230, 0, 18, 0.07);
+}
+.req.is-cleared .req__star,
+.req.is-cleared .req__state {
+  color: var(--red);
+}
+
 .todo__check {
   display: grid;
   place-items: center;

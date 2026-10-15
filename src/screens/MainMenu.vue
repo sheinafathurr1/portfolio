@@ -32,7 +32,7 @@ const click = (i: number) => {
 }
 
 // Zig-zag offsets like the game's pause menu
-const offsets = ['0rem', '3.2rem', '1rem', '4.2rem', '1.6rem', '3.6rem', '0.4rem']
+const offsets = ['0rem', '3.2rem', '1rem', '4.2rem', '1.6rem', '3.6rem', '2.2rem', '0.4rem']
 
 // Date widget (WIB) with time-of-day phase, P5-calendar style
 const now = ref(new Date())
@@ -138,7 +138,7 @@ const openChat = () => {
       </div>
     </div>
 
-    <HintBar :hints="[['↑↓', 'Select'], ['Enter', 'Open'], ['1–7', 'Jump'], ['Esc', 'Title']]" />
+    <HintBar :hints="[['↑↓', 'Select'], ['Enter', 'Open'], [`1–${menuItems.length}`, 'Jump'], ['Esc', 'Title']]" />
   </section>
 </template>
 

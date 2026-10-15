@@ -1,7 +1,7 @@
 import type { InjectionKey, Ref } from 'vue'
 import { overlay } from './overlay'
 
-export type SectionId = 'status' | 'persona' | 'skill' | 'confidant' | 'missions' | 'den' | 'card'
+export type SectionId = 'status' | 'persona' | 'skill' | 'confidant' | 'missions' | 'den' | 'battle' | 'card'
 export type ScreenId = 'title' | 'menu' | SectionId
 
 export interface Nav {

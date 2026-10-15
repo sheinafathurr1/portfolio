@@ -4,19 +4,13 @@ import ScreenShell from '../components/ScreenShell.vue'
 import { inputBlocked } from '../composables/nav'
 import { sfx } from '../composables/sfx'
 import { useListNav } from '../composables/useListNav'
-import { rankLabel } from '../data/phantom'
+import { elementOf, rankLabel } from '../data/phantom'
 import { experiences, projects, skillCategories } from '../data/portfolio'
-
-// Each category is presented like a P5 skill element
-const ELEMENTS: Record<string, { tag: string; color: string }> = {
-  backend: { tag: 'PHYS', color: '#f97316' },
-  ai: { tag: 'PSY', color: '#e879f9' },
-  frontend: { tag: 'ELEC', color: '#facc15' },
-}
 
 const tab = ref(0)
 const category = computed(() => skillCategories[tab.value] ?? skillCategories[0]!)
-const element = computed(() => ELEMENTS[category.value.key] ?? { tag: 'ALM', color: '#fff' })
+// Each category is presented like a P5 skill element
+const element = computed(() => elementOf(category.value.key))
 
 const { index, select } = useListNav(() => category.value.skills.length)
 watch(tab, () => { index.value = 0 })
@@ -67,7 +61,7 @@ const usedIn = computed(() => [
         :aria-selected="i === tab"
         @click="setTab(i)"
       >
-        <span class="tab__el" :style="{ background: ELEMENTS[cat.key]?.color }">{{ ELEMENTS[cat.key]?.tag }}</span>
+        <span class="tab__el" :style="{ background: elementOf(cat.key).color }">{{ elementOf(cat.key).tag }}</span>
         {{ cat.short }}
       </button>
     </div>

@@ -1,5 +1,6 @@
 import { computed, ref } from 'vue'
 import { chatIntro, chatTopics, type ChatTopic } from '../data/phantom'
+import { clearRequest } from './requests'
 
 // Phan-Chat conversation state. Module-level so the thread survives closing and reopening the phone.
 export interface ChatMessage {
@@ -37,6 +38,7 @@ export async function ask(topic: ChatTopic): Promise<ChatTopic['effect']> {
     push({ from: 'switch', text, action: i === topic.answer.length - 1 ? topic.action : undefined })
   }
   typing.value = false
+  if (asked.value.length >= 3) clearRequest('talk')
   return topic.effect
 }
 

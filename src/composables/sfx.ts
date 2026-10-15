@@ -42,6 +42,16 @@ function tone(freq: number, duration: number, type: OscillatorType = 'square', d
   }
 }
 
+/** A short vibration on phones that support it; follows the SFX switch. */
+function buzz(pattern: number | number[]) {
+  if (!sfxEnabled.value || !('vibrate' in navigator)) return
+  try {
+    navigator.vibrate(pattern)
+  } catch {
+    // vibration blocked; ignore
+  }
+}
+
 export const sfx = {
   move: () => tone(1320, 0.04),
   confirm: () => {
@@ -55,9 +65,19 @@ export const sfx = {
   slam: () => {
     tone(140, 0.28, 'sawtooth', 0, 0.06)
     tone(70, 0.35, 'square', 0.02, 0.05)
+    buzz(40)
   },
-  /** Rising arpeggio for a bond rank up */
-  rankUp: () => [660, 880, 1100, 1320].forEach((f, i) => tone(f, 0.12, 'triangle', i * 0.07, 0.05)),
+  /** Taking damage */
+  hit: () => {
+    tone(220, 0.12, 'sawtooth', 0, 0.05)
+    tone(110, 0.22, 'square', 0.06, 0.045)
+    buzz([30, 40, 60])
+  },
+  /** Rising arpeggio for a bond rank up or a cleared request */
+  rankUp: () => {
+    ;[660, 880, 1100, 1320].forEach((f, i) => tone(f, 0.12, 'triangle', i * 0.07, 0.05))
+    buzz(25)
+  },
 }
 
 export function toggleSfx() {

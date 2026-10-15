@@ -3,6 +3,7 @@ import { computed, onUnmounted, ref } from 'vue'
 import ScreenShell from '../components/ScreenShell.vue'
 import RansomText from '../components/RansomText.vue'
 import MaskEmblem from '../components/MaskEmblem.vue'
+import { clearRequest } from '../composables/requests'
 import { sfx } from '../composables/sfx'
 import { profile, socialLinks } from '../data/portfolio'
 import { burstConfetti } from '../utils/confetti'
@@ -37,6 +38,7 @@ const submit = async () => {
     if (!data.success) throw new Error(data.message)
     status.value = 'sent'
     sfx.slam()
+    clearRequest('card')
     const rect = submitBtn.value?.getBoundingClientRect()
     if (rect) burstConfetti(rect.left + rect.width / 2, rect.top, 48, ['#e60012', '#0b0b0b', '#ffffff'])
     form.value = { name: '', email: '', message: '' }
@@ -58,7 +60,7 @@ onUnmounted(() => clearTimeout(resetTimer))
 </script>
 
 <template>
-  <ScreenShell title="CALLING CARD" subtitle="Let’s Collaborate" number="07" variant="red">
+  <ScreenShell title="CALLING CARD" subtitle="Let’s Collaborate" number="08" variant="red">
     <div class="cc">
       <!-- Form -->
       <form class="ccform p5-enter" @submit.prevent="submit">

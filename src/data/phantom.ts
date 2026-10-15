@@ -1,7 +1,7 @@
 // Persona 5 Royal flavour layered on top of src/data/portfolio.ts.
 // Ranks/titles here are playful self-descriptions: tweak them freely.
 import type { SectionId } from '../composables/nav'
-import { allSkills, experiences, profile, projects } from './portfolio'
+import { allSkills, experiences, profile, projects, skillCategories } from './portfolio'
 
 export const menuItems: { id: SectionId; label: string; sub: string; desc: string; bond: string }[] = [
   { id: 'status',    label: 'STATUS',       sub: 'About Me',     desc: 'Profile, social stats, and field notes on the Phantom Developer.',  bond: 'You learned who Switch really is.' },
@@ -9,7 +9,8 @@ export const menuItems: { id: SectionId; label: string; sub: string; desc: strin
   { id: 'skill',     label: 'SKILL',        sub: 'Skills',       desc: 'My technical arsenal, with mastery levels.',                        bond: 'You studied Switch’s arsenal.' },
   { id: 'confidant', label: 'CONFIDANT',    sub: 'Experience',   desc: 'Bonds forged at work: the teams and organizations I grow with.',   bond: 'You heard the stories of Switch’s allies.' },
   { id: 'missions',  label: 'MISSIONS',     sub: 'Projects',     desc: 'Cleared missions: research and system development projects.',      bond: 'You reviewed Switch’s past missions.' },
-  { id: 'den',       label: 'THIEVES DEN',  sub: 'Achievements', desc: 'A gallery of achievements and the plans currently in motion.',      bond: 'You toured the hideout.' },
+  { id: 'den',       label: 'THIEVES DEN',  sub: 'Achievements', desc: 'A gallery of achievements, plans in motion, and requests for you.',  bond: 'You toured the hideout.' },
+  { id: 'battle',    label: 'BATTLE',       sub: 'Mini-Game',    desc: 'Shadows are loose in the codebase. Hit their weaknesses with Switch’s real skills.', bond: 'You fought side by side with Switch.' },
   { id: 'card',      label: 'CALLING CARD', sub: 'Contact',      desc: 'Send a calling card. Let’s collaborate!',                          bond: 'You found where to send a calling card.' },
 ]
 
@@ -96,6 +97,48 @@ export const confidants = experiences.map((exp) => ({
 
 export const rankLabel = (level: number) => (level >= 85 ? 'Expert' : level >= 70 ? 'Advanced' : 'Intermediate')
 
+// ── Skill elements: each skill category behaves like a P5 attack element ──
+export type ElementKey = 'backend' | 'ai' | 'frontend'
+export interface Element {
+  tag: string
+  color: string
+}
+export const ELEMENTS: Record<ElementKey, Element> = {
+  backend: { tag: 'PHYS', color: '#f97316' },
+  ai: { tag: 'PSY', color: '#e879f9' },
+  frontend: { tag: 'ELEC', color: '#facc15' },
+}
+export const ELEMENT_ORDER: ElementKey[] = ['backend', 'ai', 'frontend']
+export const elementOf = (key: string): Element => ELEMENTS[key as ElementKey] ?? { tag: 'ALM', color: '#ffffff' }
+
+// ── Shadow Battle: Shadows are everyday dev problems; each one is weak to the kind of skill that fixes it ──
+export interface ShadowType {
+  id: string
+  name: string
+  icon: string
+  weak: ElementKey
+  lore: string
+  attack: string
+}
+
+export const shadows: ShadowType[] = [
+  { id: 'spaghetti', name: 'Spaghetti Code',    icon: '🍝', weak: 'backend',  lore: 'A 3,000-line controller nobody dares to touch.', attack: 'hurls a 3,000-line controller' },
+  { id: 'downtime',  name: 'Midnight Downtime', icon: '🌑', weak: 'backend',  lore: 'Takes the server down at 3 AM. Every time.',     attack: 'pulls the plug on the server' },
+  { id: 'busywork',  name: 'Manual Busywork',   icon: '📋', weak: 'ai',       lore: 'Copy, paste, repeat. Forever.',                  attack: 'buries Switch in spreadsheets' },
+  { id: 'pdfpile',   name: 'PDF Avalanche',     icon: '📚', weak: 'ai',       lore: 'Five hundred journals, zero structured data.',   attack: 'drops 500 unread journal PDFs' },
+  { id: 'clunky',    name: 'Clunky Interface',  icon: '🧱', weak: 'frontend', lore: 'Seventeen clicks to submit one form.',           attack: 'adds a seventeenth confirmation dialog' },
+  { id: 'shift',     name: 'Layout Shift',      icon: '📐', weak: 'frontend', lore: 'Moves the button right before you click it.',    attack: 'moves the button again' },
+]
+
+/** Switch's three strongest skills per element, used as battle commands. */
+export const battleSkills = skillCategories.flatMap((cat) =>
+  [...cat.skills]
+    .sort((a, b) => b.level - a.level)
+    .slice(0, 3)
+    .map((s) => ({ ...s, element: cat.key as ElementKey })),
+)
+export type BattleSkill = (typeof battleSkills)[number]
+
 // ── Phan-Chat: dialogue choices on the in-game phone; answers are built from the portfolio data ──
 export interface ChatTopic {
   id: string
@@ -139,6 +182,15 @@ export const chatTopics: ChatTopic[] = [
     question: 'Show me your best work.',
     answer: [`${projects.length} missions cleared so far:`, projects.map((p) => `▸ ${p.title} (${p.year})`).join('\n')],
     action: { label: 'Open MISSIONS', to: 'missions' },
+  },
+  {
+    id: 'battle',
+    question: 'Anything fun to do around here?',
+    answer: [
+      'Shadows keep sneaking into my codebase: spaghetti code, endless busywork, clunky UIs…',
+      'Help me take them down. Hit each one’s weakness with the right skill and you get 1 MORE turn.',
+    ],
+    action: { label: 'Open BATTLE', to: 'battle' },
   },
   {
     id: 'collab',

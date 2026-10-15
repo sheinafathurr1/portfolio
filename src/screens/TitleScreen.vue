@@ -3,7 +3,9 @@ import { inject, onMounted, onUnmounted, ref } from 'vue'
 import P5Background from '../components/P5Background.vue'
 import RansomText from '../components/RansomText.vue'
 import MaskEmblem from '../components/MaskEmblem.vue'
+import { BOND_MAX, bondRank } from '../composables/bond'
 import { NAV, inputBlocked } from '../composables/nav'
+import { REQUESTS, clearedCount } from '../composables/requests'
 import { sfx, sfxEnabled, toggleSfx } from '../composables/sfx'
 import { profile } from '../data/portfolio'
 
@@ -59,6 +61,12 @@ onUnmounted(() => {
     <button class="title__press" @click.stop="start">
       <span>{{ isTouch ? 'Tap to start' : 'Press any key' }}</span>
     </button>
+
+    <p v-if="bondRank > 0 || clearedCount > 0" class="title__back">
+      Welcome back, Phantom Thief
+      <span>Bond {{ bondRank >= BOND_MAX ? 'MAX' : `${bondRank}/${BOND_MAX}` }}</span>
+      <span>Requests {{ clearedCount }}/{{ REQUESTS.length }}</span>
+    </p>
 
     <button class="title__sfx" :aria-pressed="sfxEnabled" @click.stop="toggleSfx">
       SFX <strong>{{ sfxEnabled ? 'ON' : 'OFF' }}</strong>
@@ -180,6 +188,24 @@ onUnmounted(() => {
 .title__press::before {
   content: '▶ ';
   color: var(--red);
+}
+
+.title__back {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.3rem 0.9rem;
+  margin: -1.2rem 0 0;
+  padding: 0.3rem 1rem;
+  font-family: var(--font-type);
+  font-size: 0.9rem;
+  color: var(--paper);
+  background: var(--ink);
+  transform: rotate(-2deg);
+}
+.title__back span {
+  color: var(--red);
+  font-weight: 700;
 }
 
 .title__sfx {
