@@ -4,6 +4,8 @@ import P5Background from '../components/P5Background.vue'
 import MaskEmblem from '../components/MaskEmblem.vue'
 import HintBar from '../components/HintBar.vue'
 import { NAV } from '../composables/nav'
+import { BOND_MAX, bondRank, visited } from '../composables/bond'
+import { openOverlay } from '../composables/overlay'
 import { sfx } from '../composables/sfx'
 import { useListNav } from '../composables/useListNav'
 import { menuItems } from '../data/phantom'
@@ -52,14 +54,19 @@ const phase = computed(() => {
 
 const uptime = highlights[0]
 const automations = highlights[1]
+
+const openChat = () => {
+  sfx.confirm()
+  openOverlay('phone')
+}
 </script>
 
 <template>
-  <section class="screen menu" tabindex="-1" aria-label="Menu utama">
+  <section class="screen menu" tabindex="-1" aria-label="Main menu">
     <P5Background variant="red" />
 
     <!-- Calendar widget -->
-    <div class="date" aria-label="Tanggal hari ini">
+    <div class="date" aria-label="Today’s date">
       <div class="date__day">
         <span class="date__md">{{ dateLabel }}</span>
         <span class="date__dow">{{ dayLabel }}</span>
@@ -78,14 +85,28 @@ const automations = highlights[1]
         </div>
         <Transition name="desc" mode="out-in">
           <div :key="active.id" class="menu__desc">
-            <p class="menu__desc-kicker">{{ active.sub }}</p>
+            <p class="menu__desc-kicker">
+              {{ active.sub }}
+              <span v-if="visited.includes(active.id)" class="menu__desc-seen">✔ visited</span>
+              <span v-else class="menu__desc-new">NEW</span>
+            </p>
             <p class="menu__desc-text">{{ active.desc }}</p>
           </div>
         </Transition>
+
+        <!-- Bond meter: how much of the portfolio this visitor has explored -->
+        <button class="bond" :aria-label="`Bond with Switch: rank ${bondRank} of ${BOND_MAX}. Open Phan-Chat`" @click="openChat">
+          <span class="bond__title">Bond <b>{{ bondRank >= BOND_MAX ? 'MAX' : `Rank ${bondRank}` }}</b></span>
+          <span class="stars bond__stars" aria-hidden="true">
+            <i v-for="n in BOND_MAX" :key="n" :class="{ on: n <= bondRank }"></i>
+          </span>
+          <span class="bond__hint">{{ bondRank >= BOND_MAX ? 'You know Switch inside out' : 'Visit every section to max it out' }}</span>
+          <span class="bond__chat"><span aria-hidden="true">📱</span> Phan-Chat</span>
+        </button>
       </div>
 
       <!-- Right: the menu -->
-      <nav class="menu__list" aria-label="Menu utama">
+      <nav class="menu__list" aria-label="Main menu">
         <button
           v-for="(item, i) in menuItems"
           :key="item.id"
@@ -97,7 +118,9 @@ const automations = highlights[1]
           @focus="select(i)"
           @click="click(i)"
         >
+          <span class="menu__num" aria-hidden="true">{{ i + 1 }}</span>
           <span class="menu__label">{{ item.label }}</span>
+          <span v-if="!visited.includes(item.id)" class="menu__new" aria-label="not visited yet">NEW</span>
           <span class="menu__sub">{{ item.sub }}</span>
         </button>
       </nav>
@@ -108,24 +131,30 @@ const automations = highlights[1]
       <p class="hud__name">{{ profile.alias.toUpperCase() }} <span>LV {{ allSkills.length }}</span></p>
       <div class="hud__row"><b>HP</b><div class="p5-bar"><span style="width: 99.9%"></span></div><small>{{ uptime?.value }} uptime</small></div>
       <div class="hud__row"><b>SP</b><div class="p5-bar hud__sp"><span style="width: 78%"></span></div><small>{{ automations?.value }} automations</small></div>
+      <div class="hud__row hud__bond">
+        <b>BD</b>
+        <span class="stars" aria-hidden="true"><i v-for="n in BOND_MAX" :key="n" :class="{ on: n <= bondRank }"></i></span>
+        <small>{{ bondRank >= BOND_MAX ? 'MAX bond' : `bond ${bondRank}/${BOND_MAX}` }}</small>
+      </div>
     </div>
 
-    <HintBar :hints="[['↑↓', 'Pilih'], ['Enter', 'Buka'], ['Esc', 'Judul']]" />
+    <HintBar :hints="[['↑↓', 'Select'], ['Enter', 'Open'], ['1–7', 'Jump'], ['Esc', 'Title']]" />
   </section>
 </template>
 
 <style scoped>
-.menu > :not(:first-child) {
+/* Content sits above the fixed background (the HintBar positions itself) */
+.menu__layout {
   position: relative;
   z-index: 1;
 }
 
 /* ── Date widget ── */
 .date {
-  position: absolute !important;
+  position: absolute;
   top: 1.4rem;
   left: 1.6rem;
-  z-index: 2 !important;
+  z-index: 2;
   animation: p5Pop 0.5s var(--snap) both;
 }
 .date__day {
@@ -209,6 +238,10 @@ const automations = highlights[1]
 @media (min-width: 900px) {
   .portrait { display: block; }
 }
+@media (min-width: 900px) and (max-height: 780px) {
+  .menu__left { padding-top: 1rem; gap: 1rem; }
+  .portrait { width: min(28vw, 36vh); }
+}
 .portrait {
   position: relative;
   width: min(32vw, 360px);
@@ -266,6 +299,23 @@ const automations = highlights[1]
   color: var(--red);
   font-size: 1.1rem;
 }
+.menu__desc-seen,
+.menu__desc-new {
+  margin-left: 0.5rem;
+  padding: 0 0.45rem;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  vertical-align: middle;
+}
+.menu__desc-seen {
+  color: var(--muted);
+  border: 1px solid currentColor;
+}
+.menu__desc-new {
+  color: var(--ink);
+  background: var(--paper);
+}
 .menu__desc-text {
   margin: 0;
   font-size: 1.05rem;
@@ -281,6 +331,9 @@ const automations = highlights[1]
   flex-direction: column;
   align-items: flex-end;
   gap: 0.6rem;
+}
+@media (min-width: 900px) {
+  .menu__list { padding-right: 2.2rem; } /* room for the NEW tags */
 }
 @media (max-width: 899px) {
   .menu__list { align-items: center; }
@@ -330,6 +383,50 @@ const automations = highlights[1]
   transform: translateY(-50%) rotate(-4deg);
   transition: opacity 0.12s ease;
 }
+/* Number badge (keys 1–7 jump straight there) and a NEW tag for unvisited sections */
+.menu__num {
+  position: absolute;
+  z-index: 2;
+  top: -0.15rem;
+  left: -0.5rem;
+  display: grid;
+  place-items: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  line-height: 1;
+  color: var(--red);
+  background: var(--ink);
+  transform: rotate(10deg);
+}
+.menu__item.is-active .menu__num {
+  color: var(--ink);
+  background: var(--red);
+}
+.menu__new {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: calc(100% + 0.1rem);
+  padding: 0.05rem 0.35rem;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  background: var(--paper);
+  transform: translateY(-50%) rotate(12deg);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+.menu__item.is-active .menu__new {
+  color: var(--paper);
+  background: var(--ink);
+  box-shadow: 2px 2px 0 var(--red);
+}
+@media (pointer: coarse) {
+  .menu__num { display: none; }
+}
+
 /* White highlight + black offset slab that snap in behind the active entry */
 .menu__item::before,
 .menu__item::after {
@@ -366,7 +463,8 @@ const automations = highlights[1]
 
 /* ── Party HUD ── */
 .hud {
-  position: fixed !important;
+  position: fixed;
+  z-index: 1;
   left: 1rem;
   bottom: 3.2rem;
   width: 260px;
@@ -376,7 +474,8 @@ const automations = highlights[1]
   transform: rotate(-2deg);
   animation: p5SlideIn 0.5s var(--snap) 0.3s both;
 }
-@media (max-width: 899px) {
+/* On phones and short screens the HUD would collide with the menu; the bond panel takes over */
+@media (max-width: 899px), (max-height: 780px) {
   .hud { display: none; }
 }
 .hud__name {
@@ -410,5 +509,68 @@ const automations = highlights[1]
 }
 .hud__sp > span {
   background: #7dd3fc;
+}
+.hud__bond {
+  margin-top: 0.4rem;
+}
+
+/* ── Bond stars (HUD on desktop, panel on phones) ── */
+.stars {
+  display: flex;
+  gap: 3px;
+}
+.stars i {
+  width: 0.95rem;
+  height: 0.95rem;
+  background: rgba(255, 255, 255, 0.18);
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+.stars i.on {
+  background: var(--red);
+}
+
+.bond {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.35rem 1rem;
+  align-items: center;
+  width: min(100%, 380px);
+  border: 0;
+  padding: 0.8rem 1.3rem 0.9rem;
+  text-align: left;
+  color: var(--paper);
+  background: var(--ink);
+  clip-path: polygon(2% 0, 100% 6%, 98% 100%, 0 92%);
+  transform: rotate(2deg);
+}
+@media (min-width: 900px) and (min-height: 781px) {
+  .bond { display: none; }
+}
+.bond__title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.bond__title b {
+  font-weight: 400;
+  color: var(--red);
+}
+.bond__stars {
+  justify-self: end;
+}
+.bond__hint {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.bond__chat {
+  justify-self: end;
+  padding: 0.1rem 0.6rem;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  background: var(--paper);
+  transform: skewX(-10deg);
 }
 </style>

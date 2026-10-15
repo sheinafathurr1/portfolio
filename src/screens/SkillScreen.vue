@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import ScreenShell from '../components/ScreenShell.vue'
-import { isTypingTarget } from '../composables/nav'
+import { inputBlocked } from '../composables/nav'
 import { sfx } from '../composables/sfx'
 import { useListNav } from '../composables/useListNav'
 import { rankLabel } from '../data/phantom'
@@ -29,7 +29,7 @@ const setTab = (i: number) => {
 }
 
 const onKey = (e: KeyboardEvent) => {
-  if (isTypingTarget(e) || e.altKey || e.ctrlKey || e.metaKey) return
+  if (inputBlocked(e)) return
   const n = skillCategories.length
   const key = e.key.toLowerCase()
   if (key === 'arrowright' || key === 'd') setTab((tab.value + 1) % n)
@@ -56,8 +56,8 @@ const usedIn = computed(() => [
 </script>
 
 <template>
-  <ScreenShell title="SKILL" subtitle="Keahlian & Teknologi" number="03" :hints="[['←→', 'Kategori'], ['↑↓', 'Pilih Skill']]">
-    <div class="tabs p5-enter" role="tablist" aria-label="Kategori skill">
+  <ScreenShell title="SKILL" subtitle="Skills & Tech" number="03" :hints="[['←→', 'Category'], ['↑↓', 'Select Skill']]">
+    <div class="tabs p5-enter" role="tablist" aria-label="Skill categories">
       <button
         v-for="(cat, i) in skillCategories"
         :key="cat.key"
@@ -102,13 +102,13 @@ const usedIn = computed(() => [
             <div class="p5-bar"><span :style="{ width: `${active.level}%` }"></span></div>
             <b>{{ active.level }}%</b>
           </div>
-          <h3 class="p5-label sdetail__h">Dipakai dalam</h3>
+          <h3 class="p5-label sdetail__h">Used in</h3>
           <ul v-if="usedIn.length" class="sdetail__used">
             <li v-for="u in usedIn" :key="u.label">
               <span class="p5-chip p5-chip--red">{{ u.kind }}</span> {{ u.label }}
             </li>
           </ul>
-          <p v-else class="sdetail__none">Belum tercatat di confidant atau misi tertentu.</p>
+          <p v-else class="sdetail__none">Not tied to a specific confidant or mission yet.</p>
         </article>
       </Transition>
     </div>

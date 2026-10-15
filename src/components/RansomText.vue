@@ -29,34 +29,34 @@ function mulberry32(seed: number) {
   }
 }
 
-const letters = computed(() => {
+// Letters are grouped per word so lines break between words, not in the middle of one
+const words = computed(() => {
   const rand = mulberry32(props.seed)
-  return [...props.text].map((ch) => {
-    if (ch === ' ') return { ch, space: true, style: {} }
-    const look = LOOKS[Math.floor(rand() * LOOKS.length)] ?? LOOKS[0]!
-    return {
-      ch,
-      space: false,
-      style: {
-        ...look,
-        fontFamily: FONTS[Math.floor(rand() * FONTS.length)],
-        transform: `rotate(${((rand() - 0.5) * 16).toFixed(1)}deg) translateY(${((rand() - 0.5) * 0.14).toFixed(2)}em) scale(${(0.88 + rand() * 0.26).toFixed(2)})`,
-      },
-    }
-  })
+  return props.text
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word) =>
+      [...word].map((ch) => {
+        const look = LOOKS[Math.floor(rand() * LOOKS.length)] ?? LOOKS[0]!
+        return {
+          ch,
+          style: {
+            ...look,
+            fontFamily: FONTS[Math.floor(rand() * FONTS.length)],
+            transform: `rotate(${((rand() - 0.5) * 16).toFixed(1)}deg) translateY(${((rand() - 0.5) * 0.14).toFixed(2)}em) scale(${(0.88 + rand() * 0.26).toFixed(2)})`,
+          },
+        }
+      }),
+    )
 })
 </script>
 
 <template>
-  <span class="ransom" :style="{ fontSize: size, flexWrap: nowrap ? 'nowrap' : 'wrap' }">
+  <span class="ransom" :class="{ 'ransom--nowrap': nowrap }" :style="{ fontSize: size }">
     <span class="sr-only">{{ text }}</span>
-    <span
-      v-for="(l, i) in letters"
-      :key="i"
-      aria-hidden="true"
-      :class="l.space ? 'ransom__space' : 'ransom__ch'"
-      :style="l.style"
-    >{{ l.space ? '' : l.ch }}</span>
+    <span v-for="(word, w) in words" :key="w" class="ransom__word" aria-hidden="true">
+      <span v-for="(l, i) in word" :key="i" class="ransom__ch" :style="l.style">{{ l.ch }}</span>
+    </span>
   </span>
 </template>
 
@@ -65,16 +65,24 @@ const letters = computed(() => {
   display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.05em;
+  gap: 0.08em 0.37em;
   line-height: 1;
+}
+/* A word only splits when it can't fit on a line by itself */
+.ransom__word {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.05em;
+}
+.ransom--nowrap,
+.ransom--nowrap .ransom__word {
+  flex-wrap: nowrap;
 }
 .ransom__ch {
   display: inline-block;
   padding: 0.07em 0.13em 0.03em;
   text-transform: uppercase;
   box-shadow: 0.06em 0.06em 0 rgba(0, 0, 0, 0.55);
-}
-.ransom__space {
-  width: 0.32em;
 }
 </style>

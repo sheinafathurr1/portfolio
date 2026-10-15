@@ -9,7 +9,7 @@ import { burstConfetti } from '../utils/confetti'
 
 const ACCESS_KEY = '1a9ce086-062c-4623-aa28-623947941fc4' // Web3Forms public access key
 const MAX_CHARS = 500
-const PLACEHOLDER = 'Saya tahu kamu menyimpan ide besar yang belum terwujud. Saya akan datang untuk berkolaborasi. Bersiaplah.'
+const PLACEHOLDER = 'I know you’re sitting on a big idea that hasn’t come to life yet. I’m coming to collaborate. Be ready.'
 
 const form = ref({ name: '', email: '', message: '' })
 const status = ref<'idle' | 'sending' | 'sent' | 'error'>('idle')
@@ -17,7 +17,7 @@ const copied = ref(false)
 const submitBtn = ref<HTMLButtonElement | null>(null)
 let resetTimer: ReturnType<typeof setTimeout>
 
-const signature = computed(() => (form.value.name.trim() || 'Pengunjung Misterius').slice(0, 24))
+const signature = computed(() => (form.value.name.trim() || 'Mysterious Visitor').slice(0, 24))
 const preview = computed(() => form.value.message.trim() || PLACEHOLDER)
 
 const submit = async () => {
@@ -29,7 +29,7 @@ const submit = async () => {
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({
         access_key: ACCESS_KEY,
-        subject: `Calling card dari ${form.value.name}`,
+        subject: `Calling card from ${form.value.name}`,
         ...form.value,
       }),
     })
@@ -58,33 +58,33 @@ onUnmounted(() => clearTimeout(resetTimer))
 </script>
 
 <template>
-  <ScreenShell title="CALLING CARD" subtitle="Mari Berkolaborasi" number="07" variant="red">
+  <ScreenShell title="CALLING CARD" subtitle="Let’s Collaborate" number="07" variant="red">
     <div class="cc">
       <!-- Form -->
       <form class="ccform p5-enter" @submit.prevent="submit">
         <p class="ccform__intro">
-          Punya proyek, riset, atau sekadar ingin berdiskusi soal server &amp; AI? Tulis kartu panggilanmu, dan saya akan membalasnya.
+          Got a project, a research idea, or just want to talk servers &amp; AI? Write your calling card and I’ll answer it.
         </p>
         <label class="field">
-          <span class="field__label">Nama</span>
-          <input v-model="form.name" type="text" required maxlength="60" autocomplete="name" placeholder="Nama kamu" />
+          <span class="field__label">Name</span>
+          <input v-model="form.name" type="text" required maxlength="60" autocomplete="name" placeholder="Your name" />
         </label>
         <label class="field">
           <span class="field__label">Email</span>
-          <input v-model="form.email" type="email" required autocomplete="email" placeholder="nama@email.com" />
+          <input v-model="form.email" type="email" required autocomplete="email" placeholder="you@email.com" />
         </label>
         <label class="field">
           <span class="field__label">
-            Pesan
+            Message
             <small :class="{ warn: form.message.length > MAX_CHARS - 50 }">{{ form.message.length }}/{{ MAX_CHARS }}</small>
           </span>
-          <textarea v-model="form.message" required rows="5" :maxlength="MAX_CHARS" placeholder="Halo Switch, saya ingin berdiskusi tentang…"></textarea>
+          <textarea v-model="form.message" required rows="5" :maxlength="MAX_CHARS" placeholder="Hi Switch, I’d like to talk about…"></textarea>
         </label>
 
         <button ref="submitBtn" type="submit" class="p5-btn ccform__send" :disabled="status === 'sending'">
-          {{ status === 'sending' ? 'Mengirim…' : 'Kirim Kartu ▶' }}
+          {{ status === 'sending' ? 'Sending…' : 'Send Card ▶' }}
         </button>
-        <p v-if="status === 'error'" class="ccform__error" role="alert">Kartu gagal terkirim. Coba lagi, atau hubungi lewat email.</p>
+        <p v-if="status === 'error'" class="ccform__error" role="alert">The card didn’t go through. Try again, or reach out by email.</p>
 
         <div class="ccform__links">
           <a
@@ -98,18 +98,18 @@ onUnmounted(() => clearTimeout(resetTimer))
             <span v-html="link.icon"></span>{{ link.label }}
           </a>
           <button type="button" class="p5-btn p5-btn--red ccform__link" @click="copyEmail">
-            {{ copied ? '✔ Tersalin' : 'Salin Email' }}
+            {{ copied ? '✔ Copied' : 'Copy Email' }}
           </button>
         </div>
       </form>
 
       <!-- Live preview -->
-      <aside class="card p5-enter" style="--i: 1" aria-label="Pratinjau kartu panggilan">
+      <aside class="card p5-enter" style="--i: 1" aria-label="Calling card preview">
         <p class="card__label">— Calling Card —</p>
-        <h2 class="card__to"><RansomText text="Untuk Switch" :seed="3" size="clamp(1.8rem, 4.5vw, 2.6rem)" /></h2>
+        <h2 class="card__to"><RansomText text="To Switch" :seed="3" size="clamp(1.8rem, 4.5vw, 2.6rem)" /></h2>
         <p class="card__body" :class="{ 'is-placeholder': !form.message.trim() }">{{ preview }}</p>
         <div class="card__sign">
-          <span class="card__from">Dari</span>
+          <span class="card__from">From</span>
           <RansomText :text="signature" :seed="signature.length + 9" size="clamp(1.1rem, 3vw, 1.5rem)" />
         </div>
         <MaskEmblem class="card__mask" />
@@ -120,8 +120,8 @@ onUnmounted(() => clearTimeout(resetTimer))
     <Transition name="splash">
       <div v-if="status === 'sent'" class="splash" role="status">
         <div class="splash__burst" aria-hidden="true"></div>
-        <RansomText text="Kartu Terkirim!" :seed="42" size="clamp(2.6rem, 9vw, 5.5rem)" />
-        <p class="splash__sub">Terima kasih! Balasan akan segera meluncur ke inbox-mu.</p>
+        <RansomText text="Card Sent!" :seed="42" size="clamp(2.6rem, 9vw, 5.5rem)" />
+        <p class="splash__sub">Thank you! A reply will be heading to your inbox soon.</p>
       </div>
     </Transition>
   </ScreenShell>

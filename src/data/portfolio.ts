@@ -5,17 +5,17 @@ export const profile = {
   alias: 'Switch',
   roles: ['Technical Lead', 'AI Researcher', 'Full-Stack Developer', 'Server Engineer'],
   summary:
-    'Berfokus pada full-stack development, manajemen infrastruktur server, dan riset AI automation. Aktif meneliti Dynamic API dan membangun workflow cerdas berbasis AI.',
+    'Focused on full-stack development, server infrastructure management, and AI automation research. Actively researching Dynamic API architectures and building intelligent, AI-driven workflows.',
   stack: ['Vue.js', 'Laravel', 'Python', 'n8n', 'AI/ML', 'Linux Server'],
   email: 'sheinafathur@gmail.com',
   cvUrl: '/cv-switch.pdf',
 }
 
 export const highlights = [
-  { value: '99.9%', label: 'Server Uptime', desc: 'Rata-rata ketersediaan server operasional' },
-  { value: '10+', label: 'AI Automations', desc: 'Workflow AI yang dibangun & dioperasikan' },
-  { value: '5+', label: 'Riset & Publikasi', desc: 'Penelitian akademik & dokumen ilmiah' },
-  { value: '3+', label: 'Tim Dikelola', desc: 'Tim teknis yang dipimpin secara aktif' },
+  { value: '99.9%', label: 'Server Uptime', desc: 'Average availability of the servers I operate' },
+  { value: '10+', label: 'AI Automations', desc: 'AI workflows built and running in production' },
+  { value: '5+', label: 'Research & Papers', desc: 'Academic research and scientific documents' },
+  { value: '3+', label: 'Teams Led', desc: 'Technical teams actively led' },
 ]
 
 export const experiences: {
@@ -30,29 +30,29 @@ export const experiences: {
 }[] = [
   {
     id: 1,
-    title: 'Tenaga Lepas Harian (TLH)',
+    title: 'Daily Contract Staff (TLH)',
     company: 'CoE CAATIS',
-    period: 'Jan 2026 – Sekarang',
+    period: 'Jan 2026 – Present',
     start: '2026-01',
-    description: 'Mengelola infrastruktur operasional secara menyeluruh, termasuk pengawasan performa server dan manajemen backup data berkala. Bertanggung jawab dalam mengoordinasikan penugasan teknis harian untuk tim.',
+    description: 'Manage operational infrastructure end to end, including server performance monitoring and scheduled data backups. Coordinate the team’s daily technical assignments.',
     tags: ['Server Mgmt', 'Infrastructure', 'Linux'],
   },
   {
     id: 2,
-    title: 'Peneliti AI & Mahasiswa S2IF',
+    title: 'AI Researcher & M.Sc. Informatics Student',
     company: 'Telkom University',
-    period: '2025 – Sekarang',
-    start: '2025-08', // bulan perkiraan (period hanya mencantumkan tahun), sesuaikan bila perlu
-    description: 'Menjalankan riset akademik jenjang magister Informatika dengan fokus pada arsitektur Dynamic API, Machine Learning, dan keamanan siber. Aktif memetakan arsitektur sistem menggunakan metodologi Design Science Research (DSR).',
+    period: '2025 – Present',
+    start: '2025-08', // estimated month (the period only lists the year); adjust if needed
+    description: 'Conduct master’s-level Informatics research focused on Dynamic API architecture, Machine Learning, and cybersecurity, mapping system architectures with the Design Science Research (DSR) methodology.',
     tags: ['Machine Learning', 'Dynamic API', 'DSR'],
   },
   {
     id: 3,
     title: 'Lead Developer',
     company: 'HEI APP',
-    period: 'Maret 2026 – Sekarang',
+    period: 'Mar 2026 – Present',
     start: '2026-03',
-    description: 'Membangun dan mendokumentasikan sistem aplikasi HEI APP untuk mendigitalkan alur proses evaluasi karakter mahasiswa serta mengintegrasikan nilai-nilai universitas secara terpusat.',
+    description: 'Build and document the HEI APP system, digitizing the student character-evaluation process and integrating university values in one central platform.',
     tags: ['Vue.js', 'Laravel', 'Team Lead'],
   },
 ]
@@ -60,32 +60,32 @@ export const experiences: {
 export const projects = [
   {
     id: 1,
-    title: 'Arsitektur Dynamic API & TOPSIS',
-    category: 'riset',
+    title: 'Dynamic API Architecture & TOPSIS',
+    category: 'research',
     icon: '🔬',
     year: '2025',
-    shortDesc: 'Pengembangan Metode Pemeringkatan Publikasi Ilmiah Multi-Kriteria pada Arsitektur Dynamic API Menggunakan Pendekatan SQL-Driven Berbasis TOPSIS.',
-    fullDesc: 'Penelitian metodologi Design Science Research (DSR) yang berfokus pada sintesis artefak dan riset terbaru. Mengembangkan pemeringkatan publikasi ilmiah multi-kriteria menggunakan pendekatan SQL-Driven berbasis TOPSIS. Pendekatan ini dirancang untuk memproses data evaluasi secara lebih dinamis dan terstruktur pada database.',
+    shortDesc: 'A multi-criteria ranking method for scientific publications on a Dynamic API architecture, using a SQL-driven TOPSIS approach.',
+    fullDesc: 'Design Science Research (DSR) work focused on artifact synthesis and recent literature. Developed a multi-criteria ranking of scientific publications using a SQL-driven TOPSIS approach, designed to process evaluation data dynamically and in a well-structured way inside the database.',
     tags: ['Design Science', 'SQL-Driven', 'TOPSIS'],
   },
   {
     id: 2,
-    title: 'Automasi Ekstraksi Data Jurnal',
+    title: 'Automated Journal Data Extraction',
     category: 'development',
     icon: '🤖',
     year: '2025',
-    shortDesc: 'Membangun arsitektur workflow n8n yang diintegrasikan dengan Google Gemini API dan trigger Telegram.',
-    fullDesc: 'Membangun arsitektur workflow n8n yang diintegrasikan dengan Google Gemini API dan trigger Telegram untuk mengekstrak, meringkas, dan memproses data jurnal secara otomatis. Pipeline ini secara signifikan mengurangi beban kerja manual dengan membiarkan AI menangani ekstraksi poin-poin krusial dari dokumen.',
+    shortDesc: 'An n8n workflow architecture integrated with the Google Gemini API and Telegram triggers.',
+    fullDesc: 'Built an n8n workflow architecture integrated with the Google Gemini API and Telegram triggers to automatically extract, summarize, and process journal data. The pipeline significantly cuts manual work by letting AI pull the key points out of each document.',
     tags: ['n8n', 'Gemini API', 'Telegram Bot'],
   },
   {
     id: 3,
-    title: 'Prototype Streaming & IoT',
+    title: 'Streaming & IoT Prototype',
     category: 'development',
     icon: '📡',
     year: '2026',
-    shortDesc: 'Pengembangan prototipe aplikasi mobile untuk streaming video latensi rendah berbasis WebRTC.',
-    fullDesc: 'Membangun prototipe aplikasi mobile menggunakan Flutter yang diintegrasikan dengan perangkat keras IoT (drone). Sistem ini memanfaatkan WebRTC dan Firebase untuk menghasilkan streaming video real-time dengan latensi yang sangat rendah untuk kebutuhan pengawasan visual.',
+    shortDesc: 'A mobile app prototype for low-latency video streaming built on WebRTC.',
+    fullDesc: 'Built a Flutter mobile app prototype integrated with IoT hardware (a drone). The system uses WebRTC and Firebase to deliver real-time video streaming with very low latency for visual monitoring.',
     tags: ['Flutter', 'WebRTC', 'Firebase', 'IoT'],
   },
 ]
@@ -94,7 +94,7 @@ export type Project = (typeof projects)[number]
 
 export const skillCategories = [
   {
-    label: 'Backend & Infrastruktur',
+    label: 'Backend & Infrastructure',
     short: 'Backend',
     key: 'backend',
     skills: [
@@ -108,7 +108,7 @@ export const skillCategories = [
     ],
   },
   {
-    label: 'AI & Automasi',
+    label: 'AI & Automation',
     short: 'AI',
     key: 'ai',
     skills: [
@@ -138,17 +138,17 @@ export const skillCategories = [
 export const allSkills = skillCategories.flatMap((c) => c.skills)
 
 export const milestones = [
-  { year: '2026', title: 'Lead Developer — HEI APP', icon: '🏆', desc: 'Memimpin pengembangan sistem digital evaluasi karakter mahasiswa untuk Telkom University.' },
-  { year: '2026', title: 'Tenaga Lepas Harian — CoE CAATIS', icon: '⚙️', desc: 'Mengelola infrastruktur server dan koordinasi teknis harian untuk pusat keunggulan AI.' },
-  { year: '2025', title: 'Peneliti AI — Telkom University', icon: '🔬', desc: 'Memulai riset S2IF dengan fokus Dynamic API, Machine Learning, dan keamanan siber berbasis DSR.' },
-  { year: '2025', title: 'Automasi AI Pipeline', icon: '🤖', desc: 'Membangun 10+ workflow n8n terintegrasi Google Gemini API untuk otomatisasi ekstraksi jurnal.' },
+  { year: '2026', title: 'Lead Developer — HEI APP', icon: '🏆', desc: 'Leading development of a digital student character-evaluation system for Telkom University.' },
+  { year: '2026', title: 'Daily Contract Staff — CoE CAATIS', icon: '⚙️', desc: 'Running server infrastructure and daily technical coordination for an AI center of excellence.' },
+  { year: '2025', title: 'AI Researcher — Telkom University', icon: '🔬', desc: 'Started M.Sc. research on Dynamic API, Machine Learning, and DSR-based cybersecurity.' },
+  { year: '2025', title: 'AI Automation Pipeline', icon: '🤖', desc: 'Built 10+ n8n workflows integrated with the Google Gemini API to automate journal extraction.' },
 ]
 
 export const currentFocus = [
-  { label: 'Riset Dynamic API', icon: '🔬', pct: 90 },
-  { label: 'ML Model Training', icon: '🧠', pct: 70 },
-  { label: 'HEI APP v2',        icon: '💻', pct: 55 },
-  { label: 'Server Hardening',  icon: '🛡️', pct: 80 },
+  { label: 'Dynamic API Research', icon: '🔬', pct: 90 },
+  { label: 'ML Model Training',    icon: '🧠', pct: 70 },
+  { label: 'HEI APP v2',           icon: '💻', pct: 55 },
+  { label: 'Server Hardening',     icon: '🛡️', pct: 80 },
 ]
 
 export const socialLinks = [

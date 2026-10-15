@@ -10,10 +10,10 @@ const active = computed(() => personas[index.value] ?? personas[0]!)
 </script>
 
 <template>
-  <ScreenShell title="PERSONA" subtitle="Peran & Spesialisasi" number="02" :hints="[['↑↓', 'Pilih Persona']]">
+  <ScreenShell title="PERSONA" subtitle="Roles & Specialties" number="02" :hints="[['↑↓', 'Select Persona']]">
     <div class="split">
       <!-- Compendium list -->
-      <ul class="plist" role="listbox" aria-label="Daftar persona">
+      <ul class="plist" role="listbox" aria-label="Persona list">
         <li v-for="(p, i) in personas" :key="p.name">
           <button
             class="pcard p5-enter"
@@ -43,8 +43,8 @@ const active = computed(() => personas[index.value] ?? personas[0]!)
             </div>
             <div>
               <p class="pdetail__arcana">Arcana · {{ active.arcanaName }}</p>
-              <h2 class="pdetail__name"><RansomText :text="active.name" :seed="active.level" size="clamp(1.8rem, 4.6vw, 2.8rem)" /></h2>
-              <p class="pdetail__lv">LV <b>{{ active.level }}</b> <small>rata-rata skill inti</small></p>
+              <h2 class="pdetail__name"><RansomText :text="active.name" :seed="active.level" size="clamp(1.3rem, 4.6vw, 2.8rem)" /></h2>
+              <p class="pdetail__lv">LV <b>{{ active.level }}</b> <small>avg. of core skills</small></p>
             </div>
           </div>
 

@@ -3,7 +3,7 @@ import { inject, onMounted, onUnmounted, ref } from 'vue'
 import P5Background from '../components/P5Background.vue'
 import RansomText from '../components/RansomText.vue'
 import MaskEmblem from '../components/MaskEmblem.vue'
-import { NAV } from '../composables/nav'
+import { NAV, inputBlocked } from '../composables/nav'
 import { sfx, sfxEnabled, toggleSfx } from '../composables/sfx'
 import { profile } from '../data/portfolio'
 
@@ -22,7 +22,7 @@ const start = () => {
 }
 
 const onKey = (e: KeyboardEvent) => {
-  if (['Tab', 'Escape', 'Shift', 'Control', 'Alt', 'Meta'].includes(e.key) || e.ctrlKey || e.metaKey || e.altKey) return
+  if (['Tab', 'Escape', 'Shift', 'Control', 'Alt', 'Meta'].includes(e.key) || inputBlocked(e)) return
   start()
 }
 
@@ -37,7 +37,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <section class="screen title" tabindex="-1" aria-label="Layar judul" @click="start">
+  <section class="screen title" tabindex="-1" aria-label="Title screen" @click="start">
     <P5Background variant="red" />
     <div class="title__burst" aria-hidden="true"></div>
     <span class="title__star title__star--a" aria-hidden="true"></span>
@@ -52,12 +52,12 @@ onUnmounted(() => {
         <RansomText text="SWITCH" :seed="11" size="clamp(2.6rem, 10.5vw, 6.2rem)" nowrap />
       </h1>
       <p class="title__who">{{ profile.name }} <span>·</span> Technical Lead &amp; AI Researcher</p>
-      <p class="title__line">Bersiaplah. Portofolio ini akan mencuri perhatianmu.</p>
+      <p class="title__line">Brace yourself. This portfolio is about to steal your heart.</p>
       <MaskEmblem class="title__mask" />
     </div>
 
     <button class="title__press" @click.stop="start">
-      <span>{{ isTouch ? 'Tap untuk mulai' : 'Press any key' }}</span>
+      <span>{{ isTouch ? 'Tap to start' : 'Press any key' }}</span>
     </button>
 
     <button class="title__sfx" :aria-pressed="sfxEnabled" @click.stop="toggleSfx">

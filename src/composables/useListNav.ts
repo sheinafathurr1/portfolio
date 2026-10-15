@@ -1,5 +1,5 @@
 import { ref, onMounted, onUnmounted } from 'vue'
-import { isActivatable, isTypingTarget } from './nav'
+import { inputBlocked, isActivatable } from './nav'
 import { sfx } from './sfx'
 
 /** ↑/↓ (or W/S) moves a highlighted index through a list; Enter triggers `onEnter`. */
@@ -13,7 +13,7 @@ export function useListNav(count: () => number, options: { initial?: number; onE
   }
 
   const onKey = (e: KeyboardEvent) => {
-    if (isTypingTarget(e) || e.altKey || e.ctrlKey || e.metaKey) return
+    if (inputBlocked(e)) return
     const n = count()
     if (n === 0) return
     const key = e.key.toLowerCase()

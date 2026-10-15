@@ -6,10 +6,10 @@ const tilts = [-3, 2, -1.5, 3]
 </script>
 
 <template>
-  <ScreenShell title="THIEVES DEN" subtitle="Pencapaian & Fokus" number="06">
-    <p class="den__intro p5-enter">Selamat datang di markas. Setiap plakat di dinding ini adalah bukti misi yang berhasil.</p>
+  <ScreenShell title="THIEVES DEN" subtitle="Achievements & Focus" number="06">
+    <p class="den__intro p5-enter">Welcome to the hideout. Every plaque on this wall marks a mission accomplished.</p>
 
-    <section class="wall" aria-label="Galeri pencapaian">
+    <section class="wall" aria-label="Achievement gallery">
       <article
         v-for="(m, i) in milestones"
         :key="m.title"
@@ -26,8 +26,8 @@ const tilts = [-3, 2, -1.5, 3]
 
     <section class="todo p5-enter" style="--i: 6">
       <header class="todo__head">
-        <h2 class="p5-label">Rencana Hari Ini</h2>
-        <span class="todo__live">● Sedang berjalan</span>
+        <h2 class="p5-label">Today’s Plans</h2>
+        <span class="todo__live">● In progress</span>
       </header>
       <ul class="todo__list">
         <li v-for="f in currentFocus" :key="f.label">

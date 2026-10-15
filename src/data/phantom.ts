@@ -1,16 +1,16 @@
 // Persona 5 Royal flavour layered on top of src/data/portfolio.ts.
 // Ranks/titles here are playful self-descriptions: tweak them freely.
 import type { SectionId } from '../composables/nav'
-import { allSkills, experiences } from './portfolio'
+import { allSkills, experiences, profile, projects } from './portfolio'
 
-export const menuItems: { id: SectionId; label: string; sub: string; desc: string }[] = [
-  { id: 'status',    label: 'STATUS',       sub: 'Tentang Saya', desc: 'Profil, statistik sosial, dan catatan lapangan sang Phantom Developer.' },
-  { id: 'persona',   label: 'PERSONA',      sub: 'Peran',        desc: 'Empat topeng yang saya kenakan: peran & spesialisasi.' },
-  { id: 'skill',     label: 'SKILL',        sub: 'Keahlian',     desc: 'Daftar skill teknis lengkap dengan level penguasaan.' },
-  { id: 'confidant', label: 'CONFIDANT',    sub: 'Pengalaman',   desc: 'Ikatan kerja sama: pengalaman & organisasi tempat saya berkembang.' },
-  { id: 'missions',  label: 'MISSIONS',     sub: 'Proyek',       desc: 'Misi yang telah diselesaikan: proyek riset & pengembangan sistem.' },
-  { id: 'den',       label: 'THIEVES DEN',  sub: 'Pencapaian',   desc: 'Galeri pencapaian dan rencana yang sedang dijalankan.' },
-  { id: 'card',      label: 'CALLING CARD', sub: 'Kontak',       desc: 'Kirim kartu panggilan: mari berkolaborasi!' },
+export const menuItems: { id: SectionId; label: string; sub: string; desc: string; bond: string }[] = [
+  { id: 'status',    label: 'STATUS',       sub: 'About Me',     desc: 'Profile, social stats, and field notes on the Phantom Developer.',  bond: 'You learned who Switch really is.' },
+  { id: 'persona',   label: 'PERSONA',      sub: 'Roles',        desc: 'The four masks I wear: roles and specialties.',                     bond: 'You’ve seen the masks Switch wears.' },
+  { id: 'skill',     label: 'SKILL',        sub: 'Skills',       desc: 'My technical arsenal, with mastery levels.',                        bond: 'You studied Switch’s arsenal.' },
+  { id: 'confidant', label: 'CONFIDANT',    sub: 'Experience',   desc: 'Bonds forged at work: the teams and organizations I grow with.',   bond: 'You heard the stories of Switch’s allies.' },
+  { id: 'missions',  label: 'MISSIONS',     sub: 'Projects',     desc: 'Cleared missions: research and system development projects.',      bond: 'You reviewed Switch’s past missions.' },
+  { id: 'den',       label: 'THIEVES DEN',  sub: 'Achievements', desc: 'A gallery of achievements and the plans currently in motion.',      bond: 'You toured the hideout.' },
+  { id: 'card',      label: 'CALLING CARD', sub: 'Contact',      desc: 'Send a calling card. Let’s collaborate!',                          bond: 'You found where to send a calling card.' },
 ]
 
 const RANK_TITLES: Record<string, string[]> = {
@@ -24,11 +24,11 @@ const RANK_TITLES: Record<string, string[]> = {
 const averageSkill = Math.round(allSkills.reduce((sum, s) => sum + s.level, 0) / allSkills.length)
 
 export const socialStats = [
-  { stat: 'Knowledge',   rank: 5, note: 'Riset magister Informatika: Dynamic API, ML, keamanan siber' },
-  { stat: 'Proficiency', rank: 5, note: `${allSkills.length} skill teknis, rata-rata level ${averageSkill}%` },
-  { stat: 'Guts',        rank: 4, note: 'Memimpin tim & menjaga server tetap hidup' },
-  { stat: 'Kindness',    rank: 4, note: 'Terbuka untuk kolaborasi dan berbagi ilmu' },
-  { stat: 'Charm',       rank: 4, note: 'Menjembatani kebutuhan pengguna & tim teknis' },
+  { stat: 'Knowledge',   rank: 5, note: 'Master’s research in Informatics: Dynamic API, ML, cybersecurity' },
+  { stat: 'Proficiency', rank: 5, note: `${allSkills.length} technical skills, averaging ${averageSkill}%` },
+  { stat: 'Guts',        rank: 4, note: 'Leads teams and keeps the servers alive' },
+  { stat: 'Kindness',    rank: 4, note: 'Open to collaboration and sharing knowledge' },
+  { stat: 'Charm',       rank: 4, note: 'Bridges user needs and the technical team' },
 ].map((s) => ({ ...s, title: RANK_TITLES[s.stat]?.[s.rank - 1] ?? '' }))
 
 /** Roles presented as Personas; their "stats" are real skill levels looked up by name. */
@@ -38,25 +38,25 @@ export const personas = [
     arcana: 'IV',
     arcanaName: 'The Emperor',
     icon: '👑',
-    desc: 'Memimpin pengembangan HEI APP dan mengoordinasikan penugasan teknis harian, menjaga arsitektur tetap rapi saat kebutuhan terus berubah.',
+    desc: 'Leads HEI APP development and coordinates daily technical assignments, keeping the architecture clean while requirements keep shifting.',
     statSkills: ['GitHub', 'Laravel', 'Vue.js', 'REST API', 'TypeScript'],
-    traits: ['Team Lead', 'Code Review', 'Dokumentasi'],
+    traits: ['Team Lead', 'Code Review', 'Documentation'],
   },
   {
     name: 'AI Researcher',
     arcana: 'IX',
     arcanaName: 'The Hermit',
     icon: '🔮',
-    desc: 'Meneliti arsitektur Dynamic API, Machine Learning, dan keamanan siber dengan metodologi Design Science Research.',
+    desc: 'Researches Dynamic API architectures, Machine Learning, and cybersecurity using the Design Science Research methodology.',
     statSkills: ['Dynamic API', 'Machine Learning', 'Python', 'Gemini API', 'n8n Workflows'],
-    traits: ['Design Science', 'TOPSIS', 'Publikasi'],
+    traits: ['Design Science', 'TOPSIS', 'Publications'],
   },
   {
     name: 'Full-Stack Developer',
     arcana: 'I',
     arcanaName: 'The Magician',
     icon: '🪄',
-    desc: 'Merangkai backend Laravel & REST API dengan frontend Vue.js dan Tailwind menjadi aplikasi yang utuh.',
+    desc: 'Weaves Laravel and REST API backends together with Vue.js and Tailwind frontends into complete applications.',
     statSkills: ['Laravel', 'Vue.js', 'Tailwind CSS', 'MySQL', 'REST API'],
     traits: ['Laravel', 'Vue.js', 'Flutter'],
   },
@@ -65,9 +65,9 @@ export const personas = [
     arcana: 'VII',
     arcanaName: 'The Chariot',
     icon: '⚙️',
-    desc: 'Mengelola server, backup berkala, dan performa infrastruktur supaya layanan tetap hidup.',
+    desc: 'Runs servers, scheduled backups, and infrastructure performance so services stay up.',
     statSkills: ['Server Mgmt', 'CyberPanel', 'MySQL', 'GitHub', 'PHP'],
-    traits: ['Linux', 'Backup', 'Monitoring'],
+    traits: ['Linux', 'Backups', 'Monitoring'],
   },
 ].map((p) => {
   const stats = p.statSkills.map((name) => ({ name, level: allSkills.find((s) => s.name === name)?.level ?? 0 }))
@@ -95,3 +95,67 @@ export const confidants = experiences.map((exp) => ({
 }))
 
 export const rankLabel = (level: number) => (level >= 85 ? 'Expert' : level >= 70 ? 'Advanced' : 'Intermediate')
+
+// ── Phan-Chat: dialogue choices on the in-game phone; answers are built from the portfolio data ──
+export interface ChatTopic {
+  id: string
+  question: string
+  answer: string[]
+  action?: { label: string; to: SectionId }
+  effect?: 'attack'
+}
+
+const sharpest = [...allSkills].sort((a, b) => b.level - a.level).slice(0, 3).map((s) => s.name)
+
+export const chatIntro = [
+  'Yo! You actually made it into my portfolio. 😎',
+  'Ask me anything. Pick one of the options below.',
+]
+
+export const chatTopics: ChatTopic[] = [
+  {
+    id: 'who',
+    question: 'Who are you, exactly?',
+    answer: [
+      `I’m ${profile.name}, but around here they call me “${profile.alias}”.`,
+      'Technical lead, AI researcher and full-stack developer. I keep servers alive and teach workflows to think.',
+    ],
+    action: { label: 'Open STATUS', to: 'status' },
+  },
+  {
+    id: 'now',
+    question: 'What are you up to these days?',
+    answer: ['Juggling a few bonds at the moment:', experiences.map((e) => `▸ ${e.title} @ ${e.company}`).join('\n')],
+    action: { label: 'Open CONFIDANT', to: 'confidant' },
+  },
+  {
+    id: 'stack',
+    question: 'What’s in your arsenal?',
+    answer: [`Daily drivers: ${profile.stack.join(', ')}.`, `Sharpest blades right now: ${sharpest.join(', ')}.`],
+    action: { label: 'Open SKILL', to: 'skill' },
+  },
+  {
+    id: 'missions',
+    question: 'Show me your best work.',
+    answer: [`${projects.length} missions cleared so far:`, projects.map((p) => `▸ ${p.title} (${p.year})`).join('\n')],
+    action: { label: 'Open MISSIONS', to: 'missions' },
+  },
+  {
+    id: 'collab',
+    question: 'Are you open to collaboration?',
+    answer: ['Always. Research, server infrastructure, AI automation: count me in.', 'Send me a calling card and tell me what you have in mind.'],
+    action: { label: 'Write a calling card', to: 'card' },
+  },
+  {
+    id: 'contact',
+    question: 'How can I reach you?',
+    answer: [`Email: ${profile.email}`, 'GitHub and LinkedIn are on the Calling Card screen too.'],
+    action: { label: 'Open CALLING CARD', to: 'card' },
+  },
+  {
+    id: 'cool',
+    question: 'Show me something cool.',
+    answer: ['Heh. You asked for it…'],
+    effect: 'attack',
+  },
+]

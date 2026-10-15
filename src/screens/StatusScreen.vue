@@ -31,7 +31,7 @@ const labels = socialStats.map((s, i) => {
 </script>
 
 <template>
-  <ScreenShell title="STATUS" subtitle="Tentang Saya" number="01">
+  <ScreenShell title="STATUS" subtitle="About Me" number="01">
     <div class="status">
       <!-- ID card -->
       <article class="idcard p5-enter" style="--i: 0">
@@ -54,7 +54,7 @@ const labels = socialStats.map((s, i) => {
       <div class="status__grid">
         <!-- Bio -->
         <section class="p5-panel status__bio p5-enter" style="--i: 1">
-          <h3 class="p5-label status__h">Catatan Lapangan</h3>
+          <h3 class="p5-label status__h">Field Notes</h3>
           <p class="status__summary">{{ profile.summary }}</p>
           <h3 class="p5-label status__h">Loadout</h3>
           <div class="status__stack">
@@ -62,14 +62,14 @@ const labels = socialStats.map((s, i) => {
           </div>
           <div class="status__actions">
             <a :href="profile.cvUrl" target="_blank" class="p5-btn p5-btn--red">Download CV</a>
-            <button class="p5-btn p5-btn--light" @click="toCard">Kirim Calling Card</button>
+            <button class="p5-btn p5-btn--light" @click="toCard">Send a Calling Card</button>
           </div>
         </section>
 
         <!-- Social stats -->
         <section class="p5-panel p5-panel--paper status__social p5-enter" style="--i: 2">
           <h3 class="p5-label status__h status__h--dark">Social Stats</h3>
-          <svg viewBox="0 0 260 250" class="radar" role="img" aria-label="Diagram statistik sosial">
+          <svg viewBox="0 0 260 250" class="radar" role="img" aria-label="Social stats chart">
             <polygon v-for="k in 5" :key="k" :points="ring(k)" class="radar__ring" />
             <polygon :points="valueShape" class="radar__value" />
             <text
@@ -86,7 +86,7 @@ const labels = socialStats.map((s, i) => {
             <li v-for="s in socialStats" :key="s.stat">
               <span class="stats__name">{{ s.stat }}</span>
               <span class="stats__title">{{ s.title }}</span>
-              <span class="stats__pips" :aria-label="`Rank ${s.rank} dari 5`">
+              <span class="stats__pips" :aria-label="`Rank ${s.rank} of 5`">
                 <i v-for="n in 5" :key="n" :class="{ on: n <= s.rank }"></i>
               </span>
               <small>{{ s.note }}</small>

@@ -9,9 +9,9 @@ const active = computed(() => confidants[index.value] ?? confidants[0]!)
 </script>
 
 <template>
-  <ScreenShell title="CONFIDANT" subtitle="Pengalaman & Organisasi" number="04" :hints="[['↑↓', 'Pilih Confidant']]">
+  <ScreenShell title="CONFIDANT" subtitle="Experience & Organizations" number="04" :hints="[['↑↓', 'Select Confidant']]">
     <div class="split">
-      <ul class="clist" role="listbox" aria-label="Daftar confidant">
+      <ul class="clist" role="listbox" aria-label="Confidant list">
         <li v-for="(c, i) in confidants" :key="c.id">
           <button
             class="crow p5-enter"
@@ -29,7 +29,7 @@ const active = computed(() => confidants[index.value] ?? confidants[0]!)
             <span class="crow__info">
               <span class="crow__arcana">{{ c.arcana.name }}</span>
               <span class="crow__name">{{ c.company }}</span>
-              <span class="crow__stars" :aria-label="`Rank ${c.rank} dari 10`">
+              <span class="crow__stars" :aria-label="`Rank ${c.rank} of 10`">
                 <i v-for="n in 10" :key="n" :class="{ on: n <= c.rank }"></i>
               </span>
             </span>
@@ -50,7 +50,7 @@ const active = computed(() => confidants[index.value] ?? confidants[0]!)
               <p class="cdetail__arcana">{{ active.arcana.name }} Arcana</p>
               <h2 class="cdetail__company">{{ active.company }}</h2>
               <p class="cdetail__role">{{ active.title }}</p>
-              <p class="cdetail__period">{{ active.period }} · {{ active.months }} bulan</p>
+              <p class="cdetail__period">{{ active.period }} · {{ active.months }} {{ active.months === 1 ? 'month' : 'months' }}</p>
             </div>
           </div>
 
@@ -59,7 +59,7 @@ const active = computed(() => confidants[index.value] ?? confidants[0]!)
             <span class="cdetail__rank-num">{{ active.rank === 10 ? 'MAX' : active.rank }}</span>
             <div class="cdetail__rank-bar">
               <div class="p5-bar"><span :style="{ width: `${active.progress * 100}%` }"></span></div>
-              <small>{{ active.rank === 10 ? 'Ikatan maksimal tercapai' : 'Menuju rank berikutnya' }}</small>
+              <small>{{ active.rank === 10 ? 'Max bond reached' : 'Progress to next rank' }}</small>
             </div>
           </div>
 
@@ -72,7 +72,7 @@ const active = computed(() => confidants[index.value] ?? confidants[0]!)
               {{ tag }}
             </li>
           </ul>
-          <p class="cdetail__note">Rank naik satu tingkat setiap dua bulan kerja sama.</p>
+          <p class="cdetail__note">Rank goes up by one for every two months of working together.</p>
         </article>
       </Transition>
     </div>

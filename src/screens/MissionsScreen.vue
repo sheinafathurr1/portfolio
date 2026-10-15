@@ -7,13 +7,13 @@ import { projects } from '../data/portfolio'
 
 const { index, select } = useListNav(() => projects.length)
 const active = computed(() => projects[index.value] ?? projects[0]!)
-const place = (category: string) => (category === 'riset' ? 'Palace · Akademik' : 'Mementos · Sistem')
+const place = (category: string) => (category === 'research' ? 'Palace · Academia' : 'Mementos · Systems')
 </script>
 
 <template>
-  <ScreenShell title="MISSIONS" subtitle="Proyek & Riset" number="05" :hints="[['↑↓', 'Pilih Misi']]">
+  <ScreenShell title="MISSIONS" subtitle="Projects & Research" number="05" :hints="[['↑↓', 'Select Mission']]">
     <div class="split">
-      <ul class="mlist" role="listbox" aria-label="Daftar misi">
+      <ul class="mlist" role="listbox" aria-label="Mission list">
         <li v-for="(p, i) in projects" :key="p.id">
           <button
             class="mrow p5-enter"
@@ -43,13 +43,13 @@ const place = (category: string) => (category === 'riset' ? 'Palace · Akademik'
             <span class="mdetail__stamp p5-stamp">Mission Complete</span>
           </div>
 
-          <h2 class="mdetail__title"><RansomText :text="`Misi #0${active.id}`" :seed="active.id * 5" size="1.6rem" /></h2>
+          <h2 class="mdetail__title"><RansomText :text="`Mission #0${active.id}`" :seed="active.id * 5" size="1.6rem" /></h2>
           <p class="mdetail__name">{{ active.title }}</p>
 
           <dl class="mdetail__brief">
             <dt>Target</dt>
             <dd>{{ active.shortDesc }}</dd>
-            <dt>Laporan</dt>
+            <dt>Report</dt>
             <dd>{{ active.fullDesc }}</dd>
           </dl>
 

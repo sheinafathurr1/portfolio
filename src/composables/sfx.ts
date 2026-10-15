@@ -56,6 +56,8 @@ export const sfx = {
     tone(140, 0.28, 'sawtooth', 0, 0.06)
     tone(70, 0.35, 'square', 0.02, 0.05)
   },
+  /** Rising arpeggio for a bond rank up */
+  rankUp: () => [660, 880, 1100, 1320].forEach((f, i) => tone(f, 0.12, 'triangle', i * 0.07, 0.05)),
 }
 
 export function toggleSfx() {
