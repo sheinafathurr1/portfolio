@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, watch, inject, onMounted, onUnmounted, nextTick } from 'vue'
+import { PORTFOLIO_MODE } from '../composables/portfolioMode'
+
+const modeApi = inject(PORTFOLIO_MODE, null)
 
 const isOpen = ref(false)
 const query = ref('')
@@ -25,6 +28,9 @@ const allCommands: Command[] = [
   { id: 'nav-projects', group: 'Navigasi', icon: '🚀', label: 'Proyek & Riset', action: () => { scrollToSection('projects'); close() } },
   { id: 'nav-testi',    group: 'Navigasi', icon: '💬', label: 'Testimoni',      action: () => { scrollToSection('testimonials'); close() } },
   { id: 'nav-contact',  group: 'Navigasi', icon: '✉️', label: 'Kontak',         action: () => { scrollToSection('contact'); close() } },
+  ...(modeApi?.canUseWorld
+    ? [{ id: 'act-world', group: 'Aksi', icon: '🌐', label: 'Jelajahi Dunia 3D', action: () => { close(); modeApi.setMode('world') } }]
+    : []),
   { id: 'act-cv',       group: 'Aksi',    icon: '📄', label: 'Download CV',    action: () => { window.open('/cv-switch.pdf', '_blank'); close() } },
   { id: 'act-email',    group: 'Aksi',    icon: '📋', label: 'Salin Email',    action: () => { navigator.clipboard.writeText('sheinafathur@gmail.com').catch(() => {}); close() } },
   { id: 'act-top',      group: 'Aksi',    icon: '⬆️', label: 'Ke Atas',        action: () => { window.scrollTo({ top: 0, behavior: 'smooth' }); close() } },

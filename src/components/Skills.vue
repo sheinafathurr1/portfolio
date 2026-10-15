@@ -1,66 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+import { skillCategories } from '../data/portfolio'
 
 type ViewMode = 'bars' | 'grid'
 const viewMode = ref<ViewMode>('bars')
 
-const categories = [
-  {
-    label: 'Backend & Infrastruktur',
-    key: 'backend',
-    accentBorder: 'hover:border-blue-500/50',
-    accentIcon: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-    barFrom: 'from-blue-500',
-    barTo: 'to-cyan-500',
-    badgeBg: 'bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-100 dark:border-blue-500/20',
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg>`,
-    skills: [
-      { name: 'GitHub',      level: 95 },
-      { name: 'Laravel',     level: 90 },
-      { name: 'REST API',    level: 90 },
-      { name: 'PHP',         level: 85 },
-      { name: 'MySQL',       level: 85 },
-      { name: 'Server Mgmt', level: 80 },
-      { name: 'CyberPanel',  level: 75 },
-    ],
-  },
-  {
-    label: 'AI & Automasi',
-    key: 'ai',
-    accentBorder: 'hover:border-violet-500/50',
-    accentIcon: 'bg-violet-500/10 text-violet-600 dark:text-violet-400',
-    barFrom: 'from-violet-500',
-    barTo: 'to-purple-500',
-    badgeBg: 'bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300 border-violet-100 dark:border-violet-500/20',
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>`,
-    skills: [
-      { name: 'Dynamic API',     level: 92 },
-      { name: 'n8n Workflows',   level: 88 },
-      { name: 'Gemini API',      level: 85 },
-      { name: 'Telegram Bot',    level: 85 },
-      { name: 'Python',          level: 80 },
-      { name: 'Machine Learning',level: 72 },
-    ],
-  },
-  {
-    label: 'Frontend & Mobile',
-    key: 'frontend',
-    accentBorder: 'hover:border-emerald-500/50',
-    accentIcon: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-    barFrom: 'from-emerald-500',
-    barTo: 'to-teal-500',
-    badgeBg: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-100 dark:border-emerald-500/20',
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>`,
-    skills: [
-      { name: 'Tailwind CSS', level: 92 },
-      { name: 'Vue.js',       level: 88 },
-      { name: 'TypeScript',   level: 82 },
-      { name: 'Flutter',      level: 72 },
-      { name: 'Firebase',     level: 70 },
-      { name: 'WebRTC',       level: 68 },
-    ],
-  },
-]
+const categories = skillCategories
 
 const levelLabel = (level: number) =>
   level >= 85 ? 'Expert' : level >= 70 ? 'Advanced' : 'Intermediate'
@@ -75,7 +20,7 @@ onMounted(() => {
   const section = document.getElementById('skills')
   if (!section) return
   observer = new IntersectionObserver(
-    ([entry]) => { if (entry.isIntersecting && !animated.value) animated.value = true },
+    ([entry]) => { if (entry?.isIntersecting && !animated.value) animated.value = true },
     { threshold: 0.2 }
   )
   observer.observe(section)

@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+import { profile } from '../data/portfolio'
 
 // ── Typing animation ──
-const roles = ['Technical Lead', 'AI Researcher', 'Full-Stack Developer', 'Server Engineer']
+const roles = profile.roles
 const currentRole = ref(0)
 const displayedRole = ref('')
 const isDeleting = ref(false)
 let typingTimer: ReturnType<typeof setTimeout>
 
 const typeRole = () => {
-  const target = roles[currentRole.value]
+  const target = roles[currentRole.value] ?? ''
   if (!isDeleting.value) {
     displayedRole.value = target.substring(0, displayedRole.value.length + 1)
     if (displayedRole.value === target) {

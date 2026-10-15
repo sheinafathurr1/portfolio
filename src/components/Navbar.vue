@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, watch, nextTick, inject, onMounted, onUnmounted } from 'vue'
+import { PORTFOLIO_MODE } from '../composables/portfolioMode'
+
+const modeApi = inject(PORTFOLIO_MODE, null)
+const canUseWorld = modeApi?.canUseWorld ?? false
 
 const isDark = ref(true)
 const isMenuOpen = ref(false)
@@ -48,6 +52,10 @@ const toggleTheme = () => {
 const toggleMenu = () => { isMenuOpen.value = !isMenuOpen.value }
 const closeMenu = () => { isMenuOpen.value = false }
 const openCommandPalette = () => window.dispatchEvent(new Event('open-command-palette'))
+const openWorld = () => {
+  closeMenu()
+  modeApi?.setMode('world')
+}
 
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 20
@@ -171,6 +179,19 @@ onUnmounted(() => {
           </svg>
         </button>
 
+        <!-- 3D world mode -->
+        <button
+          v-if="canUseWorld"
+          @click="openWorld"
+          class="animate-glow-pulse flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-500 hover:to-blue-500 transition-colors"
+          title="Jelajahi portofolio dalam dunia 3D"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+          </svg>
+          <span><span class="hidden lg:inline">Mode </span>3D</span>
+        </button>
+
         <!-- ⌘K Command palette trigger -->
         <button
           @click="openCommandPalette"
@@ -250,6 +271,13 @@ onUnmounted(() => {
             </svg>
             Download CV
           </a>
+          <button
+            v-if="canUseWorld"
+            @click="openWorld"
+            class="bg-gradient-to-r from-violet-600 to-blue-600 text-white px-4 py-2.5 rounded-xl font-semibold"
+          >
+            🌐 Jelajahi Mode 3D
+          </button>
           <a
             href="#contact"
             @click="closeMenu"

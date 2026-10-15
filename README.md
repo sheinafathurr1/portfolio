@@ -1,6 +1,25 @@
 # portofolio
 
-This template should help get you started developing with Vue 3 in Vite.
+Portofolio Switch (Sheina Fathur) dengan dua mode tampilan:
+
+- **Dunia 3D (default)**: pulau interaktif berbasis [three.js](https://threejs.org/) + [cannon-es](https://github.com/pmndrs/cannon-es).
+  Pengunjung menggelindingkan bot kecil (WASD/panah, Space lompat, Shift boost, R ulang; joystick di HP) ke tiap area:
+  Tentang, Pengalaman, Keahlian (peti yang bisa ditabrak), Proyek, Pencapaian, dan Kontak. Ada 8 *data core* untuk dikumpulkan.
+- **Versi klasik**: halaman scroll biasa. Bisa dibuka lewat tombol "Versi Klasik", dan otomatis dipakai bila browser
+  tidak mendukung WebGL atau URL berisi anchor (mis. `/#projects`). Pilihan terakhir pengunjung diingat di `localStorage`.
+
+Struktur penting:
+
+| Path | Isi |
+| --- | --- |
+| `src/data/portfolio.ts` | **Semua konten** (profil, pengalaman, proyek, skill, pencapaian, sosial). Dipakai oleh kedua mode. |
+| `src/world/layout.ts` | Posisi zona, ramp, platform, dan data core di pulau 3D. |
+| `src/world/*.ts` | Scene 3D: `World` (renderer, loop, kamera), `Player`, `Environment`, `Zones`, `Props`. |
+| `src/components/WorldExperience.vue` | UI mode 3D: layar intro, HUD, panel info zona, minimap, kontrol sentuh. |
+| `src/components/ClassicPortfolio.vue` | Layout versi klasik. |
+
+three.js hanya diunduh saat mode 3D dibuka (chunk terpisah ~180 kB gzip). Kualitas grafis (bloom, resolusi)
+turun otomatis bila frame rate perangkat rendah.
 
 ## Recommended IDE Setup
 

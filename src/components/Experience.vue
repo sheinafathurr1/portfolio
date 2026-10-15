@@ -1,37 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+import { experiences, type Accent } from '../data/portfolio'
 
-const experiences = [
-  {
-    id: 1,
-    title: 'Tenaga Lepas Harian (TLH)',
-    company: 'CoE CAATIS',
-    period: 'Jan 2026 – Sekarang',
-    description: 'Mengelola infrastruktur operasional secara menyeluruh, termasuk pengawasan performa server dan manajemen backup data berkala. Bertanggung jawab dalam mengoordinasikan penugasan teknis harian untuk tim.',
-    tags: ['Server Mgmt', 'Infrastructure', 'Linux'],
-    accent: 'blue',
-  },
-  {
-    id: 2,
-    title: 'Peneliti AI & Mahasiswa S2IF',
-    company: 'Telkom University',
-    period: '2025 – Sekarang',
-    description: 'Menjalankan riset akademik jenjang magister Informatika dengan fokus pada arsitektur Dynamic API, Machine Learning, dan keamanan siber. Aktif memetakan arsitektur sistem menggunakan metodologi Design Science Research (DSR).',
-    tags: ['Machine Learning', 'Dynamic API', 'DSR'],
-    accent: 'violet',
-  },
-  {
-    id: 3,
-    title: 'Lead Developer',
-    company: 'HEI APP',
-    period: 'Maret 2026 – Sekarang',
-    description: 'Membangun dan mendokumentasikan sistem aplikasi HEI APP untuk mendigitalkan alur proses evaluasi karakter mahasiswa serta mengintegrasikan nilai-nilai universitas secara terpusat.',
-    tags: ['Vue.js', 'Laravel', 'Team Lead'],
-    accent: 'emerald',
-  },
-]
-
-const accentConfig: Record<string, { dot: string; ping: string; bar: string; border: string; shadow: string }> = {
+const accentConfig: Record<Accent, { dot: string; ping: string; bar: string; border: string; shadow: string }> = {
   blue:    { dot: 'from-blue-500 to-cyan-500 shadow-blue-500/30',    ping: 'bg-blue-500',    bar: 'from-blue-500 to-cyan-500',    border: 'hover:border-blue-500/40',    shadow: 'hover:shadow-blue-500/10' },
   violet:  { dot: 'from-violet-500 to-purple-500 shadow-violet-500/30', ping: 'bg-violet-500', bar: 'from-violet-500 to-purple-500', border: 'hover:border-violet-500/40', shadow: 'hover:shadow-violet-500/10' },
   emerald: { dot: 'from-emerald-500 to-teal-500 shadow-emerald-500/30', ping: 'bg-emerald-500', bar: 'from-emerald-500 to-teal-500', border: 'hover:border-emerald-500/40', shadow: 'hover:shadow-emerald-500/10' },
@@ -44,7 +15,7 @@ let observer: IntersectionObserver | null = null
 onMounted(() => {
   if (!timelineContainer.value) return
   observer = new IntersectionObserver(
-    ([entry]) => { if (entry.isIntersecting) lineAnimated.value = true },
+    ([entry]) => { if (entry?.isIntersecting) lineAnimated.value = true },
     { threshold: 0.1 }
   )
   observer.observe(timelineContainer.value)

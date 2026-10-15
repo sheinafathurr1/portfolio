@@ -62,7 +62,9 @@ let observer: IntersectionObserver | null = null
 const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3)
 
 const animateCounter = (index: number) => {
-  const { target, suffix } = stats[index]
+  const stat = stats[index]
+  if (!stat) return
+  const { target, suffix } = stat
   const duration = 1600
   const start = performance.now()
   const tick = (now: number) => {
@@ -79,7 +81,7 @@ onMounted(() => {
   if (!section) return
   observer = new IntersectionObserver(
     ([entry]) => {
-      if (entry.isIntersecting && !hasAnimated) {
+      if (entry?.isIntersecting && !hasAnimated) {
         hasAnimated = true
         animated.value = true
         stats.forEach((_, i) => setTimeout(() => animateCounter(i), i * 150))

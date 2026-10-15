@@ -1,55 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-
-const milestones = [
-  {
-    year: '2026',
-    title: 'Lead Developer — HEI APP',
-    desc: 'Memimpin pengembangan sistem digital evaluasi karakter mahasiswa untuk Telkom University.',
-    icon: '🏆',
-    color: 'from-blue-500 to-cyan-500',
-    bg: 'bg-blue-500/10',
-    border: 'border-blue-200 dark:border-blue-500/20',
-    text: 'text-blue-600 dark:text-blue-400',
-  },
-  {
-    year: '2026',
-    title: 'Tenaga Lepas Harian — CoE CAATIS',
-    desc: 'Mengelola infrastruktur server dan koordinasi teknis harian untuk pusat keunggulan AI.',
-    icon: '⚙️',
-    color: 'from-cyan-500 to-teal-500',
-    bg: 'bg-cyan-500/10',
-    border: 'border-cyan-200 dark:border-cyan-500/20',
-    text: 'text-cyan-600 dark:text-cyan-400',
-  },
-  {
-    year: '2025',
-    title: 'Peneliti AI — Telkom University',
-    desc: 'Memulai riset S2IF dengan fokus Dynamic API, Machine Learning, dan keamanan siber berbasis DSR.',
-    icon: '🔬',
-    color: 'from-violet-500 to-purple-500',
-    bg: 'bg-violet-500/10',
-    border: 'border-violet-200 dark:border-violet-500/20',
-    text: 'text-violet-600 dark:text-violet-400',
-  },
-  {
-    year: '2025',
-    title: 'Automasi AI Pipeline',
-    desc: 'Membangun 10+ workflow n8n terintegrasi Google Gemini API untuk otomatisasi ekstraksi jurnal.',
-    icon: '🤖',
-    color: 'from-emerald-500 to-teal-500',
-    bg: 'bg-emerald-500/10',
-    border: 'border-emerald-200 dark:border-emerald-500/20',
-    text: 'text-emerald-600 dark:text-emerald-400',
-  },
-]
-
-const currentFocus = [
-  { label: 'Riset Dynamic API',  icon: '🔬', pct: 90 },
-  { label: 'ML Model Training',  icon: '🧠', pct: 70 },
-  { label: 'HEI APP v2',         icon: '💻', pct: 55 },
-  { label: 'Server Hardening',   icon: '🛡️', pct: 80 },
-]
+import { milestones, currentFocus } from '../data/portfolio'
 
 const animated = ref(false)
 let observer: IntersectionObserver | null = null
@@ -58,7 +9,7 @@ onMounted(() => {
   const section = document.getElementById('achievements')
   if (!section) return
   observer = new IntersectionObserver(
-    ([entry]) => { if (entry.isIntersecting && !animated.value) animated.value = true },
+    ([entry]) => { if (entry?.isIntersecting && !animated.value) animated.value = true },
     { threshold: 0.2 }
   )
   observer.observe(section)

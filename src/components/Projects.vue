@@ -1,47 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-
-const projects = [
-  {
-    id: 1,
-    title: 'Arsitektur Dynamic API & TOPSIS',
-    category: 'riset',
-    gradient: 'from-violet-600 via-purple-500 to-indigo-600',
-    glowColor: 'hover:shadow-violet-500/20',
-    borderHover: 'hover:border-violet-500/60',
-    icon: '🔬',
-    year: '2025',
-    shortDesc: 'Pengembangan Metode Pemeringkatan Publikasi Ilmiah Multi-Kriteria pada Arsitektur Dynamic API Menggunakan Pendekatan SQL-Driven Berbasis TOPSIS.',
-    fullDesc: 'Penelitian metodologi Design Science Research (DSR) yang berfokus pada sintesis artefak dan riset terbaru. Mengembangkan pemeringkatan publikasi ilmiah multi-kriteria menggunakan pendekatan SQL-Driven berbasis TOPSIS. Pendekatan ini dirancang untuk memproses data evaluasi secara lebih dinamis dan terstruktur pada database.',
-    tags: ['Design Science', 'SQL-Driven', 'TOPSIS'],
-  },
-  {
-    id: 2,
-    title: 'Automasi Ekstraksi Data Jurnal',
-    category: 'development',
-    gradient: 'from-blue-600 via-cyan-500 to-sky-500',
-    glowColor: 'hover:shadow-blue-500/20',
-    borderHover: 'hover:border-blue-500/60',
-    icon: '🤖',
-    year: '2025',
-    shortDesc: 'Membangun arsitektur workflow n8n yang diintegrasikan dengan Google Gemini API dan trigger Telegram.',
-    fullDesc: 'Membangun arsitektur workflow n8n yang diintegrasikan dengan Google Gemini API dan trigger Telegram untuk mengekstrak, meringkas, dan memproses data jurnal secara otomatis. Pipeline ini secara signifikan mengurangi beban kerja manual dengan membiarkan AI menangani ekstraksi poin-poin krusial dari dokumen.',
-    tags: ['n8n', 'Gemini API', 'Telegram Bot'],
-  },
-  {
-    id: 3,
-    title: 'Prototype Streaming & IoT',
-    category: 'development',
-    gradient: 'from-emerald-600 via-teal-500 to-cyan-600',
-    glowColor: 'hover:shadow-emerald-500/20',
-    borderHover: 'hover:border-emerald-500/60',
-    icon: '📡',
-    year: '2026',
-    shortDesc: 'Pengembangan prototipe aplikasi mobile untuk streaming video latensi rendah berbasis WebRTC.',
-    fullDesc: 'Membangun prototipe aplikasi mobile menggunakan Flutter yang diintegrasikan dengan perangkat keras IoT (drone). Sistem ini memanfaatkan WebRTC dan Firebase untuk menghasilkan streaming video real-time dengan latensi yang sangat rendah untuk kebutuhan pengawasan visual.',
-    tags: ['Flutter', 'WebRTC', 'Firebase', 'IoT'],
-  },
-]
+import { projects } from '../data/portfolio'
 
 const activeCategory = ref('semua')
 const isModalOpen = ref(false)
