@@ -308,6 +308,14 @@ export class Props {
     d.body.sleep()
   }
 
+  /** Calls `fn` for every letter/crate within `radius` of (x, z), with a 1→0 distance falloff. */
+  forEachBodyNear(x: number, z: number, radius: number, fn: (body: CANNON.Body, falloff: number) => void) {
+    for (const d of this.dynamics) {
+      const dist = Math.hypot(d.body.position.x - x, d.body.position.z - z)
+      if (dist < radius) fn(d.body, 1 - dist / radius)
+    }
+  }
+
   /** Put the letters and crates back where they started. */
   resetAll() {
     for (const d of this.dynamics) this.resetProp(d)

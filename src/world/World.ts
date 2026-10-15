@@ -71,7 +71,7 @@ export class World {
   private transition = 0
   private zoom = 1
   private activeZone: ZoneId | null = null
-  private bumpCooldown = new WeakMap<CANNON.Body, number>()
+  private lastBump = -1
   private bumpImpulse = new CANNON.Vec3()
   private bumpPoint = new CANNON.Vec3(0, 0.3, 0)
   private camGoal = new THREE.Vector3()
@@ -138,18 +138,25 @@ export class World {
     this.labelRenderer.setSize(w, h)
   }
 
-  /** Give letters/crates an arcade-style kick when the bot rams them, so they topple instead of sliding. */
+  /**
+   * Arcade-style impact when the bot rams a letter/crate at speed. Touching crates act as one heavy block
+   * in a pure physics sim, so the kick goes to every prop near the impact, making stacks burst and topple.
+   */
   private handleBump = (e: { body: CANNON.Body }) => {
-    const other = e.body
-    if (other.collisionFilterGroup !== GROUP.DYNAMIC) return
+    if (e.body.collisionFilterGroup !== GROUP.DYNAMIC) return
     const v = this.player.body.velocity
-    if (Math.hypot(v.x, v.z) < 3) return
-    if (this.elapsed - (this.bumpCooldown.get(other) ?? -1) < 0.3) return
-    this.bumpCooldown.set(other, this.elapsed)
-    const k = other.mass * 0.45
-    this.bumpImpulse.set(v.x * k, other.mass * 2.2, v.z * k)
-    other.wakeUp()
-    other.applyImpulse(this.bumpImpulse, this.bumpPoint)
+    const speed = Math.hypot(v.x, v.z)
+    if (speed < 3 || this.elapsed - this.lastBump < 0.35) return
+    this.lastBump = this.elapsed
+    const p = this.player.body.position
+    const ax = p.x + (v.x / speed) * 1.2
+    const az = p.z + (v.z / speed) * 1.2
+    this.props.forEachBodyNear(ax, az, 2.6, (body, falloff) => {
+      const k = body.mass * falloff
+      this.bumpImpulse.set(v.x * 0.6 * k, (1.5 + speed * 0.25) * k, v.z * 0.6 * k)
+      body.wakeUp()
+      body.applyImpulse(this.bumpImpulse, this.bumpPoint)
+    })
   }
 
   private handleWheel = (e: WheelEvent) => {

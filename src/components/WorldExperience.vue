@@ -152,6 +152,7 @@ const drawMinimap = () => {
   if (!ctx) return
   const dpr = Math.min(window.devicePixelRatio, 2)
   const css = canvas.clientWidth
+  if (css === 0) return // minimap is hidden on small screens
   if (canvas.width !== Math.round(css * dpr)) {
     canvas.width = Math.round(css * dpr)
     canvas.height = Math.round(css * dpr)

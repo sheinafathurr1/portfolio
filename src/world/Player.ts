@@ -140,6 +140,13 @@ export class Player {
   }
 
   private updateGrounded() {
+    // Supporting contacts from the last step: catches slopes like the ramp, where the short ray can miss
+    for (const c of this.physics.contacts) {
+      if ((c.bi === this.body && c.ni.y < -0.5) || (c.bj === this.body && c.ni.y > 0.5)) {
+        this.grounded = true
+        return
+      }
+    }
     const p = this.body.position
     this.rayFrom.set(p.x, p.y, p.z)
     this.rayTo.set(p.x, p.y - RADIUS - 0.18, p.z)
