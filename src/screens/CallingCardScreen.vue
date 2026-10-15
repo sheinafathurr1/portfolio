@@ -6,6 +6,7 @@ import MaskEmblem from '../components/MaskEmblem.vue'
 import { clearRequest } from '../composables/requests'
 import { sfx } from '../composables/sfx'
 import { profile, socialLinks } from '../data/portfolio'
+import { renderCallingCard } from '../utils/callingCard'
 import { burstConfetti } from '../utils/confetti'
 
 const ACCESS_KEY = '1a9ce086-062c-4623-aa28-623947941fc4' // Web3Forms public access key
@@ -54,6 +55,33 @@ const copyEmail = () => {
     copied.value = true
     setTimeout(() => { copied.value = false }, 2200)
   }).catch(() => {})
+}
+
+// Export the live preview as a PNG the visitor can keep or share
+const exporting = ref(false)
+const exportFailed = ref(false)
+const downloadCard = async () => {
+  if (exporting.value) return
+  exporting.value = true
+  exportFailed.value = false
+  try {
+    const blob = await renderCallingCard({ message: preview.value, from: signature.value })
+    if (!blob) throw new Error('canvas unavailable')
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `calling-card-${signature.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'phantom'}.png`
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    setTimeout(() => URL.revokeObjectURL(url), 2000)
+    sfx.confirm()
+    clearRequest('forger')
+  } catch {
+    exportFailed.value = true
+  } finally {
+    exporting.value = false
+  }
 }
 
 onUnmounted(() => clearTimeout(resetTimer))
@@ -106,16 +134,25 @@ onUnmounted(() => clearTimeout(resetTimer))
       </form>
 
       <!-- Live preview -->
-      <aside class="card p5-enter" style="--i: 1" aria-label="Calling card preview">
-        <p class="card__label">— Calling Card —</p>
-        <h2 class="card__to"><RansomText text="To Switch" :seed="3" size="clamp(1.8rem, 4.5vw, 2.6rem)" /></h2>
-        <p class="card__body" :class="{ 'is-placeholder': !form.message.trim() }">{{ preview }}</p>
-        <div class="card__sign">
-          <span class="card__from">From</span>
-          <RansomText :text="signature" :seed="signature.length + 9" size="clamp(1.1rem, 3vw, 1.5rem)" />
+      <div class="cc__side">
+        <aside class="card p5-enter" style="--i: 1" aria-label="Calling card preview">
+          <p class="card__label">— Calling Card —</p>
+          <h2 class="card__to"><RansomText text="To Switch" :seed="3" size="clamp(1.8rem, 4.5vw, 2.6rem)" /></h2>
+          <p class="card__body" :class="{ 'is-placeholder': !form.message.trim() }">{{ preview }}</p>
+          <div class="card__sign">
+            <span class="card__from">From</span>
+            <RansomText :text="signature" :seed="signature.length + 9" size="clamp(1.1rem, 3vw, 1.5rem)" />
+          </div>
+          <MaskEmblem class="card__mask" />
+        </aside>
+        <div class="cc__export p5-enter" style="--i: 2">
+          <button type="button" class="p5-btn" :disabled="exporting" @click="downloadCard">
+            {{ exporting ? 'Forging…' : 'Download card as image ⬇' }}
+          </button>
+          <small v-if="exportFailed" role="alert">Couldn’t create the image in this browser.</small>
+          <small v-else>Your message and name, as a PNG you can share.</small>
         </div>
-        <MaskEmblem class="card__mask" />
-      </aside>
+      </div>
     </div>
 
     <!-- Success splash -->
@@ -240,8 +277,23 @@ onUnmounted(() => clearTimeout(resetTimer))
   transform: rotate(3deg);
   box-shadow: 14px 14px 0 var(--ink);
 }
+.cc__side {
+  display: grid;
+  gap: 1.6rem;
+}
 @media (min-width: 960px) {
-  .card { position: sticky; top: 1.5rem; }
+  .cc__side { position: sticky; top: 1.5rem; }
+}
+.cc__export {
+  display: grid;
+  justify-items: start;
+  gap: 0.4rem;
+}
+.cc__export small {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--paper);
+  text-shadow: 1px 1px 0 var(--ink);
 }
 .card__label {
   margin: 0 0 0.6rem;

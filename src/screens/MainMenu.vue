@@ -6,6 +6,7 @@ import HintBar from '../components/HintBar.vue'
 import { NAV } from '../composables/nav'
 import { BOND_MAX, bondRank, visited } from '../composables/bond'
 import { openOverlay } from '../composables/overlay'
+import { loadWeather, raining, weather, weatherCity } from '../composables/weather'
 import { sfx } from '../composables/sfx'
 import { useListNav } from '../composables/useListNav'
 import { menuItems } from '../data/phantom'
@@ -37,7 +38,10 @@ const offsets = ['0rem', '3.2rem', '1rem', '4.2rem', '1.6rem', '3.6rem', '2.2rem
 // Date widget (WIB) with time-of-day phase, P5-calendar style
 const now = ref(new Date())
 let clock: ReturnType<typeof setInterval>
-onMounted(() => { clock = setInterval(() => { now.value = new Date() }, 30_000) })
+onMounted(() => {
+  clock = setInterval(() => { now.value = new Date() }, 30_000)
+  loadWeather()
+})
 onUnmounted(() => clearInterval(clock))
 
 const wib = computed(() => new Date(now.value.toLocaleString('en-US', { timeZone: 'Asia/Jakarta' })))
@@ -64,6 +68,7 @@ const openChat = () => {
 <template>
   <section class="screen menu" tabindex="-1" aria-label="Main menu">
     <P5Background variant="red" />
+    <div v-if="raining" class="rain" :class="{ 'rain--storm': weather?.kind === 'storm' }" aria-hidden="true"></div>
 
     <!-- Calendar widget -->
     <div class="date" aria-label="Today’s date">
@@ -72,9 +77,14 @@ const openChat = () => {
         <span class="date__dow">{{ dayLabel }}</span>
       </div>
       <div class="date__phase">{{ phase.label }} <span>{{ phase.icon }}</span></div>
+      <div v-if="weather" class="date__weather" :title="`Live weather in ${weatherCity}`">
+        <span class="date__weather-icon" aria-hidden="true">{{ weather.icon }}</span>
+        {{ weather.label }}<template v-if="weather.temp !== null"> · {{ weather.temp }}°C</template>
+        <small>{{ weatherCity }}</small>
+      </div>
     </div>
 
-    <div class="menu__layout">
+    <div class="menu__layout" :class="{ 'has-weather': weather }">
       <!-- Left: "character" emblem + description of the highlighted entry -->
       <div class="menu__left">
         <div class="portrait" aria-hidden="true">
@@ -197,6 +207,63 @@ const openChat = () => {
 .date__phase span {
   color: var(--red);
 }
+.date__weather {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: max-content;
+  margin: 0.45rem 0 0 2.1rem;
+  padding: 0.1rem 0.7rem 0.1rem 0.3rem;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--paper);
+  transform: rotate(-8deg) skewX(-14deg);
+  animation: p5SlideIn 0.4s var(--snap) both;
+}
+.date__weather-icon {
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  font-size: 1rem;
+  color: var(--paper);
+  background: var(--red);
+  border-radius: 50%;
+}
+.date__weather small {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  color: #666;
+}
+
+/* ── Rain when it's raining in Bandung: two tiled layers of drops, falling at different speeds ── */
+.rain {
+  position: fixed;
+  inset: -25%;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='220'%3E%3Cg stroke='white' stroke-linecap='round'%3E%3Cpath d='M20 10v46' stroke-opacity='.5' stroke-width='2'/%3E%3Cpath d='M70 120v34' stroke-opacity='.3' stroke-width='1.5'/%3E%3Cpath d='M115 40v52' stroke-opacity='.45' stroke-width='2'/%3E%3Cpath d='M145 160v30' stroke-opacity='.25' stroke-width='1.5'/%3E%3Cpath d='M45 165v40' stroke-opacity='.4' stroke-width='2'/%3E%3C/g%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='220'%3E%3Cg stroke='white' stroke-linecap='round'%3E%3Cpath d='M20 10v46' stroke-opacity='.5' stroke-width='2'/%3E%3Cpath d='M70 120v34' stroke-opacity='.3' stroke-width='1.5'/%3E%3Cpath d='M115 40v52' stroke-opacity='.45' stroke-width='2'/%3E%3Cpath d='M145 160v30' stroke-opacity='.25' stroke-width='1.5'/%3E%3Cpath d='M45 165v40' stroke-opacity='.4' stroke-width='2'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 160px 220px, 110px 150px;
+  transform: rotate(14deg);
+  animation: rainFall 0.5s linear infinite;
+}
+.rain--storm {
+  animation: rainFall 0.32s linear infinite, lightning 7s steps(1) infinite;
+}
+@keyframes rainFall {
+  to { background-position: 0 220px, 0 300px; }
+}
+@keyframes lightning {
+  0%, 93%, 96%, 100% { box-shadow: none; }
+  94%, 97% { box-shadow: inset 0 0 0 100vmax rgba(255, 255, 255, 0.25); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rain, .rain--storm { animation: none; }
+}
 
 /* ── Layout ── */
 .menu__layout {
@@ -208,8 +275,13 @@ const openChat = () => {
   max-width: 1280px;
   margin: 0 auto;
 }
+/* Phones: the calendar widget grows a weather row, so push the menu down a bit */
+.menu__layout.has-weather {
+  padding-top: 10.5rem;
+}
 @media (min-width: 900px) {
-  .menu__layout {
+  .menu__layout,
+  .menu__layout.has-weather {
     grid-template-columns: 1fr 1.15fr;
     align-items: center;
     padding: 2rem 2rem 6rem;

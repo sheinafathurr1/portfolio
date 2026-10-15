@@ -273,6 +273,27 @@ button {
   80% { transform: translate(2px, -1px); }
 }
 
+/* Printing (the résumé view): let the page flow and drop the game chrome */
+@media print {
+  @page { margin: 14mm; }
+  html,
+  body {
+    height: auto;
+    overflow: visible;
+    background: #fff;
+  }
+  .screen {
+    position: static;
+    overflow: visible;
+  }
+  .wipe,
+  .hints,
+  .rankup,
+  .req-toast {
+    display: none !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

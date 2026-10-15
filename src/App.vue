@@ -10,6 +10,7 @@ import MissionsScreen from './screens/MissionsScreen.vue'
 import DenScreen from './screens/DenScreen.vue'
 import BattleScreen from './screens/BattleScreen.vue'
 import CallingCardScreen from './screens/CallingCardScreen.vue'
+import ResumeScreen from './screens/ResumeScreen.vue'
 import PhoneChat from './components/PhoneChat.vue'
 import HelpOverlay from './components/HelpOverlay.vue'
 import AllOutAttack from './components/AllOutAttack.vue'
@@ -39,7 +40,7 @@ const isSection = (id: ScreenId): id is SectionId => id in SECTIONS
 // Screens live in the URL hash (#/status, #/skill, …) so links can be shared and the back button works
 const fromHash = (): ScreenId => {
   const id = window.location.hash.replace(/^#\/?/, '')
-  if (id === 'menu') return 'menu'
+  if (id === 'menu' || id === 'resume') return id
   return id in SECTIONS ? (id as SectionId) : 'title'
 }
 
@@ -48,6 +49,7 @@ const menuIndex = ref(Math.max(0, menuItems.findIndex((m) => m.id === current.va
 const screen = computed<Component>(() => {
   if (current.value === 'title') return TitleScreen
   if (current.value === 'menu') return MainMenu
+  if (current.value === 'resume') return ResumeScreen
   return SECTIONS[current.value]
 })
 
@@ -238,7 +240,8 @@ const syncFromUrl = () => show(fromHash())
 
 const setTitle = (id: ScreenId) => {
   const item = menuItems.find((m) => m.id === id)
-  document.title = item ? `${item.label} · Switch` : id === 'menu' ? 'Menu · Switch' : 'Switch | Technical Lead & AI Researcher'
+  const named: Partial<Record<ScreenId, string>> = { menu: 'Menu · Switch', resume: 'Résumé · Sheina Fathur (Switch)' }
+  document.title = item ? `${item.label} · Switch` : (named[id] ?? 'Switch | Technical Lead & AI Researcher')
 }
 watch(current, setTitle, { immediate: true })
 

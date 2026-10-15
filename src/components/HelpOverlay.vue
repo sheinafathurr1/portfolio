@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { inject, onMounted, ref } from 'vue'
 import { BOND_MAX, bondRank, resetBond } from '../composables/bond'
+import { NAV } from '../composables/nav'
 import { closeOverlay } from '../composables/overlay'
 import { REQUESTS, clearedCount, resetRequests } from '../composables/requests'
 import { sfx, sfxEnabled, toggleSfx } from '../composables/sfx'
@@ -17,6 +18,13 @@ const controls: [string, string][] = [
   ['C', 'Open Phan-Chat'],
   ['?', 'This screen'],
 ]
+
+const nav = inject(NAV)
+const openResume = () => {
+  sfx.confirm()
+  closeOverlay()
+  nav?.goTo('resume')
+}
 
 const closeBtn = ref<HTMLButtonElement | null>(null)
 const resetDone = ref(false)
@@ -58,6 +66,7 @@ onMounted(() => closeBtn.value?.focus())
       <div class="help__settings">
         <button class="p5-btn p5-btn--red" :aria-pressed="sfxEnabled" @click="toggleSfx">SFX &amp; haptics: {{ sfxEnabled ? 'ON' : 'OFF' }}</button>
         <button class="p5-btn p5-btn--light" @click="reset">{{ resetDone ? 'Progress reset ✔' : 'Reset progress' }}</button>
+        <button class="p5-btn p5-btn--light" @click="openResume">Plain résumé ▶</button>
       </div>
 
       <p class="help__secret">★ Rumor has it a certain old-school cheat code unleashes an <b>All-Out Attack</b>…</p>

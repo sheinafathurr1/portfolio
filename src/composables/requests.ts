@@ -10,6 +10,9 @@ export const REQUESTS = [
   { id: 'showtime', title: 'Showtime', desc: 'Witness an All-Out Attack.' },
   { id: 'cheat', title: 'Old School', desc: 'Enter a secret code.' },
   { id: 'card', title: 'Calling Card', desc: 'Send Switch a calling card.' },
+  { id: 'forger', title: 'Card Forger', desc: 'Download your own calling card as an image.' },
+  { id: 'fortune', title: 'Fortune Seeker', desc: 'Have Switch read your fortune on Phan-Chat.' },
+  { id: 'paper', title: 'Paper Trail', desc: 'Open the printable résumé.' },
 ] as const
 
 export type RequestId = (typeof REQUESTS)[number]['id']

@@ -39,6 +39,7 @@ export async function ask(topic: ChatTopic): Promise<ChatTopic['effect']> {
   }
   typing.value = false
   if (asked.value.length >= 3) clearRequest('talk')
+  if (topic.id === 'fortune') clearRequest('fortune')
   return topic.effect
 }
 

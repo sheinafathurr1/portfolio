@@ -10,13 +10,15 @@ const emit = defineEmits<{ dismiss: [] }>()
     <div class="req-toast__head">
       <RansomText text="REQUEST CLEARED!" :seed="done * 7 + 2" size="clamp(1rem, 2.6vw, 1.2rem)" />
     </div>
-    <p class="req-toast__title">{{ title }}</p>
+    <div class="req-toast__row">
+      <p class="req-toast__title">{{ title }}</p>
+      <span class="req-toast__stamp p5-stamp">Cleared</span>
+    </div>
     <p class="req-toast__desc">{{ desc }}</p>
     <div class="req-toast__progress">
       <div class="p5-bar p5-bar--paper"><span :style="{ width: `${(done / total) * 100}%` }"></span></div>
       <small>{{ done }}/{{ total }} requests</small>
     </div>
-    <span class="req-toast__stamp p5-stamp">Cleared</span>
   </div>
 </template>
 
@@ -37,6 +39,12 @@ const emit = defineEmits<{ dismiss: [] }>()
 }
 .req-toast__head {
   margin-bottom: 0.55rem;
+}
+.req-toast__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
 }
 .req-toast__title {
   margin: 0;
@@ -63,9 +71,7 @@ const emit = defineEmits<{ dismiss: [] }>()
   text-transform: uppercase;
 }
 .req-toast__stamp {
-  position: absolute;
-  top: 3.3rem;
-  right: 1.1rem;
+  flex-shrink: 0;
   font-size: 0.95rem;
   animation: stampIn 0.4s var(--snap) 0.35s both;
 }

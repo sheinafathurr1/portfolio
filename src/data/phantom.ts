@@ -1,6 +1,6 @@
 // Persona 5 Royal flavour layered on top of src/data/portfolio.ts.
 // Ranks/titles here are playful self-descriptions: tweak them freely.
-import type { SectionId } from '../composables/nav'
+import type { ScreenId, SectionId } from '../composables/nav'
 import { allSkills, experiences, profile, projects, skillCategories } from './portfolio'
 
 export const menuItems: { id: SectionId; label: string; sub: string; desc: string; bond: string }[] = [
@@ -144,9 +144,25 @@ export interface ChatTopic {
   id: string
   question: string
   answer: string[]
-  action?: { label: string; to: SectionId }
+  action?: { label: string; to: ScreenId }
   effect?: 'attack'
 }
+
+// Today's tarot card (same card all day, Jakarta time), for the fortune-telling chat option
+const FORTUNES = [
+  { card: '0 · The Fool', message: 'Start that side project. A fresh repo is a fresh adventure.' },
+  { card: 'I · The Magician', message: 'You already have every tool you need. Combine them.' },
+  { card: 'II · The Priestess', message: 'Read the docs before the Stack Overflow answers. Trust me.' },
+  { card: 'IV · The Emperor', message: 'Structure wins today. Write the plan before the code.' },
+  { card: 'VII · The Chariot', message: 'Ship it. Momentum beats perfection.' },
+  { card: 'IX · The Hermit', message: 'Deep work ahead. Silence the notifications for an hour.' },
+  { card: 'X · Fortune', message: 'A lucky bug fix is coming your way. Commit often.' },
+  { card: 'XI · Strength', message: 'The hard refactor is worth it. You can carry it.' },
+  { card: 'XVII · The Star', message: 'Hope is high. A good day to open-source something.' },
+  { card: 'XIX · The Sun', message: 'Everything compiles on the first try. Enjoy it while it lasts.' },
+]
+const jakartaDay = Math.floor((Date.now() + 7 * 3600 * 1000) / 86_400_000)
+const fortune = FORTUNES[jakartaDay % FORTUNES.length] ?? FORTUNES[0]!
 
 const sharpest = [...allSkills].sort((a, b) => b.level - a.level).slice(0, 3).map((s) => s.name)
 
@@ -178,6 +194,15 @@ export const chatTopics: ChatTopic[] = [
     action: { label: 'Open SKILL', to: 'skill' },
   },
   {
+    id: 'recruiter',
+    question: 'I’m a recruiter. Is there a quick version?',
+    answer: [
+      'Of course. No Shadows, no slashes: a clean one-page résumé.',
+      'You can print it or save it as a PDF straight from the page.',
+    ],
+    action: { label: 'Open RÉSUMÉ', to: 'resume' },
+  },
+  {
     id: 'missions',
     question: 'Show me your best work.',
     answer: [`${projects.length} missions cleared so far:`, projects.map((p) => `▸ ${p.title} (${p.year})`).join('\n')],
@@ -191,6 +216,11 @@ export const chatTopics: ChatTopic[] = [
       'Help me take them down. Hit each one’s weakness with the right skill and you get 1 MORE turn.',
     ],
     action: { label: 'Open BATTLE', to: 'battle' },
+  },
+  {
+    id: 'fortune',
+    question: 'Can you read my fortune?',
+    answer: ['Shuffling the deck… 🔮', `Today’s card: ${fortune.card}.`, `“${fortune.message}”`],
   },
   {
     id: 'collab',

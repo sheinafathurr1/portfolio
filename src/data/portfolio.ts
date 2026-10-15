@@ -8,7 +8,8 @@ export const profile = {
     'Focused on full-stack development, server infrastructure management, and AI automation research. Actively researching Dynamic API architectures and building intelligent, AI-driven workflows.',
   stack: ['Vue.js', 'Laravel', 'Python', 'n8n', 'AI/ML', 'Linux Server'],
   email: 'sheinafathur@gmail.com',
-  cvUrl: '/cv-switch.pdf',
+  /** Optional PDF CV: put the file in /public and set its path (e.g. '/cv-switch.pdf') to show a Download PDF button. */
+  cvUrl: '',
 }
 
 export const highlights = [

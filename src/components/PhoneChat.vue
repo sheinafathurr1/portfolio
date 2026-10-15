@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { inject, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
-import { NAV, isTypingTarget, type SectionId } from '../composables/nav'
+import { NAV, isTypingTarget, type ScreenId } from '../composables/nav'
 import { closeOverlay, openOverlay, overlay } from '../composables/overlay'
 import { sfx } from '../composables/sfx'
 import { ask, choices, messages, resetChat, startChat, typing } from '../composables/chat'
@@ -24,7 +24,7 @@ const pick = async (topic: ChatTopic) => {
   if (effect === 'attack') setTimeout(() => overlay.value === 'phone' && openOverlay('attack'), 600)
 }
 
-const go = (to: SectionId) => {
+const go = (to: ScreenId) => {
   sfx.confirm()
   closeOverlay()
   nav?.goTo(to)

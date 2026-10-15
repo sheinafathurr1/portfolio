@@ -1,54 +1,28 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { ransomWords } from '../utils/ransom'
 
-// Ransom-note lettering: every character gets its own font, colour block and tilt.
-// A seed keeps the look stable between renders (and between visits).
+// Ransom-note lettering (see utils/ransom.ts). A seed keeps the look stable between renders and visits.
 const props = withDefaults(defineProps<{ text: string; seed?: number; size?: string; nowrap?: boolean }>(), {
   seed: 7,
   size: '3rem',
   nowrap: false,
 })
 
-const FONTS = ["'Anton'", "'Archivo Black'", "'Abril Fatface'", "'Permanent Marker'", "'Special Elite'", "'Bebas Neue'"]
-const LOOKS = [
-  { background: '#ffffff', color: '#0b0b0b' },
-  { background: '#0b0b0b', color: '#ffffff' },
-  { background: '#e60012', color: '#ffffff' },
-  { background: '#ffffff', color: '#e60012' },
-  { background: '#0b0b0b', color: '#e60012' },
-]
-
-function mulberry32(seed: number) {
-  let s = seed
-  return () => {
-    s += 0x6d2b79f5
-    let t = s
-    t = Math.imul(t ^ (t >>> 15), t | 1)
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-  }
-}
-
 // Letters are grouped per word so lines break between words, not in the middle of one
-const words = computed(() => {
-  const rand = mulberry32(props.seed)
-  return props.text
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((word) =>
-      [...word].map((ch) => {
-        const look = LOOKS[Math.floor(rand() * LOOKS.length)] ?? LOOKS[0]!
-        return {
-          ch,
-          style: {
-            ...look,
-            fontFamily: FONTS[Math.floor(rand() * FONTS.length)],
-            transform: `rotate(${((rand() - 0.5) * 16).toFixed(1)}deg) translateY(${((rand() - 0.5) * 0.14).toFixed(2)}em) scale(${(0.88 + rand() * 0.26).toFixed(2)})`,
-          },
-        }
-      }),
-    )
-})
+const words = computed(() =>
+  ransomWords(props.text, props.seed).map((word) =>
+    word.map((l) => ({
+      ch: l.ch,
+      style: {
+        background: l.background,
+        color: l.color,
+        fontFamily: l.font,
+        transform: `rotate(${l.rotate}deg) translateY(${l.shiftY}em) scale(${l.scale})`,
+      },
+    })),
+  ),
+)
 </script>
 
 <template>

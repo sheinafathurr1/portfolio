@@ -18,15 +18,24 @@ dengan CSS/SVG + Google Fonts, tanpa gambar, logo, atau audio dari game aslinya.
 
 Fitur interaktif:
 
+- **Résumé mode** (`/#/resume`): CV satu halaman yang bersih untuk recruiter, tanpa elemen game, dan bisa langsung
+  di-print / *Save as PDF* (tata letak print rapi, ±2 halaman A4). Bisa dibuka dari layar judul ("Skip the game"),
+  tombol *Résumé / CV* di STATUS, Help, atau Phan-Chat. Kalau ingin menyediakan file PDF sendiri, taruh di `public/`
+  dan isi `profile.cvUrl` di `src/data/portfolio.ts`; tombol *Download PDF* akan muncul otomatis.
+- **Calling Card maker**: kartu panggilan di layar CALLING CARD bisa diunduh sebagai gambar PNG 1200×630
+  (gaya yang sama dengan pratinjau, siap dibagikan).
+- **Cuaca live Bandung** di widget kalender menu (Open-Meteo, tanpa API key, cache 30 menit). Saat hujan/badai,
+  menu ikut turun hujan. Pratinjau kondisi lain dengan `?weather=rain` (atau `clear`, `cloudy`, `fog`, `snow`, `storm`).
 - **Phan-Chat** (tombol 📱 Chat atau tombol `C`): ponsel dalam game, pengunjung memilih pertanyaan (klik atau `1`–`4`)
   dan Switch membalas dengan jawaban yang disusun dari `src/data/portfolio.ts`, lengkap dengan tombol pintas ke layar terkait.
+  Termasuk ramalan tarot harian (kartu berganti tiap hari, waktu WIB) dan jalan pintas untuk recruiter.
 - **Bond with Switch**: kunjungan pertama ke tiap bagian memunculkan notifikasi *RANK UP!*; kedelapan bagian = *MAX RANK*
   (dengan konfeti). Progres tersimpan di `localStorage` dan terlihat di menu (bintang di HUD, label *NEW* di menu).
 - **Shadow Battle**: tiga Shadow (Spaghetti Code, Manual Busywork, Clunky Interface, dst.) masing-masing lemah
   terhadap satu elemen skill (PHYS = backend, PSY = AI, ELEC = frontend). Kena *weakness* → **DOWN** + **1 MORE**;
   salah pilih → Shadow bangun dan menyerang. Jatuhkan semuanya → **HOLD UP!** → All-Out Attack. Rekor giliran tercepat tersimpan.
-- **Mementos Requests**: 7 tantangan untuk pengunjung (jelajahi semua bagian, ngobrol di Phan-Chat, menang battle,
-  menang dalam satu giliran, kode rahasia, kirim calling card, dll.) dengan notifikasi *REQUEST CLEARED!*.
+- **Mementos Requests**: 10 tantangan untuk pengunjung (jelajahi semua bagian, ngobrol di Phan-Chat, menang battle,
+  menang dalam satu giliran, kode rahasia, kirim/unduh calling card, ramalan, buka résumé, dll.) dengan notifikasi *REQUEST CLEARED!*.
   Daftarnya ada di Thieves Den; progres juga tampil di layar judul dan Help.
 - **All-Out Attack**: easter egg lewat kode Konami (`↑ ↑ ↓ ↓ ← → ← → B A`), mengetik `showtime`, atau pilihan di Phan-Chat.
 - **Navigasi cepat**: `1`–`8` langsung ke bagian, `Q`/`E` bagian sebelumnya/berikutnya, tombol ◀ ▶ di bawah tiap
@@ -44,9 +53,10 @@ Struktur penting:
 | --- | --- |
 | `src/data/portfolio.ts` | **Semua konten** (profil, pengalaman, proyek, skill, pencapaian, sosial). |
 | `src/data/phantom.ts` | Lapisan tema P5R: menu (+ kalimat bond), Social Stats, Persona, Arcana confidant, elemen skill, daftar Shadow, naskah Phan-Chat. Ubah sesuka hati. |
-| `src/screens/*.vue` | Satu file per layar (Title, MainMenu, Status, Persona, Skill, Confidant, Missions, Den, Battle, CallingCard). |
+| `src/screens/*.vue` | Satu file per layar (Title, MainMenu, Status, Persona, Skill, Confidant, Missions, Den, Battle, CallingCard, Resume). |
+| `src/utils/*.ts` | Generator huruf *ransom*, bentuk topeng, render kartu ke PNG, konfeti. |
 | `src/components/*.vue` | Komponen bersama: `RansomText`, `P5Background`, `ScreenShell`, `HintBar`, `MaskEmblem`, serta overlay `PhoneChat`, `HelpOverlay`, `AllOutAttack`, `RankUpToast`, `RequestToast`. |
-| `src/composables/*.ts` | State kecil: navigasi, overlay, bond, requests, antrean toast, chat, SFX. |
+| `src/composables/*.ts` | State kecil: navigasi, overlay, bond, requests, antrean toast, chat, cuaca, SFX. |
 | `src/App.vue` | Pergantian layar, URL hash, transisi tebasan, shortcut global, dan notifikasi rank up. |
 
 ## Recommended IDE Setup

@@ -9,6 +9,10 @@ import { socialStats } from '../data/phantom'
 import { highlights, profile } from '../data/portfolio'
 
 const nav = inject(NAV)
+const toResume = () => {
+  sfx.confirm()
+  nav?.goTo('resume')
+}
 const toCard = () => {
   sfx.confirm()
   nav?.goTo('card')
@@ -61,7 +65,7 @@ const labels = socialStats.map((s, i) => {
             <span v-for="tech in profile.stack" :key="tech" class="p5-chip">{{ tech }}</span>
           </div>
           <div class="status__actions">
-            <a :href="profile.cvUrl" target="_blank" class="p5-btn p5-btn--red">Download CV</a>
+            <button class="p5-btn p5-btn--red" @click="toResume">Résumé / CV</button>
             <button class="p5-btn p5-btn--light" @click="toCard">Send a Calling Card</button>
           </div>
         </section>

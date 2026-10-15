@@ -4,7 +4,7 @@ import P5Background from '../components/P5Background.vue'
 import RansomText from '../components/RansomText.vue'
 import MaskEmblem from '../components/MaskEmblem.vue'
 import { BOND_MAX, bondRank } from '../composables/bond'
-import { NAV, inputBlocked } from '../composables/nav'
+import { NAV, inputBlocked, isActivatable } from '../composables/nav'
 import { REQUESTS, clearedCount } from '../composables/requests'
 import { sfx, sfxEnabled, toggleSfx } from '../composables/sfx'
 import { profile } from '../data/portfolio'
@@ -25,7 +25,14 @@ const start = () => {
 
 const onKey = (e: KeyboardEvent) => {
   if (['Tab', 'Escape', 'Shift', 'Control', 'Alt', 'Meta'].includes(e.key) || inputBlocked(e)) return
+  // Enter/Space on a focused button (SFX, résumé) should only press that button
+  if ((e.key === 'Enter' || e.key === ' ') && isActivatable(e)) return
   start()
+}
+
+const openResume = () => {
+  sfx.confirm()
+  nav?.goTo('resume')
 }
 
 onMounted(() => {
@@ -67,6 +74,8 @@ onUnmounted(() => {
       <span>Bond {{ bondRank >= BOND_MAX ? 'MAX' : `${bondRank}/${BOND_MAX}` }}</span>
       <span>Requests {{ clearedCount }}/{{ REQUESTS.length }}</span>
     </p>
+
+    <a class="title__resume" href="#/resume" @click.stop.prevent="openResume">Skip the game · <b>Résumé ▶</b></a>
 
     <button class="title__sfx" :aria-pressed="sfxEnabled" @click.stop="toggleSfx">
       SFX <strong>{{ sfxEnabled ? 'ON' : 'OFF' }}</strong>
@@ -206,6 +215,27 @@ onUnmounted(() => {
 .title__back span {
   color: var(--red);
   font-weight: 700;
+}
+
+.title__resume {
+  position: fixed !important;
+  left: 1rem;
+  bottom: 1rem;
+  padding: 0.35rem 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--paper);
+  background: var(--ink);
+}
+.title__resume b {
+  color: var(--red);
+}
+.title__resume:hover,
+.title__resume:focus-visible {
+  color: var(--ink);
+  background: var(--paper);
 }
 
 .title__sfx {
