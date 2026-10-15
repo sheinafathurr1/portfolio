@@ -1,5 +1,4 @@
-// Single source of truth for portfolio content.
-// Used by the classic layout components and by the 3D world (src/world).
+// Single source of truth for portfolio content. Edit here; every screen reads from this file.
 
 export const profile = {
   name: 'Sheina Fathur',
@@ -12,43 +11,49 @@ export const profile = {
   cvUrl: '/cv-switch.pdf',
 }
 
-export type Accent = 'blue' | 'violet' | 'emerald'
+export const highlights = [
+  { value: '99.9%', label: 'Server Uptime', desc: 'Rata-rata ketersediaan server operasional' },
+  { value: '10+', label: 'AI Automations', desc: 'Workflow AI yang dibangun & dioperasikan' },
+  { value: '5+', label: 'Riset & Publikasi', desc: 'Penelitian akademik & dokumen ilmiah' },
+  { value: '3+', label: 'Tim Dikelola', desc: 'Tim teknis yang dipimpin secara aktif' },
+]
 
 export const experiences: {
   id: number
   title: string
   company: string
   period: string
+  /** Start month (YYYY-MM); drives the Confidant rank. */
+  start: string
   description: string
   tags: string[]
-  accent: Accent
 }[] = [
   {
     id: 1,
     title: 'Tenaga Lepas Harian (TLH)',
     company: 'CoE CAATIS',
     period: 'Jan 2026 – Sekarang',
+    start: '2026-01',
     description: 'Mengelola infrastruktur operasional secara menyeluruh, termasuk pengawasan performa server dan manajemen backup data berkala. Bertanggung jawab dalam mengoordinasikan penugasan teknis harian untuk tim.',
     tags: ['Server Mgmt', 'Infrastructure', 'Linux'],
-    accent: 'blue',
   },
   {
     id: 2,
     title: 'Peneliti AI & Mahasiswa S2IF',
     company: 'Telkom University',
     period: '2025 – Sekarang',
+    start: '2025-08', // bulan perkiraan (period hanya mencantumkan tahun), sesuaikan bila perlu
     description: 'Menjalankan riset akademik jenjang magister Informatika dengan fokus pada arsitektur Dynamic API, Machine Learning, dan keamanan siber. Aktif memetakan arsitektur sistem menggunakan metodologi Design Science Research (DSR).',
     tags: ['Machine Learning', 'Dynamic API', 'DSR'],
-    accent: 'violet',
   },
   {
     id: 3,
     title: 'Lead Developer',
     company: 'HEI APP',
     period: 'Maret 2026 – Sekarang',
+    start: '2026-03',
     description: 'Membangun dan mendokumentasikan sistem aplikasi HEI APP untuk mendigitalkan alur proses evaluasi karakter mahasiswa serta mengintegrasikan nilai-nilai universitas secara terpusat.',
     tags: ['Vue.js', 'Laravel', 'Team Lead'],
-    accent: 'emerald',
   },
 ]
 
@@ -57,10 +62,6 @@ export const projects = [
     id: 1,
     title: 'Arsitektur Dynamic API & TOPSIS',
     category: 'riset',
-    gradient: 'from-violet-600 via-purple-500 to-indigo-600',
-    colors: ['#7c3aed', '#a855f7', '#4f46e5'],
-    glowColor: 'hover:shadow-violet-500/20',
-    borderHover: 'hover:border-violet-500/60',
     icon: '🔬',
     year: '2025',
     shortDesc: 'Pengembangan Metode Pemeringkatan Publikasi Ilmiah Multi-Kriteria pada Arsitektur Dynamic API Menggunakan Pendekatan SQL-Driven Berbasis TOPSIS.',
@@ -71,10 +72,6 @@ export const projects = [
     id: 2,
     title: 'Automasi Ekstraksi Data Jurnal',
     category: 'development',
-    gradient: 'from-blue-600 via-cyan-500 to-sky-500',
-    colors: ['#2563eb', '#06b6d4', '#0ea5e9'],
-    glowColor: 'hover:shadow-blue-500/20',
-    borderHover: 'hover:border-blue-500/60',
     icon: '🤖',
     year: '2025',
     shortDesc: 'Membangun arsitektur workflow n8n yang diintegrasikan dengan Google Gemini API dan trigger Telegram.',
@@ -85,10 +82,6 @@ export const projects = [
     id: 3,
     title: 'Prototype Streaming & IoT',
     category: 'development',
-    gradient: 'from-emerald-600 via-teal-500 to-cyan-600',
-    colors: ['#059669', '#14b8a6', '#0891b2'],
-    glowColor: 'hover:shadow-emerald-500/20',
-    borderHover: 'hover:border-emerald-500/60',
     icon: '📡',
     year: '2026',
     shortDesc: 'Pengembangan prototipe aplikasi mobile untuk streaming video latensi rendah berbasis WebRTC.',
@@ -102,14 +95,8 @@ export type Project = (typeof projects)[number]
 export const skillCategories = [
   {
     label: 'Backend & Infrastruktur',
+    short: 'Backend',
     key: 'backend',
-    hex: '#3b82f6',
-    accentBorder: 'hover:border-blue-500/50',
-    accentIcon: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-    barFrom: 'from-blue-500',
-    barTo: 'to-cyan-500',
-    badgeBg: 'bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-100 dark:border-blue-500/20',
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg>`,
     skills: [
       { name: 'GitHub',      level: 95 },
       { name: 'Laravel',     level: 90 },
@@ -122,33 +109,21 @@ export const skillCategories = [
   },
   {
     label: 'AI & Automasi',
+    short: 'AI',
     key: 'ai',
-    hex: '#a855f7',
-    accentBorder: 'hover:border-violet-500/50',
-    accentIcon: 'bg-violet-500/10 text-violet-600 dark:text-violet-400',
-    barFrom: 'from-violet-500',
-    barTo: 'to-purple-500',
-    badgeBg: 'bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300 border-violet-100 dark:border-violet-500/20',
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>`,
     skills: [
-      { name: 'Dynamic API',     level: 92 },
-      { name: 'n8n Workflows',   level: 88 },
-      { name: 'Gemini API',      level: 85 },
-      { name: 'Telegram Bot',    level: 85 },
-      { name: 'Python',          level: 80 },
-      { name: 'Machine Learning',level: 72 },
+      { name: 'Dynamic API',      level: 92 },
+      { name: 'n8n Workflows',    level: 88 },
+      { name: 'Gemini API',       level: 85 },
+      { name: 'Telegram Bot',     level: 85 },
+      { name: 'Python',           level: 80 },
+      { name: 'Machine Learning', level: 72 },
     ],
   },
   {
     label: 'Frontend & Mobile',
+    short: 'Frontend',
     key: 'frontend',
-    hex: '#10b981',
-    accentBorder: 'hover:border-emerald-500/50',
-    accentIcon: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-    barFrom: 'from-emerald-500',
-    barTo: 'to-teal-500',
-    badgeBg: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-100 dark:border-emerald-500/20',
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>`,
     skills: [
       { name: 'Tailwind CSS', level: 92 },
       { name: 'Vue.js',       level: 88 },
@@ -160,54 +135,20 @@ export const skillCategories = [
   },
 ]
 
+export const allSkills = skillCategories.flatMap((c) => c.skills)
+
 export const milestones = [
-  {
-    year: '2026',
-    title: 'Lead Developer — HEI APP',
-    desc: 'Memimpin pengembangan sistem digital evaluasi karakter mahasiswa untuk Telkom University.',
-    icon: '🏆',
-    color: 'from-blue-500 to-cyan-500',
-    bg: 'bg-blue-500/10',
-    border: 'border-blue-200 dark:border-blue-500/20',
-    text: 'text-blue-600 dark:text-blue-400',
-  },
-  {
-    year: '2026',
-    title: 'Tenaga Lepas Harian — CoE CAATIS',
-    desc: 'Mengelola infrastruktur server dan koordinasi teknis harian untuk pusat keunggulan AI.',
-    icon: '⚙️',
-    color: 'from-cyan-500 to-teal-500',
-    bg: 'bg-cyan-500/10',
-    border: 'border-cyan-200 dark:border-cyan-500/20',
-    text: 'text-cyan-600 dark:text-cyan-400',
-  },
-  {
-    year: '2025',
-    title: 'Peneliti AI — Telkom University',
-    desc: 'Memulai riset S2IF dengan fokus Dynamic API, Machine Learning, dan keamanan siber berbasis DSR.',
-    icon: '🔬',
-    color: 'from-violet-500 to-purple-500',
-    bg: 'bg-violet-500/10',
-    border: 'border-violet-200 dark:border-violet-500/20',
-    text: 'text-violet-600 dark:text-violet-400',
-  },
-  {
-    year: '2025',
-    title: 'Automasi AI Pipeline',
-    desc: 'Membangun 10+ workflow n8n terintegrasi Google Gemini API untuk otomatisasi ekstraksi jurnal.',
-    icon: '🤖',
-    color: 'from-emerald-500 to-teal-500',
-    bg: 'bg-emerald-500/10',
-    border: 'border-emerald-200 dark:border-emerald-500/20',
-    text: 'text-emerald-600 dark:text-emerald-400',
-  },
+  { year: '2026', title: 'Lead Developer — HEI APP', icon: '🏆', desc: 'Memimpin pengembangan sistem digital evaluasi karakter mahasiswa untuk Telkom University.' },
+  { year: '2026', title: 'Tenaga Lepas Harian — CoE CAATIS', icon: '⚙️', desc: 'Mengelola infrastruktur server dan koordinasi teknis harian untuk pusat keunggulan AI.' },
+  { year: '2025', title: 'Peneliti AI — Telkom University', icon: '🔬', desc: 'Memulai riset S2IF dengan fokus Dynamic API, Machine Learning, dan keamanan siber berbasis DSR.' },
+  { year: '2025', title: 'Automasi AI Pipeline', icon: '🤖', desc: 'Membangun 10+ workflow n8n terintegrasi Google Gemini API untuk otomatisasi ekstraksi jurnal.' },
 ]
 
 export const currentFocus = [
-  { label: 'Riset Dynamic API',  icon: '🔬', pct: 90 },
-  { label: 'ML Model Training',  icon: '🧠', pct: 70 },
-  { label: 'HEI APP v2',         icon: '💻', pct: 55 },
-  { label: 'Server Hardening',   icon: '🛡️', pct: 80 },
+  { label: 'Riset Dynamic API', icon: '🔬', pct: 90 },
+  { label: 'ML Model Training', icon: '🧠', pct: 70 },
+  { label: 'HEI APP v2',        icon: '💻', pct: 55 },
+  { label: 'Server Hardening',  icon: '🛡️', pct: 80 },
 ]
 
 export const socialLinks = [

@@ -1,10 +1,10 @@
 const COLORS = ['#3b82f6', '#06b6d4', '#8b5cf6', '#f59e0b', '#10b981', '#ec4899']
 
-export function burstConfetti(originX: number, originY: number, count = 36) {
+export function burstConfetti(originX: number, originY: number, count = 36, colors: string[] = COLORS) {
   for (let i = 0; i < count; i++) {
     const el = document.createElement('div')
     const size = 5 + Math.random() * 6
-    const color = COLORS[Math.floor(Math.random() * COLORS.length)]
+    const color = colors[Math.floor(Math.random() * colors.length)]
     const angle = Math.random() * Math.PI * 2
     const distance = 70 + Math.random() * 150
     const dx = Math.cos(angle) * distance

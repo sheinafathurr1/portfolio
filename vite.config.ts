@@ -13,8 +13,4 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-  build: {
-    // The lazily-loaded 3D world chunk (three.js + cannon-es) is ~700 kB on its own
-    chunkSizeWarningLimit: 800,
-  },
 })

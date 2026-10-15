@@ -1,25 +1,33 @@
 # portofolio
 
-Portofolio Switch (Sheina Fathur) dengan dua mode tampilan:
+Portofolio Switch (Sheina Fathur) bertema **Persona 5 Royal**: seluruh situs tampil seperti menu game
+(merah–hitam–putih, huruf ala *ransom note*, panel miring, transisi tebasan merah/hitam). Semua aset dibuat sendiri
+dengan CSS/SVG + Google Fonts, tanpa gambar, logo, atau audio dari game aslinya.
 
-- **Dunia 3D (default)**: pulau interaktif berbasis [three.js](https://threejs.org/) + [cannon-es](https://github.com/pmndrs/cannon-es).
-  Pengunjung menggelindingkan bot kecil (WASD/panah, Space lompat, Shift boost, R ulang; joystick di HP) ke tiap area:
-  Tentang, Pengalaman, Keahlian (peti yang bisa ditabrak), Proyek, Pencapaian, dan Kontak. Ada 8 *data core* untuk dikumpulkan.
-- **Versi klasik**: halaman scroll biasa. Bisa dibuka lewat tombol "Versi Klasik", dan otomatis dipakai bila browser
-  tidak mendukung WebGL atau URL berisi anchor (mis. `/#projects`). Pilihan terakhir pengunjung diingat di `localStorage`.
+| Menu game | Isi portofolio |
+| --- | --- |
+| Title screen | Kartu panggilan pembuka, "Press any key" |
+| **STATUS** | Tentang saya, *Social Stats* (Knowledge, Guts, Proficiency, Kindness, Charm), catatan rekor |
+| **PERSONA** | Empat peran sebagai Persona + Arcana; stats diambil dari level skill sungguhan |
+| **SKILL** | Skill per kategori (tab ←/→) + daftar confidant/misi yang memakai skill itu |
+| **CONFIDANT** | Pengalaman; rank naik 1 tiap 2 bulan kerja sama (maks. 10) |
+| **MISSIONS** | Proyek & riset gaya *Mementos request* |
+| **THIEVES DEN** | Galeri pencapaian + rencana yang sedang berjalan |
+| **CALLING CARD** | Formulir kontak (Web3Forms) dengan pratinjau kartu panggilan langsung |
+
+Kontrol: `↑↓` / `W S` pilih, `Enter` buka, `Esc` kembali, `←→` ganti tab skill. Setiap layar punya URL sendiri
+(`/#/status`, `/#/skill`, …) sehingga tombol *back* browser dan tautan langsung berfungsi. Efek suara (disintesis,
+bukan file audio) mati secara default dan bisa dinyalakan lewat tombol **SFX**.
 
 Struktur penting:
 
 | Path | Isi |
 | --- | --- |
-| `src/data/portfolio.ts` | **Semua konten** (profil, pengalaman, proyek, skill, pencapaian, sosial). Dipakai oleh kedua mode. |
-| `src/world/layout.ts` | Posisi zona, ramp, platform, dan data core di pulau 3D. |
-| `src/world/*.ts` | Scene 3D: `World` (renderer, loop, kamera), `Player`, `Environment`, `Zones`, `Props`. |
-| `src/components/WorldExperience.vue` | UI mode 3D: layar intro, HUD, panel info zona, minimap, kontrol sentuh. |
-| `src/components/ClassicPortfolio.vue` | Layout versi klasik. |
-
-three.js hanya diunduh saat mode 3D dibuka (chunk terpisah ~180 kB gzip). Kualitas grafis (bloom, resolusi)
-turun otomatis bila frame rate perangkat rendah.
+| `src/data/portfolio.ts` | **Semua konten** (profil, pengalaman, proyek, skill, pencapaian, sosial). |
+| `src/data/phantom.ts` | Lapisan tema P5R: menu, Social Stats, Persona, Arcana confidant. Ubah sesuka hati. |
+| `src/screens/*.vue` | Satu file per layar (Title, MainMenu, Status, Persona, Skill, Confidant, Missions, Den, CallingCard). |
+| `src/components/*.vue` | Komponen bersama: `RansomText`, `P5Background`, `ScreenShell`, `HintBar`, `MaskEmblem`. |
+| `src/App.vue` | Pergantian layar, URL hash, dan transisi tebasan. |
 
 ## Recommended IDE Setup
 

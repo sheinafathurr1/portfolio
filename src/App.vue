@@ -1,76 +1,132 @@
 <script setup lang="ts">
-import { ref, provide, onMounted, onUnmounted } from 'vue'
-import ClassicPortfolio from './components/ClassicPortfolio.vue'
-// Small UI shell; it lazy-loads three.js + the world itself, so classic visitors never download it
-import WorldExperience from './components/WorldExperience.vue'
-import { PORTFOLIO_MODE, hasWebGL, loadSavedMode, saveMode, type PortfolioMode } from './composables/portfolioMode'
-import { burstConfetti } from './utils/confetti'
+import { computed, nextTick, onMounted, onUnmounted, provide, ref, watch, type Component } from 'vue'
+import TitleScreen from './screens/TitleScreen.vue'
+import MainMenu from './screens/MainMenu.vue'
+import StatusScreen from './screens/StatusScreen.vue'
+import PersonaScreen from './screens/PersonaScreen.vue'
+import SkillScreen from './screens/SkillScreen.vue'
+import ConfidantScreen from './screens/ConfidantScreen.vue'
+import MissionsScreen from './screens/MissionsScreen.vue'
+import DenScreen from './screens/DenScreen.vue'
+import CallingCardScreen from './screens/CallingCardScreen.vue'
+import { NAV, isTypingTarget, type ScreenId, type SectionId } from './composables/nav'
+import { sfx } from './composables/sfx'
+import { menuItems } from './data/phantom'
 
-const canUseWorld = hasWebGL()
-
-const initialMode = (): PortfolioMode => {
-  if (!canUseWorld) return 'classic'
-  // Deep links like /#projects point at the classic layout
-  if (window.location.hash.length > 1) return 'classic'
-  return loadSavedMode() ?? 'world'
+const SECTIONS: Record<SectionId, Component> = {
+  status: StatusScreen,
+  persona: PersonaScreen,
+  skill: SkillScreen,
+  confidant: ConfidantScreen,
+  missions: MissionsScreen,
+  den: DenScreen,
+  card: CallingCardScreen,
 }
 
-const mode = ref<PortfolioMode>(initialMode())
-const targetSection = ref<string | null>(null)
-const switchedFromWorld = ref(false)
-
-const setMode = (next: PortfolioMode, section?: string) => {
-  if (next === 'world' && !canUseWorld) return
-  switchedFromWorld.value = mode.value === 'world'
-  targetSection.value = section ?? null
-  mode.value = next
-  saveMode(next)
-  window.scrollTo(0, 0)
+// Screens live in the URL hash (#/status, #/skill, …) so links can be shared and the back button works
+const fromHash = (): ScreenId => {
+  const id = window.location.hash.replace(/^#\/?/, '')
+  if (id === 'menu') return 'menu'
+  return id in SECTIONS ? (id as SectionId) : 'title'
 }
 
-provide(PORTFOLIO_MODE, { mode, setMode, canUseWorld })
+const current = ref<ScreenId>(fromHash())
+const menuIndex = ref(Math.max(0, menuItems.findIndex((m) => m.id === current.value)))
+const screen = computed<Component>(() => {
+  if (current.value === 'title') return TitleScreen
+  if (current.value === 'menu') return MainMenu
+  return SECTIONS[current.value]
+})
 
-// Konami code easter egg (works in both layouts)
-const konamiSequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA']
-const konamiBuffer: string[] = []
-const showEasterEgg = ref(false)
-let easterEggTimer: ReturnType<typeof setTimeout>
+// ── Screen change: slashes sweep in, the screen swaps while covered, slashes sweep out ──
+const wipe = ref<'idle' | 'in' | 'out'>('idle')
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+let pending: ScreenId | null = null
+let fallbackTimer: ReturnType<typeof setTimeout>
 
-const triggerEasterEgg = () => {
-  showEasterEgg.value = true
-  clearTimeout(easterEggTimer)
-  easterEggTimer = setTimeout(() => { showEasterEgg.value = false }, 3500)
-  const points = [
-    { x: window.innerWidth * 0.2, y: window.innerHeight * 0.3 },
-    { x: window.innerWidth * 0.5, y: window.innerHeight * 0.2 },
-    { x: window.innerWidth * 0.8, y: window.innerHeight * 0.3 },
-  ]
-  points.forEach((p, i) => setTimeout(() => burstConfetti(p.x, p.y, 50), i * 200))
+const focusScreen = () => (document.querySelector('.screen') as HTMLElement | null)?.focus({ preventScroll: true })
+
+const swap = () => {
+  if (pending) current.value = pending
+  pending = null
+  nextTick(focusScreen)
 }
 
-const handleKonami = (e: KeyboardEvent) => {
-  konamiBuffer.push(e.code)
-  if (konamiBuffer.length > konamiSequence.length) konamiBuffer.shift()
-  if (konamiBuffer.length === konamiSequence.length && konamiBuffer.every((k, i) => k === konamiSequence[i])) {
-    konamiBuffer.length = 0
-    triggerEasterEgg()
+const finishWipe = () => {
+  clearTimeout(fallbackTimer)
+  swap()
+  wipe.value = 'idle'
+}
+
+const show = (next: ScreenId) => {
+  if (next === (pending ?? current.value)) return
+  pending = next
+  if (reduceMotion) {
+    swap()
+    return
+  }
+  wipe.value = 'in'
+  // If animations never report back (e.g. a background tab), don't leave navigation stuck
+  clearTimeout(fallbackTimer)
+  fallbackTimer = setTimeout(finishWipe, 1200)
+}
+
+const onWipeEnd = (e: AnimationEvent) => {
+  const bar = e.target as HTMLElement
+  if (wipe.value === 'in' && bar.classList.contains('wipe__bar--black')) {
+    swap()
+    nextTick(() => { wipe.value = 'out' })
+  } else if (wipe.value === 'out' && bar.classList.contains('wipe__bar--red')) {
+    clearTimeout(fallbackTimer)
+    wipe.value = 'idle'
   }
 }
 
-onMounted(() => window.addEventListener('keydown', handleKonami))
-onUnmounted(() => window.removeEventListener('keydown', handleKonami))
+const goTo = (next: ScreenId) => {
+  const hash = next === 'title' ? '' : `#/${next}`
+  if (window.location.hash !== hash) {
+    history.pushState(null, '', hash || window.location.pathname + window.location.search)
+  }
+  show(next)
+}
+
+const back = () => goTo(current.value === 'menu' || current.value === 'title' ? 'title' : 'menu')
+
+provide(NAV, { current, goTo, back, menuIndex })
+
+const syncFromUrl = () => show(fromHash())
+const onKey = (e: KeyboardEvent) => {
+  if (e.key !== 'Escape' || isTypingTarget(e) || current.value === 'title') return
+  sfx.back()
+  back()
+}
+
+watch(
+  current,
+  (id) => {
+    const item = menuItems.find((m) => m.id === id)
+    document.title = item ? `${item.label} · Switch` : id === 'menu' ? 'Menu · Switch' : 'Switch | Technical Lead & AI Researcher'
+  },
+  { immediate: true },
+)
+
+onMounted(() => {
+  window.addEventListener('popstate', syncFromUrl)
+  window.addEventListener('keydown', onKey)
+})
+onUnmounted(() => {
+  window.removeEventListener('popstate', syncFromUrl)
+  window.removeEventListener('keydown', onKey)
+  clearTimeout(fallbackTimer)
+})
 </script>
 
 <template>
-  <WorldExperience v-if="mode === 'world'" />
-  <ClassicPortfolio v-else :skip-preloader="switchedFromWorld" :target-section="targetSection" />
+  <component :is="screen" :key="current" />
 
-  <!-- Konami code easter egg banner -->
-  <Transition name="egg">
-    <div v-if="showEasterEgg" class="fixed top-20 left-1/2 -translate-x-1/2 z-[9500] pointer-events-none px-4 w-full flex justify-center">
-      <div class="flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 text-white font-bold text-sm shadow-2xl shadow-blue-500/40 text-center">
-        🎉 Easter egg ditemukan! Kamu tahu Konami Code!
-      </div>
-    </div>
-  </Transition>
+  <div class="wipe" :class="`is-${wipe}`" aria-hidden="true" @animationend="onWipeEnd">
+    <span class="wipe__bar wipe__bar--red"></span>
+    <span class="wipe__bar wipe__bar--black"></span>
+    <span class="wipe__star"></span>
+  </div>
 </template>
