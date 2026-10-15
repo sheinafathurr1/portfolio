@@ -50,6 +50,8 @@ export class Player {
   private light: THREE.PointLight
   private offIsland = false
   private hop = 0
+  private airTime = 0
+  private jumpBuffer = 0
   private rayFrom = new CANNON.Vec3()
   private rayTo = new CANNON.Vec3()
   private rayResult = new CANNON.RaycastResult()
@@ -185,8 +187,13 @@ export class Player {
       w.z += (-v.x / RADIUS - w.z) * t
     }
 
-    if (input.consumeJump() && this.grounded) {
+    // Jump buffer + coyote time: forgive a press slightly before landing or just after leaving an edge
+    this.airTime = this.grounded ? 0 : this.airTime + dt
+    this.jumpBuffer = input.consumeJump() ? 0.15 : Math.max(0, this.jumpBuffer - dt)
+    if (this.jumpBuffer > 0 && this.airTime < 0.15) {
       v.y = 9.2
+      this.jumpBuffer = 0
+      this.airTime = 1
       this.hop = 1
     }
 

@@ -109,7 +109,7 @@ export class Props {
       this.addDynamic(
         mesh,
         new CANNON.Box(new CANNON.Vec3(width / 2, height / 2, LETTER_DEPTH / 2)),
-        2,
+        1.2,
         new CANNON.Vec3(x, height / 2 + 0.01, LETTERS_Z),
       )
     })
@@ -165,7 +165,7 @@ export class Props {
         scene.add(mesh)
         const x = SKILL_PYRAMID.x + (i - (count - 1) / 2) * 1.03
         const y = 0.5 + r * 1.0 + 0.005
-        this.addDynamic(mesh, new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5)), 0.6, new CANNON.Vec3(x, y, SKILL_PYRAMID.z))
+        this.addDynamic(mesh, new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5)), 0.3, new CANNON.Vec3(x, y, SKILL_PYRAMID.z))
       }
     })
   }
