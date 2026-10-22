@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import ScreenShell from '../components/ScreenShell.vue'
+import { useFocus } from '../composables/focus'
 import { inputBlocked } from '../composables/nav'
 import { sfx } from '../composables/sfx'
 import { useListNav } from '../composables/useListNav'
@@ -14,6 +15,16 @@ const element = computed(() => elementOf(category.value.key))
 
 const { index, select } = useListNav(() => category.value.skills.length)
 watch(tab, () => { index.value = 0 })
+
+// Search results land on a specific skill: switch to its tab, then select it
+useFocus('skill', (key) => {
+  const t = skillCategories.findIndex((c) => c.skills.some((s) => s.name === key))
+  if (t < 0) return
+  tab.value = t
+  nextTick(() => {
+    index.value = Math.max(0, skillCategories[t]!.skills.findIndex((s) => s.name === key))
+  })
+})
 const active = computed(() => category.value.skills[index.value] ?? category.value.skills[0]!)
 
 const setTab = (i: number) => {

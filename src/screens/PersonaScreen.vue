@@ -2,10 +2,15 @@
 import { computed } from 'vue'
 import ScreenShell from '../components/ScreenShell.vue'
 import RansomText from '../components/RansomText.vue'
+import { useFocus } from '../composables/focus'
 import { useListNav } from '../composables/useListNav'
 import { personas } from '../data/phantom'
 
 const { index, select } = useListNav(() => personas.length)
+useFocus('persona', (key) => {
+  const i = personas.findIndex((p) => p.name === key)
+  if (i >= 0) index.value = i
+})
 const active = computed(() => personas[index.value] ?? personas[0]!)
 </script>
 

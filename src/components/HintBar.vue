@@ -5,7 +5,7 @@ import { sfx, sfxEnabled, toggleSfx } from '../composables/sfx'
 defineProps<{ hints: [string, string][] }>()
 const isTouch = window.matchMedia('(pointer: coarse)').matches
 
-const open = (id: 'phone' | 'help') => {
+const open = (id: 'phone' | 'help' | 'search') => {
   sfx.confirm()
   openOverlay(id)
 }
@@ -18,6 +18,9 @@ const open = (id: 'phone' | 'help') => {
         <kbd class="p5-kbd">{{ key }}</kbd>{{ label }}
       </span>
     </template>
+    <button class="hints__btn hints__btn--search" aria-label="Search (Third Eye)" title="Search ( / )" @click.stop="open('search')">
+      <span aria-hidden="true">◉</span> Search
+    </button>
     <button class="hints__btn hints__btn--chat" aria-label="Open Phan-Chat" @click.stop="open('phone')">
       <span aria-hidden="true">📱</span> Chat
     </button>
@@ -64,10 +67,12 @@ const open = (id: 'phone' | 'help') => {
 .hints__btn:hover {
   color: var(--paper);
 }
-.hints__btn--chat {
+.hints__btn--chat,
+.hints__btn--search {
   color: var(--paper);
 }
-.hints__btn--chat:hover {
+.hints__btn--chat:hover,
+.hints__btn--search:hover {
   color: var(--red);
 }
 .hints__help {

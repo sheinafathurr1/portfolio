@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import ScreenShell from '../components/ScreenShell.vue'
+import { useFocus } from '../composables/focus'
 import { useListNav } from '../composables/useListNav'
 import { confidants } from '../data/phantom'
 
 const { index, select } = useListNav(() => confidants.length)
+useFocus('confidant', (key) => {
+  const i = confidants.findIndex((c) => c.id === key)
+  if (i >= 0) index.value = i
+})
 const active = computed(() => confidants[index.value] ?? confidants[0]!)
 </script>
 

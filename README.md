@@ -34,10 +34,14 @@ Fitur interaktif:
 - **Shadow Battle**: tiga Shadow (Spaghetti Code, Manual Busywork, Clunky Interface, dst.) masing-masing lemah
   terhadap satu elemen skill (PHYS = backend, PSY = AI, ELEC = frontend). Kena *weakness* → **DOWN** + **1 MORE**;
   salah pilih → Shadow bangun dan menyerang. Jatuhkan semuanya → **HOLD UP!** → All-Out Attack. Rekor giliran tercepat tersimpan.
-- **Mementos Requests**: 10 tantangan untuk pengunjung (jelajahi semua bagian, ngobrol di Phan-Chat, menang battle,
+- **Mementos Requests**: 12 tantangan untuk pengunjung (jelajahi semua bagian, ngobrol di Phan-Chat, menang battle,
   menang dalam satu giliran, kode rahasia, kirim/unduh calling card, ramalan, buka résumé, dll.) dengan notifikasi *REQUEST CLEARED!*.
   Daftarnya ada di Thieves Den; progres juga tampil di layar judul dan Help.
 - **All-Out Attack**: easter egg lewat kode Konami (`↑ ↑ ↓ ↓ ← → ← → B A`), mengetik `showtime`, atau pilihan di Phan-Chat.
+- **Third Eye** (tombol `/` atau ◉ Search): cari apa saja (misi, pengalaman, skill, persona, paper, pendidikan) lalu
+  langsung lompat ke layarnya, dengan item yang dicari terpilih atau disorot.
+- **Misi**: filter All / Client / Research (`←→`), panel detail yang ikut menempel saat menggulir, dan tautan langsung ke
+  tiap misi (`/#/missions/10`) lengkap dengan tombol *Copy mission link*.
 - **Navigasi cepat**: `1`–`8` langsung ke bagian, `Q`/`E` bagian sebelumnya/berikutnya, tombol ◀ ▶ di bawah tiap
   bagian, dan geser kiri/kanan di ponsel.
 - **Help** (tombol `?`): daftar kontrol, progres, saklar SFX & getar (haptics di ponsel), dan reset progres.

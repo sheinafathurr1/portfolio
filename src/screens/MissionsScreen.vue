@@ -1,21 +1,113 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import ScreenShell from '../components/ScreenShell.vue'
 import RansomText from '../components/RansomText.vue'
+import { useFocus } from '../composables/focus'
+import { inputBlocked } from '../composables/nav'
+import { clearRequest } from '../composables/requests'
+import { sfx } from '../composables/sfx'
 import { useListNav } from '../composables/useListNav'
-import { projects } from '../data/portfolio'
+import { projects, type Project } from '../data/portfolio'
 
-const { index, select } = useListNav(() => projects.length)
-const active = computed(() => projects[index.value] ?? projects[0]!)
+// ── Filter tabs (← → / A D) ──
+const FILTERS: { id: 'all' | Project['category']; label: string }[] = [
+  { id: 'all', label: 'All' },
+  { id: 'client', label: 'Client' },
+  { id: 'research', label: 'Research' },
+]
+const filter = ref<(typeof FILTERS)[number]['id']>('all')
+const visible = computed(() => (filter.value === 'all' ? projects : projects.filter((p) => p.category === filter.value)))
+const countFor = (id: (typeof FILTERS)[number]['id']) => (id === 'all' ? projects.length : projects.filter((p) => p.category === id).length)
+
+const { index, select } = useListNav(() => visible.value.length)
+const active = computed(() => visible.value[index.value] ?? visible.value[0] ?? projects[0]!)
+
+let keepSelection = false
+watch(filter, () => {
+  if (keepSelection) keepSelection = false
+  else index.value = 0
+})
+const setFilter = (id: (typeof FILTERS)[number]['id']) => {
+  if (id === filter.value) return
+  filter.value = id
+  sfx.move()
+}
+
+const onKey = (e: KeyboardEvent) => {
+  if (inputBlocked(e)) return
+  const n = FILTERS.length
+  const at = FILTERS.findIndex((f) => f.id === filter.value)
+  const key = e.key.toLowerCase()
+  if (key === 'arrowright' || key === 'd') setFilter(FILTERS[(at + 1) % n]!.id)
+  if (key === 'arrowleft' || key === 'a') setFilter(FILTERS[(at - 1 + n) % n]!.id)
+}
+onMounted(() => window.addEventListener('keydown', onKey))
+onUnmounted(() => window.removeEventListener('keydown', onKey))
+
+// ── Search results and #/missions/10 links land on a specific mission ──
+const list = ref<HTMLElement | null>(null)
+useFocus('missions', (key) => {
+  const id = Number(key)
+  if (!visible.value.some((p) => p.id === id) && filter.value !== 'all') {
+    keepSelection = true
+    filter.value = 'all'
+  }
+  const i = projects.filter((p) => filter.value === 'all' || p.category === filter.value).findIndex((p) => p.id === id)
+  if (i < 0) return
+  index.value = i
+  nextTick(() => list.value?.querySelector('.is-active')?.scrollIntoView({ block: 'nearest' }))
+})
+
+// Keep the address bar pointing at the selected mission, so it can be shared as-is
+watch(
+  active,
+  (p) => {
+    if (window.location.hash.startsWith('#/missions')) history.replaceState(history.state, '', `#/missions/${p.id}`)
+  },
+  { immediate: true },
+)
+
+const copied = ref(false)
+let copiedTimer: ReturnType<typeof setTimeout>
+const shareLink = () => {
+  const url = `${window.location.origin}${window.location.pathname}#/missions/${active.value.id}`
+  navigator.clipboard
+    .writeText(url)
+    .then(() => {
+      copied.value = true
+      sfx.confirm()
+      clearRequest('share')
+      clearTimeout(copiedTimer)
+      copiedTimer = setTimeout(() => { copied.value = false }, 2200)
+    })
+    .catch(() => {})
+}
+watch(active, () => { copied.value = false })
+onUnmounted(() => clearTimeout(copiedTimer))
+
 const place = (category: string) => (category === 'research' ? 'Palace · Research' : 'Mementos · Client')
 const code = (id: number) => `#${String(id).padStart(2, '0')}`
 </script>
 
 <template>
-  <ScreenShell title="MISSIONS" subtitle="Projects & Research" number="05" :hints="[['↑↓', 'Select Mission']]">
+  <ScreenShell title="MISSIONS" subtitle="Projects & Research" number="05" :hints="[['←→', 'Filter'], ['↑↓', 'Select Mission']]">
+    <div class="filters p5-enter" role="tablist" aria-label="Mission filter">
+      <button
+        v-for="f in FILTERS"
+        :key="f.id"
+        role="tab"
+        class="filter"
+        :class="{ 'is-active': f.id === filter }"
+        :aria-selected="f.id === filter"
+        @click="setFilter(f.id)"
+      >
+        {{ f.label }} <span>{{ countFor(f.id) }}</span>
+      </button>
+    </div>
+
     <div class="split">
-      <ul class="mlist" role="listbox" aria-label="Mission list">
-        <li v-for="(p, i) in projects" :key="p.id">
+      <ul ref="list" :key="filter" class="mlist" role="listbox" aria-label="Mission list">
+        <li v-for="(p, i) in visible" :key="p.id">
           <button
             class="mrow p5-enter"
             :class="{ 'is-active': i === index }"
@@ -58,6 +150,10 @@ const code = (id: number) => `#${String(id).padStart(2, '0')}`
           <div class="mdetail__loot">
             <span v-for="t in active.tags" :key="t" class="p5-chip p5-chip--red">{{ t }}</span>
           </div>
+
+          <button class="p5-btn p5-btn--light mdetail__share" @click="shareLink">
+            {{ copied ? '✔ Link copied' : 'Copy mission link ⧉' }}
+          </button>
         </article>
       </Transition>
     </div>
@@ -143,6 +239,49 @@ const code = (id: number) => `#${String(id).padStart(2, '0')}`
   background: var(--ink);
   border: 2px solid rgba(255, 255, 255, 0.12);
   clip-path: polygon(0 0, 100% 1.5%, 98.5% 100%, 1% 98.5%);
+}
+/* The list is long: keep the briefing in view while scrolling it */
+@media (min-width: 900px) {
+  .mdetail { position: sticky; top: 1rem; }
+}
+.mdetail__share {
+  margin-top: 1.4rem;
+  font-size: 0.95rem;
+}
+
+/* ── Filter tabs ── */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.4rem;
+}
+.filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  border: 0;
+  padding: 0.45rem 1.4rem 0.45rem 0.9rem;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--paper);
+  background: rgba(255, 255, 255, 0.08);
+  clip-path: polygon(0 0, 100% 0, 92% 100%, 0 100%);
+  transition: background-color 0.12s ease;
+}
+.filter span {
+  padding: 0 0.4rem;
+  font-size: 0.85rem;
+  color: var(--ink);
+  background: var(--paper);
+}
+.filter.is-active {
+  background: var(--red);
+}
+@media (max-width: 560px) {
+  .filter { gap: 0.4rem; padding: 0.35rem 1rem 0.35rem 0.7rem; font-size: 1rem; }
 }
 .mdetail__banner {
   position: relative;

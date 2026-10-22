@@ -1,11 +1,24 @@
 <script setup lang="ts">
+import { nextTick, onUnmounted, ref } from 'vue'
 import ScreenShell from '../components/ScreenShell.vue'
+import { useFocus } from '../composables/focus'
 import { REQUESTS, cleared, clearedCount } from '../composables/requests'
 import { currentFocus, milestones, publications, socialLinks } from '../data/portfolio'
 
 const tilts = [-3, 2, -1.5, 3]
 const scholar = socialLinks.find((l) => l.label === 'Google Scholar')?.href
 const leadCount = publications.filter((p) => p.lead).length
+
+// Search results for a paper scroll to it and make it flash
+const spot = ref<number | null>(null)
+let spotTimer: ReturnType<typeof setTimeout>
+useFocus('den', (key) => {
+  spot.value = Number(key)
+  nextTick(() => document.querySelector(`[data-paper="${key}"]`)?.scrollIntoView({ block: 'center', behavior: 'smooth' }))
+  clearTimeout(spotTimer)
+  spotTimer = setTimeout(() => { spot.value = null }, 2600)
+})
+onUnmounted(() => clearTimeout(spotTimer))
 </script>
 
 <template>
@@ -34,7 +47,13 @@ const leadCount = publications.filter((p) => p.lead).length
         <span class="papers__count">{{ publications.length }} papers · {{ leadCount }} as first author</span>
       </header>
       <ol class="papers__list">
-        <li v-for="(paper, i) in publications" :key="paper.title" class="paper" :class="{ 'is-lead': paper.lead }">
+        <li
+          v-for="(paper, i) in publications"
+          :key="paper.title"
+          class="paper"
+          :class="{ 'is-lead': paper.lead, 'is-spotlit': spot === i }"
+          :data-paper="i"
+        >
           <span class="paper__no">{{ String(i + 1).padStart(2, '0') }}</span>
           <span class="paper__body">
             <span class="paper__title">{{ paper.title }}</span>
@@ -356,6 +375,12 @@ const leadCount = publications.filter((p) => p.lead).length
 }
 .paper:hover {
   background: rgba(255, 255, 255, 0.1);
+}
+.paper.is-spotlit {
+  animation: spotlight 2.4s ease-out;
+}
+@keyframes spotlight {
+  0%, 45% { background: rgba(230, 0, 18, 0.5); box-shadow: inset 4px 0 0 var(--paper); }
 }
 .paper__no {
   font-family: var(--font-display);

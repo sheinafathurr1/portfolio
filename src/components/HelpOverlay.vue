@@ -15,6 +15,7 @@ const controls: [string, string][] = [
   [`1 – ${menuItems.length}`, 'Jump straight to a section'],
   ['← →  /  A D', 'Skill tabs · Battle target'],
   ['R', 'Fight again (Battle)'],
+  ['/', 'Third Eye: search everything'],
   ['C', 'Open Phan-Chat'],
   ['?', 'This screen'],
 ]

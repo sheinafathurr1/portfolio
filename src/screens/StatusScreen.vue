@@ -1,14 +1,26 @@
 <script setup lang="ts">
-import { inject } from 'vue'
+import { inject, nextTick, onUnmounted, ref } from 'vue'
 import ScreenShell from '../components/ScreenShell.vue'
 import RansomText from '../components/RansomText.vue'
 import MaskEmblem from '../components/MaskEmblem.vue'
+import { useFocus } from '../composables/focus'
 import { NAV } from '../composables/nav'
 import { sfx } from '../composables/sfx'
 import { socialStats } from '../data/phantom'
 import { education, highlights, profile } from '../data/portfolio'
 
 const nav = inject(NAV)
+
+// Search results for a degree scroll to the academic record and make the diploma pop
+const spot = ref<string | null>(null)
+let spotTimer: ReturnType<typeof setTimeout>
+useFocus('status', (key) => {
+  spot.value = String(key)
+  nextTick(() => document.querySelector('.edu')?.scrollIntoView({ block: 'center', behavior: 'smooth' }))
+  clearTimeout(spotTimer)
+  spotTimer = setTimeout(() => { spot.value = null }, 2600)
+})
+onUnmounted(() => clearTimeout(spotTimer))
 const toResume = () => {
   sfx.confirm()
   nav?.goTo('resume')
@@ -103,7 +115,7 @@ const labels = socialStats.map((s, i) => {
       <section class="edu p5-enter" style="--i: 3" aria-labelledby="edu-title">
         <h3 id="edu-title" class="p5-label edu__h">Academic Record</h3>
         <div class="edu__grid">
-          <article v-for="e in education" :key="e.degree" class="diploma">
+          <article v-for="e in education" :key="e.degree" class="diploma" :class="{ 'is-spotlit': spot === e.degree }">
             <p class="diploma__period">{{ e.period }}</p>
             <h4 class="diploma__degree">{{ e.degree }}</h4>
             <p class="diploma__school">{{ e.school }}</p>
@@ -342,6 +354,12 @@ const labels = socialStats.map((s, i) => {
   background: var(--paper);
   border-left: 8px solid var(--red);
   clip-path: polygon(0 0, 100% 3%, 99% 100%, 1% 97%);
+}
+.diploma.is-spotlit {
+  animation: diplomaPop 0.5s var(--snap) 0.35s 3;
+}
+@keyframes diplomaPop {
+  50% { transform: scale(1.03) rotate(-1deg); background: #ffe4e6; }
 }
 .diploma p,
 .diploma h4 {

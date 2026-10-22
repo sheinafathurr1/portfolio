@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 
 // Full-screen layers that sit on top of whatever screen is showing.
-export type OverlayId = 'none' | 'phone' | 'help' | 'attack'
+export type OverlayId = 'none' | 'phone' | 'help' | 'attack' | 'search'
 
 export const overlay = ref<OverlayId>('none')
 

@@ -13,6 +13,7 @@ import CallingCardScreen from './screens/CallingCardScreen.vue'
 import ResumeScreen from './screens/ResumeScreen.vue'
 import PhoneChat from './components/PhoneChat.vue'
 import HelpOverlay from './components/HelpOverlay.vue'
+import ThirdEye from './components/ThirdEye.vue'
 import AllOutAttack from './components/AllOutAttack.vue'
 import RankUpToast from './components/RankUpToast.vue'
 import RequestToast from './components/RequestToast.vue'
@@ -20,6 +21,7 @@ import { NAV, inputBlocked, isTypingTarget, type ScreenId, type SectionId } from
 import { closeOverlay, openOverlay, overlay } from './composables/overlay'
 import { BOND_MAX, bondRank, markVisited } from './composables/bond'
 import { clearRequest } from './composables/requests'
+import { requestFocus } from './composables/focus'
 import { dropToast, pushToast, toasts } from './composables/toasts'
 import { sfx } from './composables/sfx'
 import { menuItems } from './data/phantom'
@@ -38,12 +40,21 @@ const SECTIONS: Record<SectionId, Component> = {
 }
 const isSection = (id: ScreenId): id is SectionId => id in SECTIONS
 
-// Screens live in the URL hash (#/status, #/skill, …) so links can be shared and the back button works
+// Screens live in the URL hash (#/status, #/skill, …) so links can be shared and the back button works.
+// A mission can be linked directly too: #/missions/10
+const hashParts = () => window.location.hash.replace(/^#\/?/, '').split('/')
+
 const fromHash = (): ScreenId => {
-  const id = window.location.hash.replace(/^#\/?/, '')
+  const [id = ''] = hashParts()
   if (id === 'menu' || id === 'resume') return id
   return id in SECTIONS ? (id as SectionId) : 'title'
 }
+
+const focusFromHash = () => {
+  const [id, item] = hashParts()
+  if (id === 'missions' && item && /^\d+$/.test(item)) requestFocus({ screen: 'missions', key: Number(item) })
+}
+focusFromHash()
 
 const current = ref<ScreenId>(fromHash())
 const menuIndex = ref(Math.max(0, menuItems.findIndex((m) => m.id === current.value)))
@@ -54,8 +65,8 @@ const screen = computed<Component>(() => {
   return SECTIONS[current.value]
 })
 
-// ── Toasts (bond rank ups, cleared requests): one at a time, paused while an All-Out Attack plays ──
-const visibleToast = computed(() => (overlay.value === 'attack' ? null : (toasts.value[0] ?? null)))
+// ── Toasts (bond rank ups, cleared requests): one at a time, held back during an All-Out Attack or a search ──
+const visibleToast = computed(() => (overlay.value === 'attack' || overlay.value === 'search' ? null : (toasts.value[0] ?? null)))
 const rankToast = computed(() => (visibleToast.value?.kind === 'rank' ? visibleToast.value : null))
 const requestToast = computed(() => (visibleToast.value?.kind === 'request' ? visibleToast.value : null))
 let toastTimer: ReturnType<typeof setTimeout>
@@ -221,6 +232,10 @@ const onKey = (e: KeyboardEvent) => {
     e.preventDefault()
     sfx.confirm()
     openOverlay('help')
+  } else if (key === '/') {
+    e.preventDefault()
+    sfx.confirm()
+    openOverlay('search')
   }
 }
 
@@ -237,7 +252,10 @@ watch(overlay, (now, before) => {
   }
 })
 
-const syncFromUrl = () => show(fromHash())
+const syncFromUrl = () => {
+  focusFromHash()
+  show(fromHash())
+}
 
 const setTitle = (id: ScreenId) => {
   const item = menuItems.find((m) => m.id === id)
@@ -295,6 +313,7 @@ onUnmounted(() => {
   <PhoneChat v-if="overlay === 'phone'" />
   <HelpOverlay v-else-if="overlay === 'help'" />
   <AllOutAttack v-else-if="overlay === 'attack'" />
+  <ThirdEye v-else-if="overlay === 'search'" />
 
   <div class="wipe" :class="`is-${wipe}`" aria-hidden="true" @animationend="onWipeEnd">
     <span class="wipe__bar wipe__bar--red"></span>
