@@ -1,15 +1,15 @@
 // Persona 5 Royal flavour layered on top of src/data/portfolio.ts.
 // Ranks/titles here are playful self-descriptions: tweak them freely.
 import type { ScreenId, SectionId } from '../composables/nav'
-import { allSkills, experiences, profile, projects, skillCategories } from './portfolio'
+import { allSkills, experiences, profile, projects, publications, skillCategories } from './portfolio'
 
 export const menuItems: { id: SectionId; label: string; sub: string; desc: string; bond: string }[] = [
-  { id: 'status',    label: 'STATUS',       sub: 'About Me',     desc: 'Profile, social stats, and field notes on the Phantom Developer.',  bond: 'You learned who Switch really is.' },
+  { id: 'status',    label: 'STATUS',       sub: 'About Me',     desc: 'Profile, social stats, education, and field notes on the Phantom Developer.', bond: 'You learned who Switch really is.' },
   { id: 'persona',   label: 'PERSONA',      sub: 'Roles',        desc: 'The four masks I wear: roles and specialties.',                     bond: 'You’ve seen the masks Switch wears.' },
   { id: 'skill',     label: 'SKILL',        sub: 'Skills',       desc: 'My technical arsenal, with mastery levels.',                        bond: 'You studied Switch’s arsenal.' },
-  { id: 'confidant', label: 'CONFIDANT',    sub: 'Experience',   desc: 'Bonds forged at work: the teams and organizations I grow with.',   bond: 'You heard the stories of Switch’s allies.' },
-  { id: 'missions',  label: 'MISSIONS',     sub: 'Projects',     desc: 'Cleared missions: research and system development projects.',      bond: 'You reviewed Switch’s past missions.' },
-  { id: 'den',       label: 'THIEVES DEN',  sub: 'Achievements', desc: 'A gallery of achievements, plans in motion, and requests for you.',  bond: 'You toured the hideout.' },
+  { id: 'confidant', label: 'CONFIDANT',    sub: 'Experience',   desc: 'Bonds forged at work: freelance clients, a research centre, teaching, and an internship.', bond: 'You heard the stories of Switch’s allies.' },
+  { id: 'missions',  label: 'MISSIONS',     sub: 'Projects',     desc: 'Client projects and research missions, from city agencies to IoT grants.', bond: 'You reviewed Switch’s past missions.' },
+  { id: 'den',       label: 'THIEVES DEN',  sub: 'Achievements', desc: 'Milestones, published papers, plans in motion, and requests for you.', bond: 'You toured the hideout.' },
   { id: 'battle',    label: 'BATTLE',       sub: 'Mini-Game',    desc: 'Shadows are loose in the codebase. Hit their weaknesses with Switch’s real skills.', bond: 'You fought side by side with Switch.' },
   { id: 'card',      label: 'CALLING CARD', sub: 'Contact',      desc: 'Send a calling card. Let’s collaborate!',                          bond: 'You found where to send a calling card.' },
 ]
@@ -25,50 +25,50 @@ const RANK_TITLES: Record<string, string[]> = {
 const averageSkill = Math.round(allSkills.reduce((sum, s) => sum + s.level, 0) / allSkills.length)
 
 export const socialStats = [
-  { stat: 'Knowledge',   rank: 5, note: 'Master’s research in Informatics: Dynamic API, ML, cybersecurity' },
+  { stat: 'Knowledge',   rank: 5, note: `Master of Informatics (GPA 3.49) and ${publications.length} peer-reviewed papers` },
   { stat: 'Proficiency', rank: 5, note: `${allSkills.length} technical skills, averaging ${averageSkill}%` },
-  { stat: 'Guts',        rank: 4, note: 'Leads teams and keeps the servers alive' },
-  { stat: 'Kindness',    rank: 4, note: 'Open to collaboration and sharing knowledge' },
-  { stat: 'Charm',       rank: 4, note: 'Bridges user needs and the technical team' },
+  { stat: 'Guts',        rank: 4, note: 'Ships production apps for government agencies and private clients' },
+  { stat: 'Kindness',    rank: 4, note: 'Teaching and lab assistant who mentors student projects' },
+  { stat: 'Charm',       rank: 4, note: 'Gathers requirements directly with non-technical stakeholders' },
 ].map((s) => ({ ...s, title: RANK_TITLES[s.stat]?.[s.rank - 1] ?? '' }))
 
 /** Roles presented as Personas; their "stats" are real skill levels looked up by name. */
 export const personas = [
   {
-    name: 'Technical Lead',
-    arcana: 'IV',
-    arcanaName: 'The Emperor',
-    icon: '👑',
-    desc: 'Leads HEI APP development and coordinates daily technical assignments, keeping the architecture clean while requirements keep shifting.',
-    statSkills: ['GitHub', 'Laravel', 'Vue.js', 'REST API', 'TypeScript'],
-    traits: ['Team Lead', 'Code Review', 'Documentation'],
-  },
-  {
-    name: 'AI Researcher',
-    arcana: 'IX',
-    arcanaName: 'The Hermit',
-    icon: '🔮',
-    desc: 'Researches Dynamic API architectures, Machine Learning, and cybersecurity using the Design Science Research methodology.',
-    statSkills: ['Dynamic API', 'Machine Learning', 'Python', 'Gemini API', 'n8n Workflows'],
-    traits: ['Design Science', 'TOPSIS', 'Publications'],
-  },
-  {
     name: 'Full-Stack Developer',
     arcana: 'I',
     arcanaName: 'The Magician',
     icon: '🪄',
-    desc: 'Weaves Laravel and REST API backends together with Vue.js and Tailwind frontends into complete applications.',
-    statSkills: ['Laravel', 'Vue.js', 'Tailwind CSS', 'MySQL', 'REST API'],
-    traits: ['Laravel', 'Vue.js', 'Flutter'],
+    desc: 'Delivers Laravel and Flutter apps end to end for government agencies, startups, and private clients, from requirements gathering to production support.',
+    statSkills: ['Laravel', 'Flutter', 'PHP', 'Blade Templating', 'REST API'],
+    traits: ['Laravel', 'Flutter', 'End-to-end delivery'],
   },
   {
-    name: 'Server Engineer',
+    name: 'AI & IoT Engineer',
+    arcana: 'XVII',
+    arcanaName: 'The Star',
+    icon: '🛰️',
+    desc: 'Wires agentic AI, deep learning, and ESP32 sensor pipelines into working systems, from biogas yield forecasting to climate control for a 40ft room.',
+    statSkills: ['Agentic AI', 'ESP32 & Arduino', 'Sensor Pipelines', 'Deep Learning', 'LSTM'],
+    traits: ['Agentic AI', 'CNN · LSTM', 'ESP32'],
+  },
+  {
+    name: 'Researcher',
+    arcana: 'IX',
+    arcanaName: 'The Hermit',
+    icon: '🔮',
+    desc: `Master’s research on dynamic API architecture with a TOPSIS-based ranking scheme, research-grant projects, and ${publications.length} peer-reviewed papers since 2025.`,
+    statSkills: ['TOPSIS / MCDM', 'Python', 'SQL (MySQL · Oracle)', 'Deep Learning', 'REST API'],
+    traits: ['IEEE papers', 'Research grants', 'Dynamic API'],
+  },
+  {
+    name: 'Server & Automation',
     arcana: 'VII',
     arcanaName: 'The Chariot',
     icon: '⚙️',
-    desc: 'Runs servers, scheduled backups, and infrastructure performance so services stay up.',
-    statSkills: ['Server Mgmt', 'CyberPanel', 'MySQL', 'GitHub', 'PHP'],
-    traits: ['Linux', 'Backups', 'Monitoring'],
+    desc: 'Keeps servers monitored and backed up, deploys to VPS, CyberPanel, and Hostinger, and automates KPI reporting with n8n and Telegram.',
+    statSkills: ['VPS & CyberPanel', 'Server Monitoring', 'n8n Automation', 'Git', 'SQL (MySQL · Oracle)'],
+    traits: ['Monitoring', 'Backups', 'n8n'],
   },
 ].map((p) => {
   const stats = p.statSkills.map((name) => ({ name, level: allSkills.find((s) => s.name === name)?.level ?? 0 }))
@@ -76,23 +76,32 @@ export const personas = [
 })
 
 const ARCANA_BY_EXPERIENCE: Record<number, { numeral: string; name: string; icon: string }> = {
-  1: { numeral: 'V', name: 'Hierophant', icon: '🏛️' },
+  1: { numeral: 'X', name: 'Fortune', icon: '🎡' },
   2: { numeral: 'II', name: 'Priestess', icon: '📚' },
-  3: { numeral: 'XI', name: 'Strength', icon: '🚀' },
+  3: { numeral: 'V', name: 'Hierophant', icon: '🏛️' },
+  4: { numeral: 'IV', name: 'Emperor', icon: '🏢' },
 }
 
-/** Confidant rank grows by one every two months of working together, capped at 10 (MAX). */
-export function confidantRank(start: string, now = new Date()) {
-  const [y = now.getFullYear(), m = 1] = start.split('-').map(Number)
-  const months = Math.max(0, (now.getFullYear() - y) * 12 + (now.getMonth() + 1 - m))
+const monthIndex = (ym: string) => {
+  const [y = 0, m = 1] = ym.split('-').map(Number)
+  return y * 12 + (m - 1)
+}
+
+/**
+ * Confidant rank grows by one every two months of working together, capped at 10 (MAX).
+ * Finished roles count their full span (start and end months included) and stay sealed at that rank.
+ */
+export function confidantRank(start: string, end?: string, now = new Date()) {
+  const last = end ? monthIndex(end) + 1 : now.getFullYear() * 12 + now.getMonth()
+  const months = Math.max(1, last - monthIndex(start))
   const rank = Math.min(10, 1 + Math.floor(months / 2))
-  return { months, rank, progress: rank === 10 ? 1 : (months % 2) / 2 }
+  return { months, rank, ended: !!end, progress: rank === 10 || end ? 1 : (months % 2) / 2 }
 }
 
 export const confidants = experiences.map((exp) => ({
   ...exp,
   arcana: ARCANA_BY_EXPERIENCE[exp.id] ?? { numeral: '0', name: 'Fool', icon: '🃏' },
-  ...confidantRank(exp.start),
+  ...confidantRank(exp.start, exp.end),
 }))
 
 export const rankLabel = (level: number) => (level >= 85 ? 'Expert' : level >= 70 ? 'Advanced' : 'Intermediate')
@@ -125,7 +134,7 @@ export const shadows: ShadowType[] = [
   { id: 'spaghetti', name: 'Spaghetti Code',    icon: '🍝', weak: 'backend',  lore: 'A 3,000-line controller nobody dares to touch.', attack: 'hurls a 3,000-line controller' },
   { id: 'downtime',  name: 'Midnight Downtime', icon: '🌑', weak: 'backend',  lore: 'Takes the server down at 3 AM. Every time.',     attack: 'pulls the plug on the server' },
   { id: 'busywork',  name: 'Manual Busywork',   icon: '📋', weak: 'ai',       lore: 'Copy, paste, repeat. Forever.',                  attack: 'buries Switch in spreadsheets' },
-  { id: 'pdfpile',   name: 'PDF Avalanche',     icon: '📚', weak: 'ai',       lore: 'Five hundred journals, zero structured data.',   attack: 'drops 500 unread journal PDFs' },
+  { id: 'blackout',  name: 'Sensor Blackout',   icon: '📡', weak: 'ai',       lore: 'A 40ft room overheating while nobody watches.',  attack: 'cuts the sensor feed' },
   { id: 'clunky',    name: 'Clunky Interface',  icon: '🧱', weak: 'frontend', lore: 'Seventeen clicks to submit one form.',           attack: 'adds a seventeenth confirmation dialog' },
   { id: 'shift',     name: 'Layout Shift',      icon: '📐', weak: 'frontend', lore: 'Moves the button right before you click it.',    attack: 'moves the button again' },
 ]
@@ -177,14 +186,14 @@ export const chatTopics: ChatTopic[] = [
     question: 'Who are you, exactly?',
     answer: [
       `I’m ${profile.name}, but around here they call me “${profile.alias}”.`,
-      'Technical lead, AI researcher and full-stack developer. I keep servers alive and teach workflows to think.',
+      'Full-stack developer (Laravel & Flutter) who also wires up AI and IoT, and keeps the servers running.',
     ],
     action: { label: 'Open STATUS', to: 'status' },
   },
   {
     id: 'now',
     question: 'What are you up to these days?',
-    answer: ['Juggling a few bonds at the moment:', experiences.map((e) => `▸ ${e.title} @ ${e.company}`).join('\n')],
+    answer: ['Juggling a few bonds at the moment:', experiences.filter((e) => !e.end).map((e) => `▸ ${e.title} @ ${e.company}`).join('\n')],
     action: { label: 'Open CONFIDANT', to: 'confidant' },
   },
   {
@@ -205,8 +214,20 @@ export const chatTopics: ChatTopic[] = [
   {
     id: 'missions',
     question: 'Show me your best work.',
-    answer: [`${projects.length} missions cleared so far:`, projects.map((p) => `▸ ${p.title} (${p.year})`).join('\n')],
+    answer: [
+      `${projects.length} missions so far, for city agencies, companies, and research grants. A few favourites:`,
+      projects.filter((p) => [1, 3, 4, 10].includes(p.id)).map((p) => `▸ ${p.title} (${p.org})`).join('\n'),
+    ],
     action: { label: 'Open MISSIONS', to: 'missions' },
+  },
+  {
+    id: 'papers',
+    question: 'Do you publish research?',
+    answer: [
+      `${publications.length} peer-reviewed papers since 2025, across IEEE conferences and national journals.`,
+      `Three as first and corresponding author, like “${publications.find((p) => p.lead)?.title ?? ''}”.`,
+    ],
+    action: { label: 'Open THIEVES DEN', to: 'den' },
   },
   {
     id: 'battle',
@@ -225,13 +246,13 @@ export const chatTopics: ChatTopic[] = [
   {
     id: 'collab',
     question: 'Are you open to collaboration?',
-    answer: ['Always. Research, server infrastructure, AI automation: count me in.', 'Send me a calling card and tell me what you have in mind.'],
+    answer: ['Always. Web and mobile apps, AI and IoT systems, research: count me in.', 'Send me a calling card and tell me what you have in mind.'],
     action: { label: 'Write a calling card', to: 'card' },
   },
   {
     id: 'contact',
     question: 'How can I reach you?',
-    answer: [`Email: ${profile.email}`, 'GitHub and LinkedIn are on the Calling Card screen too.'],
+    answer: [`Email: ${profile.email}`, 'GitHub, LinkedIn, and Google Scholar are on the Calling Card screen too.'],
     action: { label: 'Open CALLING CARD', to: 'card' },
   },
   {

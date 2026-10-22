@@ -6,7 +6,7 @@ import MaskEmblem from '../components/MaskEmblem.vue'
 import { NAV } from '../composables/nav'
 import { sfx } from '../composables/sfx'
 import { socialStats } from '../data/phantom'
-import { highlights, profile } from '../data/portfolio'
+import { education, highlights, profile } from '../data/portfolio'
 
 const nav = inject(NAV)
 const toResume = () => {
@@ -99,9 +99,24 @@ const labels = socialStats.map((s, i) => {
         </section>
       </div>
 
+      <!-- Education -->
+      <section class="edu p5-enter" style="--i: 3" aria-labelledby="edu-title">
+        <h3 id="edu-title" class="p5-label edu__h">Academic Record</h3>
+        <div class="edu__grid">
+          <article v-for="e in education" :key="e.degree" class="diploma">
+            <p class="diploma__period">{{ e.period }}</p>
+            <h4 class="diploma__degree">{{ e.degree }}</h4>
+            <p class="diploma__school">{{ e.school }}</p>
+            <p class="diploma__note">{{ e.note }}</p>
+            <p class="diploma__detail">{{ e.detail }}</p>
+            <span class="diploma__gpa"><small>GPA</small>{{ e.gpa }}</span>
+          </article>
+        </div>
+      </section>
+
       <!-- Records -->
       <section class="records">
-        <article v-for="(h, i) in highlights" :key="h.label" class="record p5-enter" :style="{ '--i': i + 3 }">
+        <article v-for="(h, i) in highlights" :key="h.label" class="record p5-enter" :style="{ '--i': i + 4 }">
           <p class="record__value">{{ h.value }}</p>
           <p class="record__label">{{ h.label }}</p>
           <p class="record__desc">{{ h.desc }}</p>
@@ -305,6 +320,87 @@ const labels = socialStats.map((s, i) => {
   grid-column: 1 / -1;
   font-size: 0.82rem;
   color: #555;
+}
+
+/* ── Education ── */
+.edu__h {
+  margin: 0 0 0.8rem;
+  font-size: 1.3rem;
+  color: var(--red);
+}
+.edu__grid {
+  display: grid;
+  gap: 1.2rem;
+}
+@media (min-width: 900px) {
+  .edu__grid { grid-template-columns: 1fr 1fr; }
+}
+.diploma {
+  position: relative;
+  padding: 1.1rem 6.8rem 1.2rem 1.3rem;
+  color: var(--ink);
+  background: var(--paper);
+  border-left: 8px solid var(--red);
+  clip-path: polygon(0 0, 100% 3%, 99% 100%, 1% 97%);
+}
+.diploma p,
+.diploma h4 {
+  margin: 0;
+}
+.diploma__period {
+  font-family: var(--font-type);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--red);
+}
+.diploma__degree {
+  margin-top: 0.2rem !important;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.45rem;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+.diploma__school {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.diploma__note {
+  margin-top: 0.3rem !important;
+  font-size: 0.88rem;
+  color: #555;
+}
+.diploma__detail {
+  margin-top: 0.5rem !important;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+.diploma__gpa {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 5.2rem;
+  height: 5.2rem;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--paper);
+  background: var(--ink);
+  clip-path: polygon(50% 0, 61% 18%, 82% 10%, 82% 32%, 100% 40%, 88% 58%, 96% 80%, 74% 82%, 62% 100%, 46% 88%, 26% 96%, 22% 76%, 2% 68%, 12% 48%, 4% 26%, 26% 22%);
+}
+.diploma__gpa small {
+  margin-bottom: 0.1rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.15em;
+  color: var(--red);
+}
+@media (max-width: 560px) {
+  .diploma { padding-right: 1.3rem; padding-top: 5.4rem; }
 }
 
 /* ── Records ── */

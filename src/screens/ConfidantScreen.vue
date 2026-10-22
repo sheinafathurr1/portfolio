@@ -59,11 +59,13 @@ const active = computed(() => confidants[index.value] ?? confidants[0]!)
             <span class="cdetail__rank-num">{{ active.rank === 10 ? 'MAX' : active.rank }}</span>
             <div class="cdetail__rank-bar">
               <div class="p5-bar"><span :style="{ width: `${active.progress * 100}%` }"></span></div>
-              <small>{{ active.rank === 10 ? 'Max bond reached' : 'Progress to next rank' }}</small>
+              <small>{{ active.rank === 10 ? 'Max bond reached' : active.ended ? 'Bond sealed: this chapter has ended' : 'Progress to next rank' }}</small>
             </div>
           </div>
 
-          <p class="cdetail__desc">{{ active.description }}</p>
+          <ul class="cdetail__points">
+            <li v-for="point in active.points" :key="point">{{ point }}</li>
+          </ul>
 
           <h3 class="p5-label cdetail__h">Abilities Unlocked</h3>
           <ul class="abilities">
@@ -278,11 +280,29 @@ const active = computed(() => confidants[index.value] ?? confidants[0]!)
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
-.cdetail__desc {
+.cdetail__points {
+  display: grid;
+  gap: 0.55rem;
   margin: 0 0 1.4rem;
-  font-size: 1.08rem;
-  line-height: 1.6;
+  padding: 0;
+  list-style: none;
+  font-size: 1.02rem;
+  line-height: 1.55;
   color: #e5e5e5;
+}
+.cdetail__points li {
+  position: relative;
+  padding-left: 1.3rem;
+}
+.cdetail__points li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 0.6rem;
+  height: 0.6rem;
+  background: var(--red);
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
 }
 .cdetail__h {
   margin: 0 0 0.6rem;

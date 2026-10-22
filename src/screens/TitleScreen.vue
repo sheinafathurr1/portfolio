@@ -60,7 +60,7 @@ onUnmounted(() => {
       <h1 class="title__name">
         <RansomText text="SWITCH" :seed="11" size="clamp(2.6rem, 10.5vw, 6.2rem)" nowrap />
       </h1>
-      <p class="title__who">{{ profile.name }} <span>·</span> Technical Lead &amp; AI Researcher</p>
+      <p class="title__who">{{ profile.name }} <span>·</span> {{ profile.headline }}</p>
       <p class="title__line">Brace yourself. This portfolio is about to steal your heart.</p>
       <MaskEmblem class="title__mask" />
     </div>

@@ -93,7 +93,7 @@ onUnmounted(() => clearTimeout(resetTimer))
       <!-- Form -->
       <form class="ccform p5-enter" @submit.prevent="submit">
         <p class="ccform__intro">
-          Got a project, a research idea, or just want to talk servers &amp; AI? Write your calling card and I’ll answer it.
+          Got a web or mobile project, an AI or IoT idea, or a research collaboration in mind? Write your calling card and I’ll answer it.
         </p>
         <label class="field">
           <span class="field__label">Name</span>

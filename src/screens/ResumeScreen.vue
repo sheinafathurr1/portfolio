@@ -3,18 +3,9 @@ import { inject, onMounted } from 'vue'
 import { NAV } from '../composables/nav'
 import { clearRequest } from '../composables/requests'
 import { sfx } from '../composables/sfx'
-import {
-  currentFocus,
-  experiences,
-  highlights,
-  milestones,
-  profile,
-  projects,
-  skillCategories,
-  socialLinks,
-} from '../data/portfolio'
+import { education, experiences, highlights, profile, projects, publications, skillGroups, socialLinks } from '../data/portfolio'
 
-// Recruiter-friendly view: the same content as the game, on one plain page that prints cleanly.
+// Recruiter-friendly view: the CV's content and order, on one plain page that prints cleanly.
 const nav = inject(NAV)
 const backToGame = () => {
   sfx.back()
@@ -27,9 +18,13 @@ const print = () => {
 
 const links = socialLinks.map((l) => ({
   ...l,
-  text: l.href.replace(/^mailto:/, '').replace(/^https?:\/\/(www\.)?/, ''),
+  text:
+    l.label === 'Google Scholar'
+      ? 'Google Scholar'
+      : l.href.replace(/^mailto:/, '').replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, ''),
 }))
-const categoryLabel = (c: string) => (c === 'research' ? 'Research' : 'Development')
+const clientProjects = projects.filter((p) => p.category === 'client')
+const researchProjects = projects.filter((p) => p.category === 'research')
 const siteUrl = window.location.origin + window.location.pathname
 
 onMounted(() => clearRequest('paper'))
@@ -50,9 +45,10 @@ onMounted(() => clearRequest('paper'))
         <div>
           <p class="cv__alias">“{{ profile.alias }}”</p>
           <h1 class="cv__name">{{ profile.name }}</h1>
-          <p class="cv__roles">{{ profile.roles.join(' · ') }}</p>
+          <p class="cv__roles">{{ profile.headline }}</p>
         </div>
         <ul class="cv__contact">
+          <li class="cv__place">{{ profile.location }}</li>
           <li v-for="l in links" :key="l.label">
             <span class="cv__icon" aria-hidden="true" v-html="l.icon"></span>
             <a :href="l.href" target="_blank" rel="noopener noreferrer">{{ l.text }}</a>
@@ -72,63 +68,76 @@ onMounted(() => clearRequest('paper'))
       </section>
 
       <section class="cv__section">
+        <h2>Technical Skills</h2>
+        <dl class="cv__groups">
+          <template v-for="g in skillGroups" :key="g.label">
+            <dt>{{ g.label }}</dt>
+            <dd>{{ g.items }}</dd>
+          </template>
+        </dl>
+      </section>
+
+      <section class="cv__section">
         <h2>Experience</h2>
         <article v-for="e in experiences" :key="e.id" class="cv__item">
           <header class="cv__item-head">
-            <h3>{{ e.title }} <span>· {{ e.company }}</span></h3>
+            <h3>{{ e.title }}</h3>
             <p class="cv__when">{{ e.period }}</p>
           </header>
-          <p>{{ e.description }}</p>
-          <p class="cv__tags">{{ e.tags.join(' · ') }}</p>
+          <p class="cv__org">{{ e.company }}</p>
+          <ul class="cv__points">
+            <li v-for="point in e.points" :key="point">{{ point }}</li>
+          </ul>
         </article>
       </section>
 
       <section class="cv__section">
-        <h2>Projects &amp; Research</h2>
-        <article v-for="p in projects" :key="p.id" class="cv__item">
+        <h2>Selected Client Projects</h2>
+        <article v-for="p in clientProjects" :key="p.id" class="cv__item cv__item--compact">
           <header class="cv__item-head">
             <h3>{{ p.title }}</h3>
-            <p class="cv__when">{{ p.year }} · {{ categoryLabel(p.category) }}</p>
+            <p class="cv__when">{{ p.org }}{{ p.ongoing ? ' · Ongoing' : '' }}</p>
           </header>
           <p>{{ p.fullDesc }}</p>
-          <p class="cv__tags">{{ p.tags.join(' · ') }}</p>
         </article>
       </section>
 
       <section class="cv__section">
-        <h2>Skills</h2>
-        <div class="cv__skills">
-          <div v-for="cat in skillCategories" :key="cat.key">
-            <h3>{{ cat.label }}</h3>
-            <ul>
-              <li v-for="s in cat.skills" :key="s.name">
-                <span>{{ s.name }}</span>
-                <span class="cv__meter" :aria-label="`${s.level}%`"><i :style="{ width: `${s.level}%` }"></i></span>
-              </li>
-            </ul>
-          </div>
-        </div>
+        <h2>Education</h2>
+        <article v-for="e in education" :key="e.degree" class="cv__item">
+          <header class="cv__item-head">
+            <h3>{{ e.degree }} <span>· GPA {{ e.gpa }}</span></h3>
+            <p class="cv__when">{{ e.period }}</p>
+          </header>
+          <p class="cv__org">{{ e.school }} · {{ e.note }}</p>
+          <p>{{ e.detail }}</p>
+        </article>
       </section>
 
-      <div class="cv__cols">
-        <section class="cv__section">
-          <h2>Milestones</h2>
-          <ul class="cv__list">
-            <li v-for="m in milestones" :key="m.title">
-              <b>{{ m.year }}</b> {{ m.title }}
-              <small>{{ m.desc }}</small>
-            </li>
-          </ul>
-        </section>
-        <section class="cv__section">
-          <h2>Currently working on</h2>
-          <ul class="cv__list">
-            <li v-for="f in currentFocus" :key="f.label">
-              <b>{{ f.pct }}%</b> {{ f.label }}
-            </li>
-          </ul>
-        </section>
-      </div>
+      <section class="cv__section">
+        <h2>R&amp;D Projects</h2>
+        <article v-for="p in researchProjects" :key="p.id" class="cv__item cv__item--compact">
+          <header class="cv__item-head">
+            <h3>{{ p.title }}</h3>
+            <p class="cv__when">{{ p.org }}</p>
+          </header>
+          <p>{{ p.fullDesc }}</p>
+        </article>
+      </section>
+
+      <section class="cv__section">
+        <h2>Publications</h2>
+        <p>
+          {{ publications.length }} peer-reviewed papers published in 2025–2026 across IEEE conferences and national journals,
+          {{ publications.filter((p) => p.lead).length }} of them as first and corresponding author.
+        </p>
+        <ol class="cv__pubs">
+          <li v-for="paper in publications" :key="paper.title">
+            <b>{{ paper.title }}</b>
+            <span>{{ paper.venue }}, {{ paper.year }} · {{ paper.role }}</span>
+          </li>
+        </ol>
+      </section>
 
       <footer class="cv__foot">
         Interactive Persona 5 Royal–style version: <a :href="siteUrl">{{ siteUrl.replace(/^https?:\/\//, '') }}</a>
@@ -318,62 +327,68 @@ onMounted(() => clearRequest('paper'))
   color: var(--red);
 }
 
-.cv__skills {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem 1.6rem;
+.cv__org {
+  margin-bottom: 0.3rem !important;
+  font-style: italic;
+  color: #555;
 }
-.cv__skills h3 {
-  margin: 0 0 0.4rem;
-  font-size: 0.95rem;
+.cv__place {
+  font-weight: 600;
+  color: #444;
 }
-.cv__skills ul {
-  list-style: none;
+.cv__points {
   margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 0.25rem;
+  padding-left: 1.2rem;
+  list-style: disc;
 }
-.cv__skills li {
-  display: grid;
-  grid-template-columns: 1fr 70px;
-  align-items: center;
-  gap: 0.6rem;
-  font-size: 0.9rem;
+.cv__points li + li {
+  margin-top: 0.2rem;
 }
-.cv__meter {
-  height: 6px;
-  background: #e5e5e5;
+.cv__item--compact {
+  padding-bottom: 0.6rem;
 }
-.cv__meter i {
-  display: block;
-  height: 100%;
-  background: var(--red);
+.cv__item--compact + .cv__item--compact {
+  padding-top: 0.6rem;
 }
 
-.cv__cols {
+.cv__groups {
   display: grid;
-  gap: 0 2rem;
-}
-@media (min-width: 720px) {
-  .cv__cols { grid-template-columns: 1.4fr 1fr; }
-}
-.cv__list {
-  list-style: none;
+  grid-template-columns: 10rem 1fr;
+  gap: 0.45rem 1.2rem;
   margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 0.5rem;
 }
-.cv__list b {
-  display: inline-block;
-  min-width: 2.8rem;
+.cv__groups dt {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--red);
 }
-.cv__list small {
+.cv__groups dd {
+  margin: 0;
+}
+@media (max-width: 560px) {
+  .cv__groups { grid-template-columns: 1fr; gap: 0.1rem; }
+  .cv__groups dd { margin-bottom: 0.5rem; }
+}
+
+.cv__pubs {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0.8rem 0 0;
+  padding-left: 1.6rem;
+  list-style: decimal;
+}
+.cv__pubs li::marker {
+  font-weight: 700;
+  color: var(--red);
+}
+.cv__pubs b {
   display: block;
-  padding-left: 2.8rem;
-  font-size: 0.85rem;
+  font-weight: 600;
+}
+.cv__pubs span {
+  font-size: 0.86rem;
   color: #555;
 }
 
@@ -410,18 +425,14 @@ onMounted(() => clearRequest('paper'))
   .cv__section h2 {
     break-after: avoid;
   }
-  .cv__skills {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  .cv__skills li {
-    grid-template-columns: 1fr 48px;
+  .cv__item,
+  .cv__pubs li {
+    break-inside: avoid;
   }
   .cv__section h2 {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
-  .cv__meter,
-  .cv__meter i,
   .cv__highlights li {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;

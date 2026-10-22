@@ -7,7 +7,8 @@ import { projects } from '../data/portfolio'
 
 const { index, select } = useListNav(() => projects.length)
 const active = computed(() => projects[index.value] ?? projects[0]!)
-const place = (category: string) => (category === 'research' ? 'Palace · Academia' : 'Mementos · Systems')
+const place = (category: string) => (category === 'research' ? 'Palace · Research' : 'Mementos · Client')
+const code = (id: number) => `#${String(id).padStart(2, '0')}`
 </script>
 
 <template>
@@ -24,12 +25,12 @@ const place = (category: string) => (category === 'research' ? 'Palace · Academ
             @click="select(i)"
             @mouseenter="select(i)"
           >
-            <span class="mrow__no">#0{{ p.id }}</span>
+            <span class="mrow__no">{{ code(p.id) }}</span>
             <span class="mrow__body">
               <span class="mrow__place">{{ place(p.category) }}</span>
               <span class="mrow__title">{{ p.title }}</span>
             </span>
-            <span class="mrow__stamp">Cleared</span>
+            <span class="mrow__stamp" :class="{ 'is-ongoing': p.ongoing }">{{ p.ongoing ? 'Active' : 'Cleared' }}</span>
           </button>
         </li>
       </ul>
@@ -39,11 +40,11 @@ const place = (category: string) => (category === 'research' ? 'Palace · Academ
           <div class="mdetail__banner">
             <span class="mdetail__icon" aria-hidden="true">{{ active.icon }}</span>
             <span class="mdetail__place">{{ place(active.category) }}</span>
-            <span class="mdetail__year">{{ active.year }}</span>
-            <span class="mdetail__stamp p5-stamp">Mission Complete</span>
+            <span class="mdetail__org">{{ active.org }}</span>
+            <span class="mdetail__stamp p5-stamp">{{ active.ongoing ? 'In Progress' : 'Mission Complete' }}</span>
           </div>
 
-          <h2 class="mdetail__title"><RansomText :text="`Mission #0${active.id}`" :seed="active.id * 5" size="1.6rem" /></h2>
+          <h2 class="mdetail__title"><RansomText :text="`Mission ${code(active.id)}`" :seed="active.id * 5" size="1.6rem" /></h2>
           <p class="mdetail__name">{{ active.title }}</p>
 
           <dl class="mdetail__brief">
@@ -132,6 +133,10 @@ const place = (category: string) => (category === 'research' ? 'Palace · Academ
   border: 2px solid var(--red);
   transform: rotate(-12deg);
 }
+.mrow__stamp.is-ongoing {
+  color: #4ade80;
+  border-color: #4ade80;
+}
 
 .mdetail {
   padding: 0 0 2rem;
@@ -167,15 +172,19 @@ const place = (category: string) => (category === 'research' ? 'Palace · Academ
   background: var(--ink);
   transform: skewX(-12deg);
 }
-.mdetail__year {
+/* Client / grant behind the mission */
+.mdetail__org {
   position: absolute;
   left: 1.6rem;
-  bottom: 0.8rem;
+  bottom: 0.9rem;
+  max-width: calc(100% - 9rem);
   font-family: var(--font-display);
-  font-size: 2.6rem;
-  line-height: 1;
+  font-size: clamp(1.1rem, 2.6vw, 1.6rem);
+  line-height: 1.1;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
   color: var(--paper);
-  -webkit-text-stroke: 2px var(--ink);
+  text-shadow: 3px 3px 0 var(--ink);
 }
 .mdetail__stamp {
   position: absolute;

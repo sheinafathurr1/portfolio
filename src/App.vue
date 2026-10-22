@@ -23,6 +23,7 @@ import { clearRequest } from './composables/requests'
 import { dropToast, pushToast, toasts } from './composables/toasts'
 import { sfx } from './composables/sfx'
 import { menuItems } from './data/phantom'
+import { profile } from './data/portfolio'
 import { burstConfetti } from './utils/confetti'
 
 const SECTIONS: Record<SectionId, Component> = {
@@ -240,8 +241,8 @@ const syncFromUrl = () => show(fromHash())
 
 const setTitle = (id: ScreenId) => {
   const item = menuItems.find((m) => m.id === id)
-  const named: Partial<Record<ScreenId, string>> = { menu: 'Menu · Switch', resume: 'Résumé · Sheina Fathur (Switch)' }
-  document.title = item ? `${item.label} · Switch` : (named[id] ?? 'Switch | Technical Lead & AI Researcher')
+  const named: Partial<Record<ScreenId, string>> = { menu: 'Menu · Switch', resume: `Résumé · ${profile.name} (Switch)` }
+  document.title = item ? `${item.label} · Switch` : (named[id] ?? `Switch | ${profile.headline}`)
 }
 watch(current, setTitle, { immediate: true })
 

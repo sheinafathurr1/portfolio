@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import ScreenShell from '../components/ScreenShell.vue'
 import { REQUESTS, cleared, clearedCount } from '../composables/requests'
-import { currentFocus, milestones } from '../data/portfolio'
+import { currentFocus, milestones, publications, socialLinks } from '../data/portfolio'
 
 const tilts = [-3, 2, -1.5, 3]
+const scholar = socialLinks.find((l) => l.label === 'Google Scholar')?.href
+const leadCount = publications.filter((p) => p.lead).length
 </script>
 
 <template>
@@ -25,6 +27,25 @@ const tilts = [-3, 2, -1.5, 3]
       </article>
     </section>
 
+    <!-- Published papers -->
+    <section class="papers p5-enter" style="--i: 5" aria-labelledby="papers-title">
+      <header class="papers__head">
+        <h2 id="papers-title" class="p5-label">Published Research</h2>
+        <span class="papers__count">{{ publications.length }} papers · {{ leadCount }} as first author</span>
+      </header>
+      <ol class="papers__list">
+        <li v-for="(paper, i) in publications" :key="paper.title" class="paper" :class="{ 'is-lead': paper.lead }">
+          <span class="paper__no">{{ String(i + 1).padStart(2, '0') }}</span>
+          <span class="paper__body">
+            <span class="paper__title">{{ paper.title }}</span>
+            <span class="paper__venue">{{ paper.venue }}, {{ paper.year }}</span>
+          </span>
+          <span class="paper__role">{{ paper.role }}</span>
+        </li>
+      </ol>
+      <a v-if="scholar" :href="scholar" target="_blank" rel="noopener noreferrer" class="p5-btn p5-btn--red papers__more">Google Scholar ▶</a>
+    </section>
+
     <section class="todo p5-enter" style="--i: 6">
       <header class="todo__head">
         <h2 class="p5-label">Today’s Plans</h2>
@@ -34,8 +55,7 @@ const tilts = [-3, 2, -1.5, 3]
         <li v-for="f in currentFocus" :key="f.label">
           <span class="todo__check" aria-hidden="true">▶</span>
           <span class="todo__label">{{ f.icon }} {{ f.label }}</span>
-          <div class="p5-bar"><span :style="{ width: `${f.pct}%` }"></span></div>
-          <span class="todo__pct">{{ f.pct }}%</span>
+          <span class="todo__note">{{ f.note }}</span>
         </li>
       </ul>
     </section>
@@ -175,13 +195,13 @@ const tilts = [-3, 2, -1.5, 3]
 }
 .todo__list li {
   display: grid;
-  grid-template-columns: 1.4rem minmax(9rem, 13rem) 1fr 2.8rem;
+  grid-template-columns: 1.4rem minmax(10rem, 16rem) 1fr;
   align-items: center;
   gap: 0.8rem;
 }
 @media (max-width: 560px) {
-  .todo__list li { grid-template-columns: 1.4rem 1fr 2.8rem; }
-  .todo__list li .p5-bar { grid-column: 2 / -1; grid-row: 2; }
+  .todo__list li { grid-template-columns: 1.4rem 1fr; }
+  .todo__note { grid-column: 2; }
 }
 /* ── Mementos Requests ── */
 .board {
@@ -284,9 +304,95 @@ const tilts = [-3, 2, -1.5, 3]
   font-weight: 600;
   letter-spacing: 0.03em;
 }
-.todo__pct {
-  font-family: var(--font-display);
-  text-align: right;
+.todo__note {
+  font-family: var(--font-type);
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* ── Published research ── */
+.papers {
+  max-width: 980px;
+  margin-bottom: 2.4rem;
+  padding: 1.4rem 1.6rem 1.6rem;
+  background: var(--ink);
+  border-left: 6px solid var(--red);
+}
+.papers__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+.papers__head h2 {
+  margin: 0;
+  font-size: 1.6rem;
   color: var(--red);
+}
+.papers__count {
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.papers__list {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0 0 1.2rem;
+  padding: 0;
+  list-style: none;
+}
+.paper {
+  display: grid;
+  grid-template-columns: 2.2rem 1fr auto;
+  align-items: start;
+  gap: 0.8rem;
+  padding: 0.6rem 0.8rem;
+  background: rgba(255, 255, 255, 0.05);
+  transition: background-color 0.15s ease;
+}
+.paper:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.paper__no {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  line-height: 1.2;
+  color: var(--red);
+}
+.paper__body {
+  display: grid;
+  gap: 0.15rem;
+}
+.paper__title {
+  font-weight: 600;
+  line-height: 1.35;
+}
+.paper__venue {
+  font-family: var(--font-type);
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+.paper__role {
+  padding: 0.05rem 0.5rem;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--muted);
+  border: 1px solid currentColor;
+}
+.paper.is-lead .paper__role {
+  color: var(--ink);
+  background: var(--red);
+  border-color: var(--red);
+}
+@media (max-width: 640px) {
+  .paper { grid-template-columns: 2rem 1fr; }
+  .paper__role { grid-column: 2; justify-self: start; }
 }
 </style>

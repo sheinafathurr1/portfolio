@@ -56,8 +56,9 @@ const phase = computed(() => {
   return { label: 'Late Night', icon: '☾' }
 })
 
-const uptime = highlights[0]
-const automations = highlights[1]
+// HUD bars: "HP" and "SP" show the first two headline numbers
+const hp = highlights[0]
+const sp = highlights[1]
 
 const openChat = () => {
   sfx.confirm()
@@ -139,8 +140,8 @@ const openChat = () => {
     <!-- Party HUD -->
     <div class="hud">
       <p class="hud__name">{{ profile.alias.toUpperCase() }} <span>LV {{ allSkills.length }}</span></p>
-      <div class="hud__row"><b>HP</b><div class="p5-bar"><span style="width: 99.9%"></span></div><small>{{ uptime?.value }} uptime</small></div>
-      <div class="hud__row"><b>SP</b><div class="p5-bar hud__sp"><span style="width: 78%"></span></div><small>{{ automations?.value }} automations</small></div>
+      <div class="hud__row"><b>HP</b><div class="p5-bar"><span style="width: 99.9%"></span></div><small>{{ hp?.value }} {{ hp?.short }}</small></div>
+      <div class="hud__row"><b>SP</b><div class="p5-bar hud__sp"><span style="width: 78%"></span></div><small>{{ sp?.value }} {{ sp?.short }}</small></div>
       <div class="hud__row hud__bond">
         <b>BD</b>
         <span class="stars" aria-hidden="true"><i v-for="n in BOND_MAX" :key="n" :class="{ on: n <= bondRank }"></i></span>

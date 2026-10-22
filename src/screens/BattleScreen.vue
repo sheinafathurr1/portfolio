@@ -369,7 +369,7 @@ onUnmounted(() => {
           <div v-else class="bpanel" role="dialog" aria-label="Defeat">
             <RansomText text="KNOCKED OUT" :seed="4" size="clamp(1.9rem, 7vw, 3.4rem)" />
             <p class="bpanel__lead">Don’t worry. Shadows can’t delete commits.</p>
-            <p class="bpanel__used">Hint: Spaghetti Code fears clean backend work, busywork fears automation, clunky UIs fear good frontend.</p>
+            <p class="bpanel__used">Hint: backend skills fix messy code and downtime, AI &amp; IoT skills beat busywork and blind sensors, frontend skills fix clunky UIs.</p>
             <button ref="primaryBtn" class="p5-btn" @click="start">Retry ↺</button>
           </div>
         </div>
