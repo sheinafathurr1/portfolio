@@ -265,6 +265,7 @@ export class Environment {
       { x: 17, z: -3, stop: 6.3 },
       { x: 0, z: -18, stop: 3.5 },
       { x: 15, z: 15, stop: 4.8 },
+      { x: 26, z: 5, stop: 4.3 },
       { x: -15, z: 18, stop: 4.8 },
       { x: 0, z: 21, stop: 1 },
     ]

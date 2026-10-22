@@ -10,7 +10,7 @@ import { Input } from './Input'
 import { Player } from './Player'
 import { Props } from './Props'
 import { Zones } from './Zones'
-import { CORE_POSITIONS, GROUP, type ZoneId } from './layout'
+import { CORE_POSITIONS, GROUP, ZONES, type ZoneId } from './layout'
 import { FONT, MONO, damp } from './utils'
 
 export interface WorldCallbacks {
@@ -252,6 +252,34 @@ export class World {
   resetWorld() {
     this.props.resetAll()
     this.player.respawn()
+  }
+
+  /** Fast travel: drop the bot just south of a zone's centre, facing its landmark. */
+  travelTo(id: ZoneId) {
+    const zone = ZONES.find((z) => z.id === id)
+    if (!zone) return
+    this.player.teleport(zone.x, zone.z + zone.radius * 0.35)
+    this.player.body.wakeUp()
+  }
+
+  /** Pauses keyboard/joystick control (e.g. while the map is open). */
+  setControlsEnabled(enabled: boolean) {
+    this.input.enabled = enabled && this.started
+    if (!enabled) this.input.setJoystick(0, 0)
+  }
+
+  /**
+   * Photo mode: renders a fresh frame and reads it back straight away, while the drawing buffer is still valid.
+   * Returns a PNG data URL, or null if the browser refuses.
+   */
+  capture(): string | null {
+    try {
+      if (this.composer) this.composer.render()
+      else this.renderer.render(this.scene, this.camera)
+      return this.options.canvas.toDataURL('image/png')
+    } catch {
+      return null
+    }
   }
 
   setJoystick(x: number, y: number) {

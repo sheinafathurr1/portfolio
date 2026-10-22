@@ -327,6 +327,40 @@ html.world-mode body {
 
 .world-bar { transform-origin: left; animation: barGrow 0.9s var(--ease-out) both; }
 
+/* Map: fast-travel buttons */
+.world-travel {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  background: rgba(148, 163, 184, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+.world-travel:hover,
+.world-travel:focus-visible {
+  border-color: var(--zone-color);
+  background: color-mix(in srgb, var(--zone-color) 16%, transparent);
+  transform: translateY(-1px);
+}
+.world-travel.is-here {
+  border-color: var(--zone-color);
+}
+
+/* Photo mode: white camera flash */
+.world-flash {
+  background: #fff;
+  animation: worldFlash 0.38s ease-out forwards;
+}
+@keyframes worldFlash {
+  from { opacity: 0.85; }
+  to { opacity: 0; }
+}
+
 .world-key-hint {
   display: inline-flex;
   align-items: center;

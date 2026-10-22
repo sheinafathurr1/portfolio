@@ -21,6 +21,7 @@ export type ZoneId =
   | 'project-1'
   | 'project-2'
   | 'project-3'
+  | 'library'
   | 'achievements'
   | 'contact'
 
@@ -47,6 +48,7 @@ export const ZONES: ZoneLayout[] = [
   { id: 'project-1',    x: -9,  z: -18, radius: 3.6, label: 'Deteksi Korosi',    icon: '🛰️', color: '#06b6d4', labelPos: [-9, 6.2, -21] },
   { id: 'project-2',    x: 0,   z: -21, radius: 3.6, label: 'E-Selamat',         icon: '🐄', color: '#10b981', labelPos: [0, 6.2, -24] },
   { id: 'project-3',    x: 9,   z: -18, radius: 3.6, label: 'IoT Lingkungan',    icon: '🌱', color: '#14b8a6', labelPos: [9, 6.2, -21] },
+  { id: 'library',      x: 26,  z: 5,   radius: 4,   label: 'Perpustakaan',      icon: '📚', color: '#e879f9', labelPos: [26, 5.4, 2.4] },
   { id: 'achievements', x: 15,  z: 15,  radius: 4.5, label: 'Pencapaian',        icon: '🏆', color: '#f59e0b', labelPos: [15, 4.9, 13] },
   { id: 'contact',      x: -15, z: 18,  radius: 4.5, label: 'Kontak',            icon: '📨', color: '#10b981', labelPos: [-19, 9.2, 14.5] },
 ]
@@ -63,6 +65,7 @@ export const SKILL_PYRAMID = { x: 17, z: -6 }
 export const CONTACT_TOWER = { x: -19, z: 14.5 }
 export const MAILBOX = { x: -11.8, z: 15.6 }
 export const TROPHY = { x: 15, z: 13 }
+export const LIBRARY = { x: 26, z: 2.6 }
 
 export const CORE_PICKUP_RADIUS = 1.3
 export const CORE_POSITIONS: [number, number, number][] = [

@@ -6,6 +6,10 @@ riset & hibah, pendidikan, dan publikasi, semuanya di `src/data/portfolio.ts`.
 - **Dunia 3D (default)**: pulau interaktif berbasis [three.js](https://threejs.org/) + [cannon-es](https://github.com/pmndrs/cannon-es).
   Pengunjung menggelindingkan bot kecil (WASD/panah, Space lompat, Shift boost, R ulang; joystick di HP) ke tiap area:
   Tentang, Pengalaman, Keahlian (peti yang bisa ditabrak), Proyek, Pencapaian, dan Kontak. Ada 8 *data core* untuk dikumpulkan.
+  - **Perpustakaan**: rak buku dengan satu buku per publikasi (buku emas = penulis pertama); panelnya berisi daftar 8 paper.
+  - **Peta & fast travel** (`M`, tombol Peta, atau klik minimap): klik area di peta/daftar untuk teleport.
+  - **Mode foto** (`P` atau tombol Foto): simpan tangkapan pulau sebagai PNG dengan keterangan.
+  - **Eksplorasi**: penghitung 🧭 area yang sudah dikunjungi (tersimpan di `localStorage`), dengan perayaan saat semua area dijelajahi.
 - **Versi klasik**: halaman scroll biasa. Bisa dibuka lewat tombol "Versi Klasik", dan otomatis dipakai bila browser
   tidak mendukung WebGL atau URL berisi anchor (mis. `/#projects`). Pilihan terakhir pengunjung diingat di `localStorage`.
 

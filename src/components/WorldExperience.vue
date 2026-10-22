@@ -12,6 +12,7 @@ const goClassic = (section?: string) => modeApi?.setMode('classic', section)
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 const labelsRef = ref<HTMLDivElement | null>(null)
 const minimapRef = ref<HTMLCanvasElement | null>(null)
+const bigMapRef = ref<HTMLCanvasElement | null>(null)
 const joyBaseRef = ref<HTMLDivElement | null>(null)
 
 let world: World | null = null
@@ -35,6 +36,121 @@ const showToast = (text: string, ms = 2800) => {
   toastTimer = setTimeout(() => { toast.value = null }, ms)
 }
 
+// ── Exploration: every area visited at least once (saved per browser) ──
+const VISITED_KEY = 'world-visited'
+const loadVisited = (): ZoneId[] => {
+  try {
+    const parsed: unknown = JSON.parse(localStorage.getItem(VISITED_KEY) ?? '[]')
+    return Array.isArray(parsed) ? (parsed.filter((id) => ZONES.some((z) => z.id === id)) as ZoneId[]) : []
+  } catch {
+    return []
+  }
+}
+const visited = ref<ZoneId[]>(loadVisited())
+const celebrate = () => {
+  const w = window.innerWidth
+  const h = window.innerHeight
+  ;[0.25, 0.5, 0.75].forEach((fx, i) => setTimeout(() => burstConfetti(w * fx, h * 0.35, 60), i * 180))
+}
+const markVisited = (id: ZoneId) => {
+  if (visited.value.includes(id)) return
+  visited.value = [...visited.value, id]
+  try {
+    localStorage.setItem(VISITED_KEY, JSON.stringify(visited.value))
+  } catch {
+    // storage blocked: progress just won't persist
+  }
+  const label = ZONES.find((z) => z.id === id)?.label ?? ''
+  if (visited.value.length === ZONES.length) {
+    showToast('🧭 Semua area sudah kamu jelajahi! Terima kasih sudah mampir.', 4500)
+    celebrate()
+  } else {
+    showToast(`🧭 Area baru: ${label} (${visited.value.length}/${ZONES.length})`)
+  }
+}
+
+// ── Map + fast travel ──
+const mapOpen = ref(false)
+const openMap = () => {
+  if (phase.value !== 'playing') return
+  mapOpen.value = true
+  world?.setControlsEnabled(false)
+}
+const closeMap = () => {
+  mapOpen.value = false
+  world?.setControlsEnabled(true)
+  canvasRef.value?.focus()
+}
+const travel = (id: ZoneId) => {
+  world?.travelTo(id)
+  dismissedZone.value = null
+  closeMap()
+}
+const onMapClick = (e: MouseEvent) => {
+  const canvas = bigMapRef.value
+  if (!canvas) return
+  const rect = canvas.getBoundingClientRect()
+  const scale = (rect.width / 2 - 6) / ISLAND_RADIUS
+  const wx = (e.clientX - rect.left - rect.width / 2) / scale
+  const wz = (e.clientY - rect.top - rect.height / 2) / scale
+  const hit = ZONES.map((z) => ({ z, d: Math.hypot(wx - z.x, wz - z.z) }))
+    .filter(({ z, d }) => d < z.radius + 2)
+    .sort((a, b) => a.d - b.d)[0]
+  if (hit) travel(hit.z.id)
+}
+
+// ── Photo mode: grab the current frame, stamp a caption, and download it ──
+const flash = ref(false)
+const takePhoto = () => {
+  const url = world?.capture()
+  if (!url) {
+    showToast('Foto belum bisa dibuat di browser ini 😕')
+    return
+  }
+  flash.value = true
+  setTimeout(() => { flash.value = false }, 380)
+  const img = new Image()
+  img.onload = () => {
+    const out = document.createElement('canvas')
+    out.width = img.width
+    out.height = img.height
+    const ctx = out.getContext('2d')
+    if (!ctx) return
+    ctx.drawImage(img, 0, 0)
+    const k = img.width / 1440
+    const barH = Math.round(86 * k)
+    const g = ctx.createLinearGradient(0, img.height - barH * 1.8, 0, img.height)
+    g.addColorStop(0, 'rgba(5,8,19,0)')
+    g.addColorStop(1, 'rgba(5,8,19,0.9)')
+    ctx.fillStyle = g
+    ctx.fillRect(0, img.height - barH * 1.8, img.width, barH * 1.8)
+    ctx.textBaseline = 'alphabetic'
+    ctx.fillStyle = '#ffffff'
+    ctx.font = `800 ${Math.round(34 * k)}px 'Plus Jakarta Sans', system-ui, sans-serif`
+    ctx.fillText('Pulau Switch', 32 * k, img.height - 40 * k)
+    const titleW = ctx.measureText('Pulau Switch').width
+    ctx.fillStyle = '#67e8f9'
+    ctx.font = `600 ${Math.round(18 * k)}px 'Fira Code', ui-monospace, monospace`
+    ctx.fillText(`· ${profile.name}`, 32 * k + titleW + 14 * k, img.height - 44 * k)
+    ctx.textAlign = 'right'
+    ctx.fillStyle = 'rgba(255,255,255,0.7)'
+    ctx.fillText(`◆ ${collected.value}/${totalCores.value}  🧭 ${visited.value.length}/${ZONES.length}`, img.width - 32 * k, img.height - 44 * k)
+    out.toBlob((blob) => {
+      if (!blob) return
+      const link = document.createElement('a')
+      const stamp = new Date().toISOString().slice(0, 16).replace(/[-:T]/g, '')
+      link.href = URL.createObjectURL(blob)
+      link.download = `pulau-switch-${stamp}.png`
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      setTimeout(() => URL.revokeObjectURL(link.href), 2000)
+    }, 'image/png')
+  }
+  img.src = url
+  showToast('📸 Cekrek! Foto pulau tersimpan.')
+}
+
 // ── Zone panel ──
 const panelZone = computed(() =>
   phase.value === 'playing' && activeZone.value && activeZone.value !== dismissedZone.value ? activeZone.value : null,
@@ -44,12 +160,14 @@ const zoneNumber = computed(() => Number(panelZone.value?.split('-')[1] ?? 0) - 
 const panelExperience = computed(() => (panelZone.value?.startsWith('exp-') ? experiences[zoneNumber.value] : undefined))
 const panelProject = computed(() => (panelZone.value?.startsWith('project-') ? featuredProjects[zoneNumber.value] : undefined))
 const pad = (n: number) => String(n).padStart(2, '0')
+const scholarUrl = socialLinks.find((l) => l.label === 'Google Scholar')?.href
 const panelHeader = computed(() => {
   if (panelExperience.value) return { kicker: `Pengalaman · ${pad(panelExperience.value.id)}`, title: panelExperience.value.title }
   if (panelProject.value) return { kicker: `Proyek unggulan · #${pad(panelProject.value.id)}`, title: panelProject.value.title }
   switch (panelZone.value) {
     case 'about': return { kicker: 'Tentang Saya', title: profile.name }
     case 'skills': return { kicker: 'Tech Stack', title: 'Keahlian & Teknologi' }
+    case 'library': return { kicker: 'Perpustakaan', title: 'Publikasi Ilmiah' }
     case 'achievements': return { kicker: 'Highlight', title: 'Pencapaian & Fokus' }
     case 'contact': return { kicker: 'Get in Touch', title: 'Mari Berkolaborasi' }
     default: return { kicker: '', title: '' }
@@ -78,8 +196,14 @@ const resetWorld = () => {
 
 const handleKeys = (e: KeyboardEvent) => {
   if (phase.value === 'intro' && e.key === 'Enter') start()
-  if (phase.value !== 'playing') return
+  if (phase.value !== 'playing' || e.ctrlKey || e.metaKey || e.altKey || e.repeat) return
+  if (mapOpen.value) {
+    if (e.key === 'Escape' || e.code === 'KeyM') closeMap()
+    return
+  }
   if (e.code === 'KeyH') showControls.value = !showControls.value
+  if (e.code === 'KeyM') openMap()
+  if (e.code === 'KeyP') takePhoto()
   if (e.key === 'Escape' && panelZone.value) dismissedZone.value = panelZone.value
 }
 
@@ -104,14 +228,13 @@ onMounted(async () => {
         onZoneChange: (id) => {
           activeZone.value = id
           dismissedZone.value = null
+          if (id) markVisited(id)
         },
         onCollect: (count, total) => {
           collected.value = count
           if (count === total) {
             showToast('🎉 Semua data core terkumpul! Kamu penjelajah sejati.', 4500)
-            const w = window.innerWidth
-            const h = window.innerHeight
-            ;[0.25, 0.5, 0.75].forEach((fx, i) => setTimeout(() => burstConfetti(w * fx, h * 0.35, 60), i * 180))
+            celebrate()
           } else {
             showToast(`✨ Data core ${count}/${total} terkumpul`)
           }
@@ -143,12 +266,17 @@ onUnmounted(() => {
   world = null
 })
 
-// ── Minimap ──
+// ── Minimap (and the big map when it's open) ──
 let mapRaf = 0
 const drawMinimap = () => {
   mapRaf = requestAnimationFrame(drawMinimap)
-  const canvas = minimapRef.value
-  if (!canvas || !world || phase.value !== 'playing') return
+  if (!world || phase.value !== 'playing') return
+  drawMap(minimapRef.value, false)
+  if (mapOpen.value) drawMap(bigMapRef.value, true)
+}
+
+const drawMap = (canvas: HTMLCanvasElement | null, detailed: boolean) => {
+  if (!canvas || !world) return
   const ctx = canvas.getContext('2d')
   if (!ctx) return
   const dpr = Math.min(window.devicePixelRatio, 2)
@@ -180,6 +308,14 @@ const drawMinimap = () => {
     ctx.strokeStyle = zone.color
     ctx.lineWidth = dpr
     ctx.stroke()
+    if (detailed) {
+      ctx.globalAlpha = visited.value.includes(zone.id) ? 1 : 0.45
+      ctx.font = `${Math.round(zone.radius * scale * 0.9)}px 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif`
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(zone.icon, c + zone.x * scale, c + zone.z * scale)
+      ctx.globalAlpha = 1
+    }
   }
 
   ctx.fillStyle = '#67e8f9'
@@ -277,6 +413,8 @@ const onJoyEnd = (e: PointerEvent) => {
             <span class="world-key-hint"><kbd>Space</kbd> lompat</span>
             <span class="world-key-hint"><kbd>Shift</kbd> boost</span>
             <span class="world-key-hint"><kbd>R</kbd> ulang</span>
+            <span class="world-key-hint"><kbd>M</kbd> peta</span>
+            <span class="world-key-hint"><kbd>P</kbd> foto</span>
           </div>
           <p v-else class="text-xs text-slate-400 mb-7">Geser joystick di kiri bawah untuk bergerak, dorong penuh untuk boost, dan tekan tombol lompat.</p>
 
@@ -321,10 +459,26 @@ const onJoyEnd = (e: PointerEvent) => {
         <div class="world-hud-chip font-mono text-xs sm:text-sm" :class="{ 'text-amber-300': collected === totalCores }" title="Data core terkumpul">
           <span class="text-cyan-300">◆</span> {{ collected }}/{{ totalCores }}
         </div>
+        <button
+          class="world-hud-chip font-mono text-xs sm:text-sm hover:text-white"
+          :class="{ 'text-amber-300': visited.length === ZONES.length }"
+          title="Area dijelajahi · buka peta (M)"
+          @click="openMap"
+        >
+          🧭 {{ visited.length }}/{{ ZONES.length }}
+        </button>
       </div>
 
       <!-- Actions -->
       <div class="absolute top-4 right-4 z-20 flex items-center gap-2">
+        <button @click="openMap" class="world-hud-btn" title="Peta & fast travel (M)">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>
+          <span class="hidden md:inline">Peta</span>
+        </button>
+        <button @click="takePhoto" class="world-hud-btn" title="Ambil foto (P)">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+          <span class="hidden md:inline">Foto</span>
+        </button>
         <button @click="resetWorld" class="world-hud-btn" title="Reset dunia">
           <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
           <span class="hidden md:inline">Reset</span>
@@ -350,6 +504,8 @@ const onJoyEnd = (e: PointerEvent) => {
             <li class="flex justify-between gap-2"><span>Lompat</span><kbd>Space</kbd></li>
             <li class="flex justify-between gap-2"><span>Boost</span><kbd>Shift</kbd></li>
             <li class="flex justify-between gap-2"><span>Kembali ke awal</span><kbd>R</kbd></li>
+            <li class="flex justify-between gap-2"><span>Peta & teleport</span><kbd>M</kbd></li>
+            <li class="flex justify-between gap-2"><span>Ambil foto</span><kbd>P</kbd></li>
             <li class="flex justify-between gap-2"><span>Zoom</span><span class="text-slate-400">scroll</span></li>
           </ul>
           <p class="mt-3 pt-3 border-t border-white/10 text-slate-400 leading-relaxed">
@@ -359,9 +515,14 @@ const onJoyEnd = (e: PointerEvent) => {
       </Transition>
 
       <!-- Minimap -->
-      <div class="absolute z-20 world-glass rounded-full p-1.5 right-4 hidden sm:block" :class="isTouch ? 'top-20' : 'bottom-4'">
+      <button
+        class="absolute z-20 world-glass rounded-full p-1.5 right-4 hidden sm:block cursor-pointer"
+        :class="isTouch ? 'top-20' : 'bottom-4'"
+        title="Buka peta (M)"
+        @click="openMap"
+      >
         <canvas ref="minimapRef" class="block w-36 h-36 rounded-full" aria-hidden="true"></canvas>
-      </div>
+      </button>
 
       <!-- Zone panel -->
       <Transition name="world-panel" mode="out-in">
@@ -406,7 +567,8 @@ const onJoyEnd = (e: PointerEvent) => {
               <button @click="goClassic()" class="world-action">Versi klasik</button>
             </div>
             <p class="mt-4 text-xs text-slate-500 leading-relaxed">
-              👉 Ikuti titik bercahaya: pengalaman di barat, keahlian di timur, proyek di utara, pencapaian & kontak di selatan.
+              👉 Ikuti titik bercahaya: pengalaman di barat, keahlian &amp; perpustakaan di timur, proyek di utara, pencapaian &amp; kontak di selatan.
+              Buka <strong class="text-slate-300">peta (M)</strong> untuk teleport.
             </p>
           </template>
 
@@ -457,6 +619,27 @@ const onJoyEnd = (e: PointerEvent) => {
             <button @click="goClassic('projects')" class="world-action">Lihat semua {{ projects.length }} proyek →</button>
           </template>
 
+          <!-- Library -->
+          <template v-else-if="panelZone === 'library'">
+            <p class="text-xs text-slate-400 mb-4 leading-relaxed">
+              {{ publications.length }} paper di konferensi IEEE dan jurnal nasional (2025–2026). Buku emas di rak = penulis pertama.
+            </p>
+            <ol class="space-y-3 mb-5">
+              <li v-for="(paper, i) in publications" :key="paper.title" class="flex gap-2.5">
+                <span class="font-mono text-[11px] font-bold pt-0.5" :class="paper.lead ? 'text-amber-300' : 'text-slate-500'">{{ pad(i + 1) }}</span>
+                <div class="min-w-0">
+                  <p class="text-sm text-white font-semibold leading-snug">{{ paper.title }}</p>
+                  <p class="text-[11px] text-slate-400 leading-snug mt-0.5">{{ paper.venue }}, {{ paper.year }}</p>
+                  <p class="text-[10px] font-mono mt-0.5" :class="paper.lead ? 'text-amber-300' : 'text-slate-500'">{{ paper.lead ? '★ ' : '' }}{{ paper.role }}</p>
+                </div>
+              </li>
+            </ol>
+            <div class="flex gap-2">
+              <a v-if="scholarUrl" :href="scholarUrl" target="_blank" rel="noopener noreferrer" class="world-action world-action--primary">Google Scholar</a>
+              <button @click="goClassic('academic')" class="world-action">Versi klasik</button>
+            </div>
+          </template>
+
           <!-- Achievements -->
           <template v-else-if="panelZone === 'achievements'">
             <ul class="space-y-3 mb-5">
@@ -485,7 +668,7 @@ const onJoyEnd = (e: PointerEvent) => {
           <!-- Contact -->
           <template v-else-if="panelZone === 'contact'">
             <p class="text-sm text-slate-300 leading-relaxed mb-4">
-              Diskusi infrastruktur server, eksplorasi AI, atau sekadar bertukar pikiran — kotak masuk saya selalu terbuka!
+              Punya proyek web atau mobile, ide AI &amp; IoT, atau ajakan kolaborasi riset? Kotak masuk saya selalu terbuka!
             </p>
             <div class="grid grid-cols-3 gap-2 mb-3">
               <a
@@ -530,6 +713,57 @@ const onJoyEnd = (e: PointerEvent) => {
         </button>
       </template>
     </template>
+
+    <!-- Map & fast travel -->
+    <Transition name="fade">
+      <div
+        v-if="mapOpen"
+        class="absolute inset-0 z-40 flex items-center justify-center p-3 sm:p-6 bg-[#050813]/75 backdrop-blur-sm"
+        role="dialog"
+        aria-label="Peta pulau"
+        @click.self="closeMap"
+      >
+        <div class="world-glass rounded-3xl p-4 sm:p-6 w-full max-w-4xl max-h-[92vh] overflow-y-auto grid gap-5 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] items-center">
+          <canvas
+            ref="bigMapRef"
+            class="block w-full max-w-[420px] mx-auto aspect-square rounded-full cursor-crosshair"
+            aria-hidden="true"
+            @click="onMapClick"
+          ></canvas>
+          <div>
+            <div class="flex items-start justify-between gap-3 mb-1">
+              <div>
+                <p class="text-[10px] font-mono font-bold uppercase tracking-[0.25em] text-cyan-300">Fast travel</p>
+                <h2 class="text-white text-2xl font-extrabold">Peta Pulau</h2>
+              </div>
+              <button class="text-slate-400 hover:text-white p-1" aria-label="Tutup peta" @click="closeMap">✕</button>
+            </div>
+            <p class="text-xs text-slate-400 mb-4">
+              Klik area di peta atau di daftar untuk teleport. {{ visited.length }}/{{ ZONES.length }} area sudah dijelajahi.
+            </p>
+            <div class="grid grid-cols-2 gap-2">
+              <button
+                v-for="zone in ZONES"
+                :key="zone.id"
+                class="world-travel"
+                :class="{ 'is-here': zone.id === activeZone }"
+                :style="{ '--zone-color': zone.color }"
+                @click="travel(zone.id)"
+              >
+                <span class="text-lg leading-none">{{ zone.icon }}</span>
+                <span class="flex-1 min-w-0 truncate text-left">{{ zone.label }}</span>
+                <span v-if="zone.id === activeZone" class="text-[10px] font-mono text-cyan-300">di sini</span>
+                <span v-else-if="visited.includes(zone.id)" class="text-[11px] text-emerald-400" aria-label="sudah dijelajahi">✓</span>
+                <span v-else class="text-[10px] font-mono text-amber-300">baru</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Transition>
+
+    <!-- Photo flash -->
+    <div v-if="flash" class="world-flash absolute inset-0 z-50 pointer-events-none"></div>
 
     <!-- Toast -->
     <Transition name="toast">

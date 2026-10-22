@@ -1,8 +1,8 @@
 import * as THREE from 'three'
 import type * as CANNON from 'cannon-es'
 import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js'
-import { categoryLabel, experiences, featuredProjects } from '../data/portfolio'
-import { CONTACT_TOWER, MAILBOX, SKILL_PYRAMID, TROPHY, ZONES, type ZoneId, type ZoneLayout } from './layout'
+import { categoryLabel, experiences, featuredProjects, publications } from '../data/portfolio'
+import { CONTACT_TOWER, LIBRARY, MAILBOX, SKILL_PYRAMID, TROPHY, ZONES, type ZoneId, type ZoneLayout } from './layout'
 import { addStaticBox, addStaticCylinder } from './bodies'
 import { EMOJI, FONT, MONO, damp, makeCanvasTexture, roundRect, wrapText } from './utils'
 
@@ -40,6 +40,7 @@ export class Zones {
     this.addBillboards(scene, physics)
     this.addSkillsPad(scene)
     this.addTrophy(scene, physics)
+    this.addLibrary(scene, physics)
     this.addContactTower(scene, physics)
   }
 
@@ -362,6 +363,138 @@ export class Zones {
     this.spinners.push({ obj: orbit, speed: -1.1 })
 
     addStaticCylinder(physics, x, 0.8, z, 1.0, 1.6, 12)
+  }
+
+  /** Bookshelf with one book per publication; first-author papers glow gold. A holo-book floats above. */
+  private addLibrary(scene: THREE.Scene, physics: CANNON.World) {
+    const { x, z } = LIBRARY
+    const W = 3.6
+    const H = 3.1
+    const D = 0.7
+    const shelf = new THREE.Group()
+    shelf.position.set(x, 0, z)
+
+    const wood = new THREE.MeshStandardMaterial({ color: '#1a1433', metalness: 0.3, roughness: 0.55 })
+    const part = (w: number, h: number, d: number, px: number, py: number, pz: number) => {
+      const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), wood)
+      m.position.set(px, py, pz)
+      m.castShadow = true
+      m.receiveShadow = true
+      shelf.add(m)
+    }
+    part(W, H, 0.08, 0, H / 2, -D / 2 + 0.04) // back
+    for (const side of [-1, 1]) part(0.12, H, D, side * (W / 2 - 0.06), H / 2, 0)
+    const rows = [0.12, 1.12, 2.12]
+    for (const y of [...rows, H - 0.06]) part(W, 0.1, D, 0, y, 0)
+
+    // Neon trim along the front edges
+    const neon = new THREE.MeshBasicMaterial({ color: hdr('#e879f9', 2.2) })
+    for (const y of [...rows, H - 0.06]) {
+      const strip = new THREE.Mesh(new THREE.BoxGeometry(W - 0.2, 0.025, 0.025), neon)
+      strip.position.set(0, y + 0.05, D / 2)
+      shelf.add(strip)
+    }
+
+    // Books: 3 + 3 + 2, newest first, leaning a little where a row has room
+    const palette = ['#7c3aed', '#2563eb', '#0891b2', '#059669', '#db2777', '#4f46e5']
+    const perRow = [3, 3, 2]
+    let index = 0
+    perRow.forEach((count, r) => {
+      const baseY = (rows[r] ?? 0) + 0.05
+      let bx = -W / 2 + 0.35
+      for (let i = 0; i < count; i++) {
+        const paper = publications[index]
+        if (!paper) return
+        const n = index + 1
+        const thick = 0.34
+        const tall = 0.72 + ((n * 37) % 11) / 100
+        const color = paper.lead ? '#f59e0b' : (palette[index % palette.length] ?? '#7c3aed')
+        const spine = makeCanvasTexture(96, 256, (ctx) => {
+          ctx.fillStyle = color
+          ctx.fillRect(0, 0, 96, 256)
+          ctx.fillStyle = 'rgba(0,0,0,0.25)'
+          ctx.fillRect(0, 26, 96, 10)
+          ctx.fillRect(0, 220, 96, 10)
+          ctx.fillStyle = '#ffffff'
+          ctx.font = `800 40px ${FONT}`
+          ctx.textAlign = 'center'
+          ctx.fillText(String(n).padStart(2, '0'), 48, 100)
+          ctx.font = `700 22px ${MONO}`
+          ctx.fillText(paper.year, 48, 190)
+          if (paper.lead) {
+            ctx.font = `30px ${EMOJI}`
+            ctx.fillText('★', 48, 146)
+          }
+        }, this.anisotropy)
+        const side = new THREE.MeshStandardMaterial({ color, roughness: 0.5, emissive: color, emissiveIntensity: paper.lead ? 0.55 : 0.18 })
+        const front = new THREE.MeshStandardMaterial({ map: spine, emissiveMap: spine, emissive: '#ffffff', emissiveIntensity: paper.lead ? 0.8 : 0.4, roughness: 0.5 })
+        const book = new THREE.Mesh(new THREE.BoxGeometry(thick, tall, 0.48), [side, side, side, side, front, side])
+        const lean = i === count - 1 && count < 3 ? -0.22 : 0
+        book.rotation.z = lean
+        book.position.set(bx + thick / 2 + (lean ? 0.12 : 0), baseY + tall / 2 + (lean ? -0.02 : 0), 0.05)
+        book.castShadow = true
+        shelf.add(book)
+        bx += thick + 0.06
+        index++
+      }
+    })
+
+    // Plaque on the empty right half of the bottom row
+    const plaque = makeCanvasTexture(512, 256, (ctx) => {
+      ctx.fillStyle = '#0b1026'
+      ctx.fillRect(0, 0, 512, 256)
+      ctx.strokeStyle = '#e879f9'
+      ctx.lineWidth = 8
+      ctx.strokeRect(4, 4, 504, 248)
+      ctx.fillStyle = '#f5d0fe'
+      ctx.font = `800 92px ${FONT}`
+      ctx.fillText(String(publications.length), 34, 116)
+      ctx.font = `800 40px ${FONT}`
+      ctx.fillText('PUBLIKASI', 150, 82)
+      ctx.font = `600 24px ${MONO}`
+      ctx.fillStyle = '#a5b4fc'
+      ctx.fillText('IEEE & jurnal nasional', 150, 118)
+      ctx.fillStyle = '#fbbf24'
+      ctx.fillText(`★ ${publications.filter((p) => p.lead).length} penulis pertama`, 34, 200)
+    }, this.anisotropy)
+    const sign = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.5, 0.75),
+      new THREE.MeshStandardMaterial({ map: plaque, emissiveMap: plaque, emissive: '#ffffff', emissiveIntensity: 0.6 }),
+    )
+    sign.position.set(0.85, 0.62, D / 2 - 0.02)
+    shelf.add(sign)
+    scene.add(shelf)
+
+    // Floating open book above the shelf
+    const holo = new THREE.Group()
+    const pageTex = makeCanvasTexture(128, 168, (ctx) => {
+      ctx.fillStyle = '#2e1065'
+      ctx.fillRect(0, 0, 128, 168)
+      ctx.strokeStyle = '#f0abfc'
+      ctx.lineWidth = 6
+      ctx.strokeRect(3, 3, 122, 162)
+      ctx.fillStyle = '#f5d0fe'
+      for (let y = 26; y < 150; y += 16) ctx.fillRect(16, y, 64 + ((y * 7) % 30), 5)
+    }, this.anisotropy)
+    const pageMat = new THREE.MeshStandardMaterial({
+      map: pageTex,
+      emissiveMap: pageTex,
+      emissive: '#ffffff',
+      emissiveIntensity: 1.1,
+      side: THREE.DoubleSide,
+    })
+    for (const dir of [-1, 1]) {
+      const page = new THREE.Mesh(new THREE.PlaneGeometry(0.62, 0.82), pageMat)
+      page.position.x = dir * 0.29
+      page.rotation.y = dir * 0.38
+      holo.add(page)
+    }
+    holo.rotation.x = -0.5
+    holo.position.set(x, H + 1.0, z)
+    scene.add(holo)
+    this.spinners.push({ obj: holo, speed: 0.8, baseY: H + 1.0, bob: 0.2 })
+
+    addStaticBox(physics, x, H / 2, z, W / 2, H / 2, D / 2)
   }
 
   private beam(a: THREE.Vector3, b: THREE.Vector3, radius: number, material: THREE.Material) {

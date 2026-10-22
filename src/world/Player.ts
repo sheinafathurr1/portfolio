@@ -267,7 +267,12 @@ export class Player {
   }
 
   respawn() {
-    this.body.position.set(SPAWN.x, SPAWN.y + 1.5, SPAWN.z)
+    this.teleport(SPAWN.x, SPAWN.z)
+  }
+
+  /** Drops the bot (gently) at a point on the island. */
+  teleport(x: number, z: number) {
+    this.body.position.set(x, SPAWN.y + 1.5, z)
     this.body.velocity.setZero()
     this.body.angularVelocity.setZero()
     this.body.quaternion.set(0, 0, 0, 1)
