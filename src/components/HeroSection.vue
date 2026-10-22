@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { profile } from '../data/portfolio'
+import { profile, socialLinks } from '../data/portfolio'
+
+const scholarUrl = socialLinks.find((l) => l.label === 'Google Scholar')?.href
 
 // ── Typing animation ──
 const roles = profile.roles
@@ -36,17 +38,18 @@ type TermLine =
 
 const termLines: TermLine[] = [
   { kind: 'prompt', cmd: 'whoami' },
-  { kind: 'output', text: '  Sheina Fathur  ·  Switch', cls: 'text-white font-semibold' },
-  { kind: 'output', text: '  AI Researcher & Full-Stack Engineer', cls: 'text-gray-400' },
+  { kind: 'output', text: '  Sheina Fathur Rahman  ·  Switch', cls: 'text-white font-semibold' },
+  { kind: 'output', text: '  Full-Stack Developer · AI & IoT', cls: 'text-gray-400' },
   { kind: 'gap' },
   { kind: 'prompt', cmd: 'cat .position' },
   { kind: 'output', text: '  {', cls: 'text-gray-500' },
-  { kind: 'output', text: '    "role"  : "TLH @ CoE CAATIS"', cls: 'text-yellow-400/90' },
-  { kind: 'output', text: '    "study" : "S2IF · Telkom University"', cls: 'text-yellow-400/90' },
+  { kind: 'output', text: '    "work"  : "Freelance · 7 klien"', cls: 'text-yellow-400/90' },
+  { kind: 'output', text: '    "lab"   : "TLH @ CoE CAATIS"', cls: 'text-yellow-400/90' },
+  { kind: 'output', text: '    "study" : "S2 Informatika · Tel-U"', cls: 'text-yellow-400/90' },
   { kind: 'output', text: '  }', cls: 'text-gray-500' },
   { kind: 'gap' },
   { kind: 'prompt', cmd: 'ls stack/' },
-  { kind: 'output', text: '  Vue.js   Laravel   Python   n8n   Linux', cls: 'text-cyan-400' },
+  { kind: 'output', text: `  ${profile.stack.join('   ')}`, cls: 'text-cyan-400' },
   { kind: 'gap' },
   { kind: 'cursor' },
 ]
@@ -163,8 +166,7 @@ onUnmounted(() => {
             data-aos-delay="210"
             class="text-gray-600 dark:text-gray-300 text-base md:text-lg mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0"
           >
-            Berfokus pada full-stack development, manajemen infrastruktur server, dan riset AI
-            automation. Aktif meneliti Dynamic API dan membangun workflow cerdas berbasis AI.
+            {{ profile.tagline }}
           </p>
 
           <!-- Tech chips -->
@@ -174,7 +176,7 @@ onUnmounted(() => {
             class="flex flex-wrap gap-2 justify-center lg:justify-start mb-9"
           >
             <span
-              v-for="(tech, i) in ['Vue.js', 'Laravel', 'Python', 'n8n', 'AI/ML', 'Linux Server']"
+              v-for="(tech, i) in profile.stack"
               :key="tech"
               :style="{ animationDelay: `${i * 80}ms` }"
               class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-xs font-mono font-semibold hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all duration-200 cursor-default hover:scale-105 hover:-translate-y-0.5"
@@ -200,7 +202,8 @@ onUnmounted(() => {
               Lihat Proyek
             </a>
             <a
-              href="/cv-switch.pdf"
+              v-if="profile.cvUrl"
+              :href="profile.cvUrl"
               target="_blank"
               class="group relative overflow-hidden bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 px-7 py-3 rounded-xl font-semibold text-white transition-all duration-300 hover:-translate-y-1 shadow-lg shadow-violet-500/25 hover:shadow-xl hover:shadow-violet-500/40 flex items-center justify-center gap-2 text-sm"
             >
@@ -234,13 +237,25 @@ onUnmounted(() => {
               </svg>
             </a>
             <a
-              href="https://linkedin.com/in/sheinafathur"
+              href="https://www.linkedin.com/in/sheinafathurr1/"
               target="_blank"
               rel="noopener noreferrer"
               class="w-10 h-10 rounded-xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200 dark:border-gray-700 hover:border-blue-600 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-all duration-300 hover:-translate-y-1 text-gray-600 dark:text-gray-400"
             >
               <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+              </svg>
+            </a>
+            <a
+              v-if="scholarUrl"
+              :href="scholarUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Google Scholar"
+              class="w-10 h-10 rounded-xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200 dark:border-gray-700 hover:border-sky-600 hover:bg-sky-600 hover:text-white flex items-center justify-center transition-all duration-300 hover:-translate-y-1 text-gray-600 dark:text-gray-400"
+            >
+              <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 3 1 9l11 6 9-4.9V17h2V9L12 3Zm-7 10.2v4L12 21l7-3.8v-4L12 17l-7-3.8Z"/>
               </svg>
             </a>
             <a

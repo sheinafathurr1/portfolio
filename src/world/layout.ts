@@ -16,6 +16,7 @@ export type ZoneId =
   | 'exp-1'
   | 'exp-2'
   | 'exp-3'
+  | 'exp-4'
   | 'skills'
   | 'project-1'
   | 'project-2'
@@ -36,13 +37,16 @@ export interface ZoneLayout {
 
 export const ZONES: ZoneLayout[] = [
   { id: 'about',        x: 0,   z: 3,   radius: 5,   label: 'Tentang Saya',      icon: '👋', color: '#38bdf8', labelPos: [0, 4.4, -6] },
-  { id: 'exp-1',        x: -15, z: -7,  radius: 3.4, label: 'CoE CAATIS',        icon: '💼', color: '#3b82f6', labelPos: [-15, 4.6, -8.2] },
-  { id: 'exp-2',        x: -20, z: 0,   radius: 3.4, label: 'Telkom University', icon: '🎓', color: '#8b5cf6', labelPos: [-20, 4.6, -1.2] },
-  { id: 'exp-3',        x: -15, z: 7,   radius: 3.4, label: 'HEI APP',           icon: '🚀', color: '#10b981', labelPos: [-15, 4.6, 5.8] },
+  // Experience pillars in a west-side arc, in the same order as `experiences`
+  { id: 'exp-1',        x: -13, z: -9,  radius: 3.2, label: 'Freelance',         icon: '💼', color: '#3b82f6', labelPos: [-13, 4.6, -10.2] },
+  { id: 'exp-2',        x: -19.5, z: -3.5, radius: 3.2, label: 'CoE CAATIS',     icon: '🧪', color: '#8b5cf6', labelPos: [-19.5, 4.6, -4.7] },
+  { id: 'exp-3',        x: -19.5, z: 3.5, radius: 3.2, label: 'Asisten Dosen',   icon: '🎓', color: '#10b981', labelPos: [-19.5, 4.6, 2.3] },
+  { id: 'exp-4',        x: -13, z: 9,   radius: 3.2, label: 'Telkom Indonesia',  icon: '🏢', color: '#f59e0b', labelPos: [-13, 4.6, 7.8] },
   { id: 'skills',       x: 17,  z: -3,  radius: 6,   label: 'Keahlian',          icon: '⚡', color: '#a855f7', labelPos: [17, 5.6, -6] },
-  { id: 'project-1',    x: -9,  z: -18, radius: 3.6, label: 'Proyek 01',         icon: '🔬', color: '#8b5cf6', labelPos: [-9, 6.2, -21] },
-  { id: 'project-2',    x: 0,   z: -21, radius: 3.6, label: 'Proyek 02',         icon: '🤖', color: '#06b6d4', labelPos: [0, 6.2, -24] },
-  { id: 'project-3',    x: 9,   z: -18, radius: 3.6, label: 'Proyek 03',         icon: '📡', color: '#10b981', labelPos: [9, 6.2, -21] },
+  // Billboards for the three featured projects (see `featuredProjects`)
+  { id: 'project-1',    x: -9,  z: -18, radius: 3.6, label: 'Deteksi Korosi',    icon: '🛰️', color: '#06b6d4', labelPos: [-9, 6.2, -21] },
+  { id: 'project-2',    x: 0,   z: -21, radius: 3.6, label: 'E-Selamat',         icon: '🐄', color: '#10b981', labelPos: [0, 6.2, -24] },
+  { id: 'project-3',    x: 9,   z: -18, radius: 3.6, label: 'IoT Lingkungan',    icon: '🌱', color: '#14b8a6', labelPos: [9, 6.2, -21] },
   { id: 'achievements', x: 15,  z: 15,  radius: 4.5, label: 'Pencapaian',        icon: '🏆', color: '#f59e0b', labelPos: [15, 4.9, 13] },
   { id: 'contact',      x: -15, z: 18,  radius: 4.5, label: 'Kontak',            icon: '📨', color: '#10b981', labelPos: [-19, 9.2, 14.5] },
 ]

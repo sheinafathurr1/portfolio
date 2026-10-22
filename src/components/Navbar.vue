@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, nextTick, inject, onMounted, onUnmounted } from 'vue'
 import { PORTFOLIO_MODE } from '../composables/portfolioMode'
+import { profile } from '../data/portfolio'
 
 const modeApi = inject(PORTFOLIO_MODE, null)
 const canUseWorld = modeApi?.canUseWorld ?? false
@@ -15,6 +16,7 @@ const navItems = [
   { id: 'experience', label: 'Pengalaman' },
   { id: 'skills',     label: 'Keahlian' },
   { id: 'projects',   label: 'Proyek' },
+  { id: 'academic',   label: 'Akademik' },
 ]
 
 const sections = navItems.map(i => i.id).concat('contact')
@@ -146,7 +148,8 @@ onUnmounted(() => {
 
         <!-- CV download -->
         <a
-          href="/cv-switch.pdf"
+          v-if="profile.cvUrl"
+          :href="profile.cvUrl"
           target="_blank"
           class="relative z-10 flex items-center gap-1.5 text-sm font-semibold text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/30 bg-blue-50 dark:bg-blue-500/10 px-4 py-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-colors ml-1"
         >
@@ -258,10 +261,11 @@ onUnmounted(() => {
             {{ item.label }}
           </a>
 
-          <div class="h-px bg-gray-200 dark:bg-gray-800 my-2"></div>
+          <div v-if="profile.cvUrl" class="h-px bg-gray-200 dark:bg-gray-800 my-2"></div>
 
           <a
-            href="/cv-switch.pdf"
+            v-if="profile.cvUrl"
+            :href="profile.cvUrl"
             target="_blank"
             @click="closeMenu"
             class="text-blue-600 dark:text-blue-400 font-bold flex items-center justify-center gap-2 px-4 py-2.5"

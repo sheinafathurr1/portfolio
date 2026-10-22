@@ -3,7 +3,7 @@ import { ref, computed, inject, onMounted, onUnmounted } from 'vue'
 import type { World } from '../world/World'
 import { ISLAND_RADIUS, ZONES, type ZoneId } from '../world/layout'
 import { PORTFOLIO_MODE } from '../composables/portfolioMode'
-import { profile, experiences, projects, skillCategories, milestones, currentFocus, socialLinks } from '../data/portfolio'
+import { profile, experiences, projects, featuredProjects, categoryLabel, skillCategories, milestones, currentFocus, publications, socialLinks } from '../data/portfolio'
 import { burstConfetti } from '../utils/confetti'
 
 const modeApi = inject(PORTFOLIO_MODE, null)
@@ -42,10 +42,11 @@ const panelZone = computed(() =>
 const zoneMeta = computed(() => ZONES.find((z) => z.id === panelZone.value))
 const zoneNumber = computed(() => Number(panelZone.value?.split('-')[1] ?? 0) - 1)
 const panelExperience = computed(() => (panelZone.value?.startsWith('exp-') ? experiences[zoneNumber.value] : undefined))
-const panelProject = computed(() => (panelZone.value?.startsWith('project-') ? projects[zoneNumber.value] : undefined))
+const panelProject = computed(() => (panelZone.value?.startsWith('project-') ? featuredProjects[zoneNumber.value] : undefined))
+const pad = (n: number) => String(n).padStart(2, '0')
 const panelHeader = computed(() => {
-  if (panelExperience.value) return { kicker: `Pengalaman · 0${panelExperience.value.id}`, title: panelExperience.value.title }
-  if (panelProject.value) return { kicker: `Proyek · #0${panelProject.value.id}`, title: panelProject.value.title }
+  if (panelExperience.value) return { kicker: `Pengalaman · ${pad(panelExperience.value.id)}`, title: panelExperience.value.title }
+  if (panelProject.value) return { kicker: `Proyek unggulan · #${pad(panelProject.value.id)}`, title: panelProject.value.title }
   switch (panelZone.value) {
     case 'about': return { kicker: 'Tentang Saya', title: profile.name }
     case 'skills': return { kicker: 'Tech Stack', title: 'Keahlian & Teknologi' }
@@ -400,7 +401,8 @@ const onJoyEnd = (e: PointerEvent) => {
               <span v-for="tech in profile.stack" :key="tech" class="world-chip font-mono">{{ tech }}</span>
             </div>
             <div class="flex gap-2">
-              <a :href="profile.cvUrl" target="_blank" class="world-action world-action--primary">Download CV</a>
+              <a v-if="profile.cvUrl" :href="profile.cvUrl" target="_blank" class="world-action world-action--primary">Download CV</a>
+              <button @click="goClassic('academic')" class="world-action" :class="{ 'world-action--primary': !profile.cvUrl }">Pendidikan &amp; publikasi</button>
               <button @click="goClassic()" class="world-action">Versi klasik</button>
             </div>
             <p class="mt-4 text-xs text-slate-500 leading-relaxed">
@@ -412,10 +414,12 @@ const onJoyEnd = (e: PointerEvent) => {
           <template v-else-if="panelExperience">
             <div class="flex flex-wrap items-center gap-2 mb-3">
               <span class="world-chip font-mono">{{ panelExperience.period }}</span>
-              <span class="text-xs font-semibold text-green-400">● Saat ini</span>
+              <span v-if="panelExperience.current" class="text-xs font-semibold text-green-400">● Saat ini</span>
             </div>
             <p class="text-sm font-semibold mb-2" :style="{ color: zoneMeta.color }">{{ panelExperience.company }}</p>
-            <p class="text-sm text-slate-300 leading-relaxed mb-4">{{ panelExperience.description }}</p>
+            <ul class="text-sm text-slate-300 leading-relaxed mb-4 space-y-1.5 list-disc pl-4">
+              <li v-for="point in panelExperience.points" :key="point">{{ point }}</li>
+            </ul>
             <div class="flex flex-wrap gap-1.5">
               <span v-for="tag in panelExperience.tags" :key="tag" class="world-chip font-mono">{{ tag }}</span>
             </div>
@@ -443,13 +447,14 @@ const onJoyEnd = (e: PointerEvent) => {
           <template v-else-if="panelProject">
             <div class="h-24 rounded-xl mb-4 relative overflow-hidden flex items-center justify-center text-5xl" :style="{ background: `linear-gradient(135deg, ${panelProject.colors.join(', ')})` }">
               <span class="opacity-80">{{ panelProject.icon }}</span>
-              <span class="absolute top-2 left-2 text-[10px] font-mono font-bold text-white bg-black/30 px-2 py-0.5 rounded-md">{{ panelProject.year }}</span>
+              <span class="absolute top-2 left-2 text-[10px] font-mono font-bold text-white bg-black/30 px-2 py-0.5 rounded-md">{{ panelProject.badge }}</span>
             </div>
-            <span class="world-chip font-mono mb-3 inline-block">{{ panelProject.category === 'riset' ? 'Academic Research' : 'System Development' }}</span>
+            <span class="world-chip font-mono mb-3 inline-block">{{ categoryLabel(panelProject.category) }} · {{ panelProject.org }}</span>
             <p class="text-sm text-slate-300 leading-relaxed mb-4">{{ panelProject.fullDesc }}</p>
-            <div class="flex flex-wrap gap-1.5">
+            <div class="flex flex-wrap gap-1.5 mb-5">
               <span v-for="tag in panelProject.tags" :key="tag" class="world-chip font-mono">{{ tag }}</span>
             </div>
+            <button @click="goClassic('projects')" class="world-action">Lihat semua {{ projects.length }} proyek →</button>
           </template>
 
           <!-- Achievements -->
@@ -464,13 +469,17 @@ const onJoyEnd = (e: PointerEvent) => {
               </li>
             </ul>
             <p class="text-[10px] font-mono font-bold uppercase tracking-widest text-green-400 mb-3">● Currently working on</p>
-            <div v-for="f in currentFocus" :key="f.label" class="mb-2.5">
-              <div class="flex justify-between text-xs mb-1"><span class="text-slate-300">{{ f.icon }} {{ f.label }}</span><span class="font-mono text-amber-300">{{ f.pct }}%</span></div>
-              <div class="h-1.5 rounded-full bg-white/5 overflow-hidden">
-                <div class="h-full rounded-full world-bar bg-gradient-to-r from-amber-400 to-orange-500" :style="{ width: `${f.pct}%` }"></div>
-              </div>
-            </div>
-            <p class="mt-4 text-xs text-slate-500">Ada data core di atas balok sebelah sana. Bisa lompat setinggi itu? 🧗</p>
+            <ul class="space-y-2 mb-5">
+              <li v-for="f in currentFocus" :key="f.label" class="flex gap-2 text-xs">
+                <span>{{ f.icon }}</span>
+                <span><span class="text-slate-200 font-semibold">{{ f.label }}</span> <span class="font-mono text-amber-300">· {{ f.note }}</span></span>
+              </li>
+            </ul>
+            <p class="text-[10px] font-mono font-bold uppercase tracking-widest text-violet-300 mb-2">📚 {{ publications.length }} publikasi ilmiah</p>
+            <p class="text-xs text-slate-400 leading-relaxed mb-3">
+              Konferensi IEEE dan jurnal nasional (2025–2026), {{ publications.filter((p) => p.lead).length }} sebagai penulis pertama.
+            </p>
+            <button @click="goClassic('academic')" class="world-action">Lihat publikasi →</button>
           </template>
 
           <!-- Contact -->

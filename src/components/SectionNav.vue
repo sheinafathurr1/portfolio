@@ -6,7 +6,7 @@ const sections = [
   { id: 'experience',   label: 'Pengalaman' },
   { id: 'skills',       label: 'Keahlian' },
   { id: 'projects',     label: 'Proyek' },
-  { id: 'testimonials', label: 'Testimoni' },
+  { id: 'academic',     label: 'Akademik' },
   { id: 'contact',      label: 'Kontak' },
 ]
 

@@ -73,18 +73,16 @@ onUnmounted(() => observer?.disconnect())
 
             <div class="space-y-5">
               <div v-for="(item, i) in currentFocus" :key="i">
-                <div class="flex items-center justify-between mb-2">
-                  <div class="flex items-center gap-2">
-                    <span class="text-base">{{ item.icon }}</span>
-                    <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">{{ item.label }}</span>
+                <div
+                  class="flex items-start gap-3 transition-all duration-700 ease-out"
+                  :class="animated ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-3'"
+                  :style="{ transitionDelay: `${i * 120 + 200}ms` }"
+                >
+                  <span class="text-base leading-6">{{ item.icon }}</span>
+                  <div>
+                    <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">{{ item.label }}</p>
+                    <p class="text-xs font-mono text-blue-600 dark:text-blue-400">{{ item.note }}</p>
                   </div>
-                  <span class="text-xs font-bold font-mono text-blue-600 dark:text-blue-400">{{ item.pct }}%</span>
-                </div>
-                <div class="h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                  <div
-                    class="h-full rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 transition-[width] duration-[1400ms] ease-out"
-                    :style="{ width: animated ? `${item.pct}%` : '0%', transitionDelay: `${i * 120 + 300}ms` }"
-                  ></div>
                 </div>
               </div>
             </div>

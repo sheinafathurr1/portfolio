@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { projects } from '../data/portfolio'
+import { categoryLabel, projects } from '../data/portfolio'
 
 const activeCategory = ref('semua')
 const isModalOpen = ref(false)
@@ -32,8 +32,8 @@ onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
 
 const categories = [
   { id: 'semua', label: 'Semua', count: projects.length },
-  { id: 'riset', label: 'Riset Akademik', count: projects.filter(p => p.category === 'riset').length },
-  { id: 'development', label: 'Sistem Aplikasi', count: projects.filter(p => p.category === 'development').length },
+  { id: 'klien', label: categoryLabel('klien'), count: projects.filter(p => p.category === 'klien').length },
+  { id: 'riset', label: categoryLabel('riset'), count: projects.filter(p => p.category === 'riset').length },
 ]
 
 // 3D tilt per card
@@ -77,7 +77,7 @@ const cardStyle = (id: number) => {
         </h2>
         <div class="section-divider mb-4"></div>
         <p class="text-gray-500 dark:text-gray-400 text-sm max-w-xl mx-auto">
-          Koleksi proyek riset akademik dan pengembangan sistem yang telah dikerjakan.
+          Proyek untuk klien (instansi pemerintah, perusahaan, dan kampus) serta riset dan hibah penelitian.
         </p>
       </div>
 
@@ -139,7 +139,7 @@ const cardStyle = (id: number) => {
               {{ project.icon }}
             </div>
             <div class="absolute top-3 left-3 bg-black/25 backdrop-blur-sm text-white text-[10px] font-bold font-mono px-2 py-1 rounded-lg">
-              {{ project.year }}
+              {{ project.badge }}
             </div>
             <div class="absolute top-3 right-3 text-white/40 text-xs font-mono font-bold group-hover:text-white/60 transition-colors">
               #{{ String(project.id).padStart(2, '0') }}
@@ -156,7 +156,7 @@ const cardStyle = (id: number) => {
                   : 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20'
               ]"
             >
-              {{ project.category === 'riset' ? 'Academic Research' : 'System Dev' }}
+              {{ categoryLabel(project.category) }}
             </div>
 
             <h3 class="text-base font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors leading-snug">
@@ -224,7 +224,7 @@ const cardStyle = (id: number) => {
                     : 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20'
                 ]"
               >
-                {{ selectedProject.category === 'riset' ? '💡 Academic Research' : '💻 System Development' }}
+                {{ selectedProject.category === 'riset' ? '💡' : '💻' }} {{ categoryLabel(selectedProject.category) }} · {{ selectedProject.org }}
               </div>
 
               <h3 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-2">

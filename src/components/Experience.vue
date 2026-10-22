@@ -6,6 +6,7 @@ const accentConfig: Record<Accent, { dot: string; ping: string; bar: string; bor
   blue:    { dot: 'from-blue-500 to-cyan-500 shadow-blue-500/30',    ping: 'bg-blue-500',    bar: 'from-blue-500 to-cyan-500',    border: 'hover:border-blue-500/40',    shadow: 'hover:shadow-blue-500/10' },
   violet:  { dot: 'from-violet-500 to-purple-500 shadow-violet-500/30', ping: 'bg-violet-500', bar: 'from-violet-500 to-purple-500', border: 'hover:border-violet-500/40', shadow: 'hover:shadow-violet-500/10' },
   emerald: { dot: 'from-emerald-500 to-teal-500 shadow-emerald-500/30', ping: 'bg-emerald-500', bar: 'from-emerald-500 to-teal-500', border: 'hover:border-emerald-500/40', shadow: 'hover:shadow-emerald-500/10' },
+  amber:   { dot: 'from-amber-500 to-orange-500 shadow-amber-500/30', ping: 'bg-amber-500', bar: 'from-amber-500 to-orange-500', border: 'hover:border-amber-500/40', shadow: 'hover:shadow-amber-500/10' },
 }
 
 const timelineContainer = ref<HTMLElement>()
@@ -62,7 +63,7 @@ onUnmounted(() => observer?.disconnect())
                 </svg>
               </div>
               <!-- Pulse ring -->
-              <div :class="['absolute inset-0 rounded-xl animate-ping opacity-20', accentConfig[exp.accent].ping]"></div>
+              <div v-if="exp.current" :class="['absolute inset-0 rounded-xl animate-ping opacity-20', accentConfig[exp.accent].ping]"></div>
             </div>
 
             <!-- Content card -->
@@ -85,7 +86,7 @@ onUnmounted(() => observer?.disconnect())
                   </svg>
                   {{ exp.period }}
                 </span>
-                <span class="inline-flex items-center gap-1 text-xs font-bold text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-500/10 px-2.5 py-1 rounded-md border border-green-100 dark:border-green-500/20">
+                <span v-if="exp.current" class="inline-flex items-center gap-1 text-xs font-bold text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-500/10 px-2.5 py-1 rounded-md border border-green-100 dark:border-green-500/20">
                   <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
                   Saat Ini
                 </span>
@@ -100,9 +101,9 @@ onUnmounted(() => observer?.disconnect())
                 </svg>
                 {{ exp.company }}
               </h4>
-              <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-4">
-                {{ exp.description }}
-              </p>
+              <ul class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-4 space-y-1.5 list-disc pl-4 marker:text-blue-500">
+                <li v-for="point in exp.points" :key="point">{{ point }}</li>
+              </ul>
 
               <!-- Skill tags -->
               <div class="flex flex-wrap gap-1.5">

@@ -1,6 +1,7 @@
 # portofolio
 
-Portofolio Switch (Sheina Fathur) dengan dua mode tampilan:
+Portofolio Switch (Sheina Fathur Rahman) dengan dua mode tampilan. Isinya mengikuti CV: pengalaman, proyek klien,
+riset & hibah, pendidikan, dan publikasi, semuanya di `src/data/portfolio.ts`.
 
 - **Dunia 3D (default)**: pulau interaktif berbasis [three.js](https://threejs.org/) + [cannon-es](https://github.com/pmndrs/cannon-es).
   Pengunjung menggelindingkan bot kecil (WASD/panah, Space lompat, Shift boost, R ulang; joystick di HP) ke tiap area:
@@ -12,7 +13,7 @@ Struktur penting:
 
 | Path | Isi |
 | --- | --- |
-| `src/data/portfolio.ts` | **Semua konten** (profil, pengalaman, proyek, skill, pencapaian, sosial). Dipakai oleh kedua mode. |
+| `src/data/portfolio.ts` | **Semua konten** (profil, pengalaman, pendidikan, proyek, publikasi, skill, pencapaian, sosial). Dipakai oleh kedua mode. Proyek dengan `featured: true` (maks. 3) tampil sebagai papan reklame di pulau 3D. |
 | `src/world/layout.ts` | Posisi zona, ramp, platform, dan data core di pulau 3D. |
 | `src/world/*.ts` | Scene 3D: `World` (renderer, loop, kamera), `Player`, `Environment`, `Zones`, `Props`. |
 | `src/components/WorldExperience.vue` | UI mode 3D: layar intro, HUD, panel info zona, minimap, kontrol sentuh. |

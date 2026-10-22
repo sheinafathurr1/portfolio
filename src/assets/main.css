@@ -171,11 +171,6 @@ body {
 .skill-view-enter-active, .skill-view-leave-active { transition: all 0.3s ease; }
 .skill-view-enter-from, .skill-view-leave-to { opacity: 0; transform: translateY(8px); }
 
-/* ──── Testimonial carousel ──── */
-.testi-enter-active, .testi-leave-active { transition: all 0.4s ease; }
-.testi-enter-from { opacity: 0; transform: translateX(24px); }
-.testi-leave-to { opacity: 0; transform: translateX(-24px); }
-
 /* ──── Konami easter egg banner ──── */
 .egg-enter-active { transition: all 0.4s var(--ease-spring); }
 .egg-leave-active { transition: all 0.3s ease-in; }

@@ -12,7 +12,7 @@ import Achievements from './Achievements.vue'
 import Preloader from './Preloader.vue'
 import CommandPalette from './CommandPalette.vue'
 import SectionNav from './SectionNav.vue'
-import Testimonials from './Testimonials.vue'
+import AcademicSection from './AcademicSection.vue'
 
 const props = defineProps<{
   /** Skip the intro preloader (e.g. when switching over from the 3D world). */
@@ -162,8 +162,8 @@ const particles = [
         <Experience />
         <Skills />
         <Projects />
+        <AcademicSection />
         <Achievements />
-        <Testimonials />
       </main>
       <Contact />
     </div>

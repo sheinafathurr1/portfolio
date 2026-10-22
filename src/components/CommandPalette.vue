@@ -26,16 +26,16 @@ const allCommands: Command[] = [
   { id: 'nav-exp',      group: 'Navigasi', icon: '💼', label: 'Pengalaman',     action: () => { scrollToSection('experience'); close() } },
   { id: 'nav-skills',   group: 'Navigasi', icon: '⚡', label: 'Keahlian',      action: () => { scrollToSection('skills'); close() } },
   { id: 'nav-projects', group: 'Navigasi', icon: '🚀', label: 'Proyek & Riset', action: () => { scrollToSection('projects'); close() } },
-  { id: 'nav-testi',    group: 'Navigasi', icon: '💬', label: 'Testimoni',      action: () => { scrollToSection('testimonials'); close() } },
+  { id: 'nav-academic', group: 'Navigasi', icon: '🎓', label: 'Pendidikan & Publikasi', action: () => { scrollToSection('academic'); close() } },
   { id: 'nav-contact',  group: 'Navigasi', icon: '✉️', label: 'Kontak',         action: () => { scrollToSection('contact'); close() } },
   ...(modeApi?.canUseWorld
     ? [{ id: 'act-world', group: 'Aksi', icon: '🌐', label: 'Jelajahi Dunia 3D', action: () => { close(); modeApi.setMode('world') } }]
     : []),
-  { id: 'act-cv',       group: 'Aksi',    icon: '📄', label: 'Download CV',    action: () => { window.open('/cv-switch.pdf', '_blank'); close() } },
   { id: 'act-email',    group: 'Aksi',    icon: '📋', label: 'Salin Email',    action: () => { navigator.clipboard.writeText('sheinafathur@gmail.com').catch(() => {}); close() } },
   { id: 'act-top',      group: 'Aksi',    icon: '⬆️', label: 'Ke Atas',        action: () => { window.scrollTo({ top: 0, behavior: 'smooth' }); close() } },
   { id: 'link-github',  group: 'Link',    icon: '🐙', label: 'GitHub',         action: () => { window.open('https://github.com/sheinafathurr1', '_blank'); close() } },
-  { id: 'link-linkedin',group: 'Link',    icon: '💼', label: 'LinkedIn',       action: () => { window.open('https://linkedin.com/in/sheinafathur', '_blank'); close() } },
+  { id: 'link-linkedin',group: 'Link',    icon: '💼', label: 'LinkedIn',       action: () => { window.open('https://www.linkedin.com/in/sheinafathurr1/', '_blank'); close() } },
+  { id: 'link-scholar', group: 'Link',    icon: '🎓', label: 'Google Scholar', action: () => { window.open('https://scholar.google.com/citations?user=xrlNfIQAAAAJ', '_blank'); close() } },
 ]
 
 const filteredCommands = computed(() => {
@@ -72,7 +72,8 @@ watch(query, () => { selectedIndex.value = 0 })
 const handleKeydown = (e: KeyboardEvent) => {
   if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
     e.preventDefault()
-    isOpen.value ? close() : open()
+    if (isOpen.value) close()
+    else open()
     return
   }
   if (!isOpen.value) return

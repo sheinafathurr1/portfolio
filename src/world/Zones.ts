@@ -1,13 +1,13 @@
 import * as THREE from 'three'
 import type * as CANNON from 'cannon-es'
 import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js'
-import { experiences, projects } from '../data/portfolio'
+import { categoryLabel, experiences, featuredProjects } from '../data/portfolio'
 import { CONTACT_TOWER, MAILBOX, SKILL_PYRAMID, TROPHY, ZONES, type ZoneId, type ZoneLayout } from './layout'
 import { addStaticBox, addStaticCylinder } from './bodies'
 import { EMOJI, FONT, MONO, damp, makeCanvasTexture, roundRect, wrapText } from './utils'
 
 const hdr = (hex: string, k: number) => new THREE.Color(hex).multiplyScalar(k)
-const ACCENT_HEX = { blue: '#3b82f6', violet: '#8b5cf6', emerald: '#10b981' } as const
+const ACCENT_HEX = { blue: '#3b82f6', violet: '#8b5cf6', emerald: '#10b981', amber: '#f59e0b' } as const
 
 interface ZoneVisual {
   layout: ZoneLayout
@@ -107,12 +107,12 @@ export class Zones {
         ctx.fillText(exp.period.toUpperCase(), 28, 220)
         ctx.font = `800 40px ${FONT}`
         ctx.fillStyle = '#f8fafc'
-        const lines = wrapText(ctx, exp.title, 266)
+        const lines = wrapText(ctx, exp.short, 266)
         lines.forEach((line, li) => ctx.fillText(line, 28, 300 + li * 48))
         let y = 300 + lines.length * 48 + 18
         ctx.font = `700 28px ${FONT}`
         ctx.fillStyle = color
-        ctx.fillText(exp.company, 28, y)
+        ctx.fillText(exp.org, 28, y)
         y += 70
         ctx.font = `500 20px ${MONO}`
         for (const tag of exp.tags) {
@@ -171,7 +171,7 @@ export class Zones {
 
   private addBillboards(scene: THREE.Scene, physics: CANNON.World) {
     const postGeo = new THREE.CylinderGeometry(0.09, 0.11, 2.2, 10)
-    projects.forEach((project, i) => {
+    featuredProjects.forEach((project, i) => {
       const zone = ZONES.find((z) => z.id === `project-${i + 1}`)
       if (!zone) return
       const [c1 = '#2563eb', c2 = '#06b6d4', c3 = '#0ea5e9'] = project.colors
@@ -203,20 +203,21 @@ export class Zones {
         ctx.globalAlpha = 1
         ctx.textAlign = 'left'
 
-        roundRect(ctx, 48, 44, 116, 50, 14)
+        ctx.font = `700 26px ${MONO}`
+        const badgeW = ctx.measureText(project.badge).width + 48
+        roundRect(ctx, 48, 44, badgeW, 50, 14)
         ctx.fillStyle = 'rgba(2,6,23,0.35)'
         ctx.fill()
-        ctx.font = `700 26px ${MONO}`
         ctx.fillStyle = '#ffffff'
-        ctx.fillText(project.year, 72, 79)
+        ctx.fillText(project.badge, 72, 79)
         ctx.fillStyle = 'rgba(255,255,255,0.65)'
         ctx.textAlign = 'right'
-        ctx.fillText(`#0${project.id}`, 976, 79)
+        ctx.fillText(`#${String(project.id).padStart(2, '0')}`, 976, 79)
         ctx.textAlign = 'left'
 
         ctx.font = `700 24px ${MONO}`
         ctx.fillStyle = 'rgba(255,255,255,0.85)'
-        ctx.fillText(project.category === 'riset' ? 'ACADEMIC RESEARCH' : 'SYSTEM DEVELOPMENT', 50, 180)
+        ctx.fillText(categoryLabel(project.category).toUpperCase(), 50, 180)
         ctx.font = `800 64px ${FONT}`
         ctx.fillStyle = '#ffffff'
         wrapText(ctx, project.title, 760).forEach((line, li) => ctx.fillText(line, 48, 262 + li * 74))
